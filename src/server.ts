@@ -5,12 +5,10 @@ import helmet from "helmet";
 // @ts-ignore
 import morgan from "morgan";
 import swaggerUi from "swagger-ui-express";
+// @ts-ignore
 import swaggerDocument from "./swagger-output.json";
 
-import healthRouter from "./routers/health.route";
 import dbConnect from "./config/dbConnect";
-import jobsRouter from "./routers/jobs.route";
-import talentRouter from "./routers/talents.route";
 import router from "./routers";
 
 const app = express();

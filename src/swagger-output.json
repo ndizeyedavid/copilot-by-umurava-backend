@@ -7,14 +7,11 @@
   },
   "host": "localhost:3000",
   "basePath": "/api/v1/",
-  "schemes": [
-    "http",
-    "https"
-  ],
+  "schemes": ["http", "https"],
   "paths": {
     "/health/": {
       "get": {
-        "description": "",
+        "description": "Checking if the server and other functions are active",
         "responses": {
           "200": {
             "description": "OK"
