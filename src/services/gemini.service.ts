@@ -1,26 +1,10 @@
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
+import ENV from "../config/env";
 
 dotenv.config();
 
-const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
-/**
- * PROMPT ENGINEERING DOCUMENTATION
- * ================================
- * 
- * Purpose: Multi-candidate job matching with weighted scoring
- * 
- * Prompt Strategy:
- * 1. Role assignment - AI acts as experienced technical recruiter
- * 2. Structured input - Clear job vs candidates separation
- * 3. Explicit weights - Skills (40%), Experience (35%), Education (25%)
- * 4. Output schema - Strict JSON with all required fields
- * 5. Reasoning requirement - Natural language explanation per candidate
- * 
- * Few-shot technique: Output format example embedded in prompt
- * Chain-of-thought: AI evaluates each dimension separately before scoring
- */
+const genAI = new GoogleGenAI({ apiKey: ENV.gemingi_api_key });
 
 export interface JobData {
   title: string;
@@ -85,21 +69,21 @@ export interface ScreeningResult {
 }
 
 const DEFAULT_WEIGHTS = {
-  skills: 0.40,
+  skills: 0.4,
   experience: 0.35,
   education: 0.25,
 };
 
 export async function evaluateCandidates(
   job: JobData,
-  candidates: CandidateData[]
+  candidates: CandidateData[],
 ): Promise<ScreeningResult> {
   const weights = job.weights || DEFAULT_WEIGHTS;
 
   const prompt = buildPrompt(job, candidates, weights);
 
   const response = await genAI.models.generateContent({
-    model: "gemini-2.0-flash",
+    model: ENV.gemini_model,
     contents: prompt,
     config: {
       temperature: 0.2,
@@ -123,7 +107,7 @@ export async function evaluateCandidates(
 function buildPrompt(
   job: JobData,
   candidates: CandidateData[],
-  weights: { skills: number; experience: number; education: number }
+  weights: { skills: number; experience: number; education: number },
 ): string {
   const weightsPercent = {
     skills: Math.round(weights.skills * 100),
@@ -145,7 +129,9 @@ ${job.requirements.map((r) => `- ${r}`).join("\n")}
 - Education fit: ${weightsPercent.education}%
 
 ## CANDIDATES TO EVALUATE
-${candidates.map((c, i) => `
+${candidates
+  .map(
+    (c, i) => `
 ### Candidate ${i + 1}: ${c.firstName} ${c.lastName} (ID: ${c.id})
 Headline: ${c.headline}
 Bio: ${c.bio || "N/A"}
@@ -155,7 +141,9 @@ ${c.experience.map((e) => `- ${e.role} at ${e.company}: ${e.description} [Tech: 
 Education: ${c.education.map((e) => `${e.degree} in ${e.fieldOfStudy} from ${e.institution}`).join(", ")}
 Certifications: ${c.certifications?.map((c) => c.name).join(", ") || "None"}
 Projects: ${c.projects?.map((p) => `${p.name} (${p.technologies.join(", ")})`).join(", ") || "None"}
-`).join("\n---\n")}
+`,
+  )
+  .join("\n---\n")}
 
 ## TASK
 Evaluate all candidates. Return STRICT JSON:
