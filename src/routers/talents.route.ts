@@ -1,12 +1,11 @@
 import express, { type Router } from "express";
-import { jobsController } from "../controllers/jobs.controller";
+import { talentController } from "../controllers/talents.controller";
 
 const talentRouter: Router = express.Router();
 
-talentRouter.get("/", jobsController.getAll);
-talentRouter.get("/:id", jobsController.getOne);
-talentRouter.post("/", jobsController.createJob);
-talentRouter.put("/", jobsController.updateJob);
-talentRouter.delete("/", jobsController.deleteJob);
+talentRouter.get("/", talentController.getAll);
+talentRouter.get("/:id", talentController.getById);
+talentRouter.get("/", talentController.getByName);
+talentRouter.post("/", talentController.createTalent);
 
 export default talentRouter;
