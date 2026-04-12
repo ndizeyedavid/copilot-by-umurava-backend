@@ -156,6 +156,33 @@
         }
       }
     },
+    "EmailResult": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["selected_only", "all_with_ranking", "decision_only"]
+        },
+        "sent": {
+          "type": "number"
+        },
+        "failed": {
+          "type": "number"
+        },
+        "totalCandidates": {
+          "type": "number"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "Talent": {
       "type": "object",
       "properties": {
@@ -1225,6 +1252,120 @@
           },
           "404": { "description": "Application not found" },
           "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/email/send/{screeningId}": {
+      "post": {
+        "tags": ["Email"],
+        "summary": "Send screening results via email",
+        "description": "Sends AI screening results to candidates using 3 modes: selected_only (winner only), all_with_ranking (full details to all), decision_only (positive/decline split)",
+        "parameters": [
+          {
+            "name": "screeningId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Screening ID to send results for",
+            "example": "6629a6b3c5d4e3f2a1b0c9d8"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "mode": {
+                  "type": "string",
+                  "enum": [
+                    "selected_only",
+                    "all_with_ranking",
+                    "decision_only"
+                  ],
+                  "description": "Email sending mode",
+                  "example": "decision_only"
+                },
+                "selectedCandidateId": {
+                  "type": "string",
+                  "description": "Required for 'selected_only' mode - the winning candidate ID",
+                  "example": "6618f5a2b4d3c2e1f0a9b8c8"
+                }
+              },
+              "required": ["mode"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Emails sent",
+            "schema": {
+              "$ref": "#/definitions/EmailResult"
+            },
+            "examples": {
+              "application/json": {
+                "message": "Emails sent successfully",
+                "mode": "decision_only",
+                "sent": 3,
+                "failed": 0,
+                "totalCandidates": 3,
+                "errors": []
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid mode or missing selectedCandidateId"
+          },
+          "404": { "description": "Screening or job not found" },
+          "500": { "description": "Email sending failed" }
+        }
+      }
+    },
+    "/email/preview": {
+      "post": {
+        "tags": ["Email"],
+        "summary": "Preview email template",
+        "description": "Preview the email template for a given mode without sending",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "mode": {
+                  "type": "string",
+                  "enum": [
+                    "selected_only",
+                    "all_with_ranking",
+                    "decision_only"
+                  ],
+                  "example": "decision_only"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Preview generated",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": { "type": "string" },
+                "mode": { "type": "string" },
+                "preview": {
+                  "type": "object",
+                  "properties": {
+                    "subject": { "type": "string" },
+                    "sampleData": { "type": "object" }
+                  }
+                }
+              }
+            }
+          },
+          "500": { "description": "Failed to generate preview" }
         }
       }
     }
