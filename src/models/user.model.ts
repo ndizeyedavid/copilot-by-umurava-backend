@@ -41,8 +41,8 @@ const userSchema = new Schema<IUser>(
   { timestamps: true },
 );
 
-userSchema.index({ email: 1 });
-userSchema.index({ googleId: 1 });
+// userSchema.index({ email: 1 });
+// userSchema.index({ googleId: 1 });
 
 const User = model<IUser>("User", userSchema);
 
