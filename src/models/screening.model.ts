@@ -7,21 +7,24 @@ const screeningSchema = new Schema<IScreening>(
     candidates: {
       type: [
         {
-          candidateId: Schema.Types.Mixed,
-          score: Number,
+          candidateId: { type: String, required: true },
+          rank: { type: Number, required: true },
+          matchScore: { type: Number, required: true, min: 0, max: 100 },
           confidence: {
             type: String,
             enum: ["high", "medium", "low"],
+            required: true,
           },
-          strength: [String],
-          gaps: [String],
-          reasoning: String,
-          comparisonNotes: String,
-          rank: Number,
+          strengths: { type: [String], default: [] },
+          gaps: { type: [String], default: [] },
+          reasoning: { type: String, required: true },
+          finalRecommendation: { type: String, required: true },
+          comparisonNotes: { type: String },
         },
       ],
       required: true,
     },
+    comparisonSummary: { type: String },
   },
   { timestamps: true },
 );

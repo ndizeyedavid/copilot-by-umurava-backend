@@ -6,6 +6,6 @@ export interface IJob extends Document {
   weights: {
     skills: number;
     experience: number;
-    education: "A2" | "A1" | "PhD" | "A0";
+    education: number;
   };
 }

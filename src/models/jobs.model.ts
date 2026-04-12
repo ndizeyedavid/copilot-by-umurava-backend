@@ -9,10 +9,7 @@ const jobsSchema = new Schema<IJob>(
     weights: {
       skills: Number,
       experience: Number,
-      education: {
-        type: String,
-        enum: ["A2", "A1", "PhD", "A0"],
-      },
+      education: Number,
     },
   },
   {

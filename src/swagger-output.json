@@ -37,8 +37,7 @@
               "type": "number"
             },
             "education": {
-              "type": "string",
-              "enum": ["A2", "A1", "PhD", "A0"]
+              "type": "number"
             }
           }
         },
@@ -69,14 +68,16 @@
               "candidateId": {
                 "type": "string"
               },
-              "score": {
-                "type": "number"
+              "matchScore": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
               },
               "confidence": {
                 "type": "string",
                 "enum": ["high", "medium", "low"]
               },
-              "strength": {
+              "strengths": {
                 "type": "array",
                 "items": {
                   "type": "string"
@@ -91,6 +92,10 @@
               "reasoning": {
                 "type": "string"
               },
+              "finalRecommendation": {
+                "type": "string",
+                "enum": ["Strong hire", "Consider", "Weak fit", "Reject"]
+              },
               "comparisonNotes": {
                 "type": "string"
               },
@@ -99,6 +104,9 @@
               }
             }
           }
+        },
+        "comparisonSummary": {
+          "type": "string"
         },
         "createdAt": {
           "type": "string",
@@ -539,7 +547,102 @@
         }
       }
     },
-    "/screening/{jobId}": {
+    "/screening/ai/{jobId}": {
+      "post": {
+        "tags": ["AI Screening"],
+        "summary": "Run AI-powered candidate screening",
+        "description": "Uses Gemini AI to evaluate and rank candidates against job requirements. Returns match scores, strengths, gaps, and hiring recommendations.",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "MongoDB ID of the job to screen against",
+            "example": "6618f5a2b4d3c2e1f0a9b8c7"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "candidateIds": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Optional: Filter specific candidates. Omit to screen all talents.",
+                  "example": [
+                    "6618f5a2b4d3c2e1f0a9b8c8",
+                    "6618f5a2b4d3c2e1f0a9b8c9"
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "AI screening complete",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": { "type": "string" },
+                "screening": { "$ref": "#/definitions/Screening" }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "message": "AI screening complete. 3 candidates ranked",
+                "screening": {
+                  "_id": "6629a6b3c5d4e3f2a1b0c9d8",
+                  "jobId": "6618f5a2b4d3c2e1f0a9b8c7",
+                  "candidates": [
+                    {
+                      "candidateId": "6618f5a2b4d3c2e1f0a9b8c8",
+                      "rank": 1,
+                      "matchScore": 92,
+                      "confidence": "high",
+                      "strengths": [
+                        "5+ years React",
+                        "Node.js expertise",
+                        "AWS certification"
+                      ],
+                      "gaps": ["No Python experience"],
+                      "reasoning": "Strong full-stack background aligns perfectly with job requirements. AWS cert adds value.",
+                      "finalRecommendation": "Strong hire"
+                    },
+                    {
+                      "candidateId": "6618f5a2b4d3c2e1f0a9b8c9",
+                      "rank": 2,
+                      "matchScore": 78,
+                      "confidence": "medium",
+                      "strengths": [
+                        "Strong backend skills",
+                        "Database optimization"
+                      ],
+                      "gaps": [
+                        "Limited frontend experience",
+                        "No cloud skills"
+                      ],
+                      "reasoning": "Solid backend developer but lacks frontend experience required for this full-stack role.",
+                      "finalRecommendation": "Consider"
+                    }
+                  ],
+                  "comparisonSummary": "Candidate 1 is the clear top choice with full-stack expertise. Candidate 2 is backend-focused and would need frontend upskilling.",
+                  "createdAt": "2024-04-12T10:30:00.000Z",
+                  "updatedAt": "2024-04-12T10:30:00.000Z"
+                }
+              }
+            }
+          },
+          "400": { "description": "No candidates found" },
+          "404": { "description": "Job not found" },
+          "500": { "description": "AI screening failed" }
+        }
+      }
+    },
+    "/screening/job/{jobId}": {
       "get": {
         "tags": ["Screening"],
         "description": "Retrieve screenings for a specific job",

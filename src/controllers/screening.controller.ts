@@ -1,6 +1,13 @@
 import { Request, Response } from "express";
 import Screening from "../models/screening.model";
+import Jobs from "../models/jobs.model";
+import Talent from "../models/talents.model";
 import { IScreening } from "../types/screening.types";
+import {
+  evaluateCandidates,
+  CandidateData,
+  JobData,
+} from "../services/gemini.service";
 
 const screeningController = {
   async getAll(req: Request, res: Response) {
@@ -97,6 +104,59 @@ const screeningController = {
       return res
         .status(500)
         .json({ message: "Failed to delete screening", error: error.message });
+    }
+  },
+
+  async runAiScreening(req: Request, res: Response) {
+    try {
+      const { jobId } = req.params;
+      const { candidateIds } = req.body;
+
+      const job = await Jobs.findById(jobId);
+      if (!job) return res.status(404).json({ message: "Job not found" });
+
+      const query = candidateIds ? { _id: { $in: candidateIds } } : {};
+      const talents = await Talent.find(query);
+      if (!talents.length)
+        return res.status(400).json({ message: "No candidates found" });
+
+      const jobData: JobData = {
+        title: job.title,
+        description: job.description,
+        requirements: job.requirements,
+        weights: job.weights,
+      };
+
+      const candidatesData: CandidateData[] = talents.map((t) => ({
+        id: t._id.toString(),
+        firstName: t.firstName,
+        lastName: t.lastName,
+        headline: t.headline,
+        bio: t.bio,
+        skills: t.skills,
+        experience: t.experience,
+        education: t.education,
+        certifications: t.certifications,
+        projects: t.projects,
+      }));
+
+      const aiResult = await evaluateCandidates(jobData, candidatesData);
+
+      const screening = await Screening.create({
+        jobId: job._id.toString(),
+        candidates: aiResult.candidates,
+        comparisonSummary: aiResult.comparisonSummary,
+      });
+
+      return res.status(200).json({
+        message: `AI screening complete. ${aiResult.candidates.length} candidates ranked`,
+        screening,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: "AI screening failed",
+        error: error.message,
+      });
     }
   },
 };

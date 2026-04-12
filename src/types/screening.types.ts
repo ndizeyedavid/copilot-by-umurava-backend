@@ -1,19 +1,23 @@
 import { Document, Schema } from "mongoose";
 
 export interface ICandidates {
-  candidateId: any;
-  score: number;
+  candidateId: string;
+  rank: number;
+  matchScore: number;
   confidence: "high" | "medium" | "low";
-  strength: string[];
+  strengths: string[];
   gaps: string[];
   reasoning: string;
-  comparisonNotes: string;
-  rank: number;
+  finalRecommendation: string;
+  comparisonNotes?: string;
 }
 
 export interface IScreening extends Document {
   jobId: string;
   candidates: ICandidates[];
+  comparisonSummary?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 // export default IScreening;
