@@ -19,7 +19,7 @@ const userSchema = new Schema<IUser>(
     },
     lastName: {
       type: String,
-      required: true,
+      // required: true,
     },
     picture: {
       type: String,

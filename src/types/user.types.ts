@@ -5,7 +5,7 @@ export interface IUser {
   googleId: string;
   email: string;
   firstName: string;
-  lastName: string;
+  lastName?: string;
   picture?: string;
   role: UserRole;
   isActive: boolean;
