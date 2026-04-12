@@ -4,9 +4,9 @@ import { jobsController } from "../controllers/jobs.controller";
 const jobsRouter: Router = express.Router();
 
 jobsRouter.get("/", jobsController.getAll);
-jobsRouter.get("/:id", jobsController.getOne);
+jobsRouter.get("/:jobId", jobsController.getOne);
 jobsRouter.post("/", jobsController.createJob);
-jobsRouter.put("/", jobsController.updateJob);
-jobsRouter.delete("/", jobsController.deleteJob);
+jobsRouter.put("/:jobId", jobsController.updateJob);
+jobsRouter.delete("/:jobId", jobsController.deleteJob);
 
 export default jobsRouter;
