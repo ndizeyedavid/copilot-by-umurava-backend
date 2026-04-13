@@ -51,7 +51,7 @@ export default function RootLayout({
           <GoogleOAuthProvider
             clientId={process.env.GOOGLE_CLIENT_ID as string}
           >
-            <GoogleOneTap />
+            {/* <GoogleOneTap /> */}
             {children}
           </GoogleOAuthProvider>
         </ThemeProvider>

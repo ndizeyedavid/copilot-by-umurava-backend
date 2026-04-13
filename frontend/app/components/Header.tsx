@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 
 export default function Header() {
@@ -42,12 +43,12 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-4">
-        <a
-          href=""
+        <Link
+          href="/dashboard/auth/login"
           className="text-sm font-bold text-[#286ef0] hover:text-[#4338CA]"
         >
           Login
-        </a>
+        </Link>
         <a
           href=""
           className="px-5 py-2.5 text-sm font-medium text-white bg-[#286ef0]  hover:bg-[#2566de]"
