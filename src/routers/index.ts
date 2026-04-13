@@ -5,6 +5,7 @@ import talentRouter from "./talents.route";
 import screeningRouter from "./screening.route";
 import applicationRouter from "./application.route";
 import emailRouter from "./email.route";
+import authRouter from "./auth.route";
 
 const router = Router();
 
@@ -14,5 +15,6 @@ router.use("/talents", talentRouter);
 router.use("/screening", screeningRouter);
 router.use("/applications", applicationRouter);
 router.use("/email", emailRouter);
+router.use("/auth", authRouter);
 
 export default router;

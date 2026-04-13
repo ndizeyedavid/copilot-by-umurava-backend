@@ -8,6 +8,14 @@
   "host": "localhost:3000",
   "basePath": "/api/v1/",
   "schemes": ["http", "https"],
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Enter your Bearer token in the format: Bearer <token>"
+    }
+  },
   "definitions": {
     "Job": {
       "type": "object",
@@ -179,6 +187,63 @@
           "type": "array",
           "items": {
             "type": "string"
+          }
+        }
+      }
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "picture": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["talent", "admin"]
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "talentProfileId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "AuthResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        },
+        "tokens": {
+          "type": "object",
+          "properties": {
+            "accessToken": {
+              "type": "string"
+            }
           }
         }
       }
@@ -1366,6 +1431,194 @@
             }
           },
           "500": { "description": "Failed to generate preview" }
+        }
+      }
+    },
+    "/auth/google": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Initiate Google OAuth",
+        "description": "Redirects to Google OAuth consent screen. Use ?role=talent or ?role=admin to specify role.",
+        "parameters": [
+          {
+            "name": "role",
+            "in": "query",
+            "type": "string",
+            "enum": ["talent", "admin"],
+            "description": "User role to create if new user",
+            "example": "talent"
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirects to Google OAuth"
+          }
+        }
+      }
+    },
+    "/auth/google/callback": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Google OAuth callback",
+        "description": "Handles Google OAuth callback and redirects to frontend with token",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "type": "string",
+            "description": "Authorization code from Google"
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "type": "string",
+            "description": "Role state passed to Google"
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirects to frontend with token"
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register new user",
+        "description": "Create a new user account with Google profile data",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "googleProfile": {
+                  "type": "object",
+                  "description": "Google profile data"
+                },
+                "role": {
+                  "type": "string",
+                  "enum": ["talent", "admin"]
+                },
+                "talentProfileId": {
+                  "type": "string"
+                }
+              },
+              "required": ["googleProfile", "role"]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User registered",
+            "schema": {
+              "$ref": "#/definitions/AuthResponse"
+            }
+          },
+          "400": { "description": "Missing required fields" },
+          "500": { "description": "Registration failed" }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Get current user",
+        "description": "Returns current authenticated user profile",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Current user profile",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user": { "$ref": "#/definitions/User" }
+              }
+            }
+          },
+          "401": { "description": "Not authenticated" },
+          "500": { "description": "Failed to get user" }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Refresh access token",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Token refreshed",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": { "type": "string" },
+                "tokens": {
+                  "type": "object",
+                  "properties": {
+                    "accessToken": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Not authenticated" }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Logout user",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Logged out",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/profile": {
+      "put": {
+        "tags": ["Authentication"],
+        "summary": "Update user profile",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "firstName": { "type": "string" },
+                "lastName": { "type": "string" },
+                "picture": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profile updated",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": { "type": "string" },
+                "user": { "$ref": "#/definitions/User" }
+              }
+            }
+          },
+          "401": { "description": "Not authenticated" },
+          "404": { "description": "User not found" }
         }
       }
     }
