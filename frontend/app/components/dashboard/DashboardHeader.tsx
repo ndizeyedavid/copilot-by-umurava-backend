@@ -8,7 +8,7 @@ export default function DashboardHeader() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
       <div className="flex items-center justify-between px-8 py-4">
-        <Link href="/" className="shrink-0">
+        <Link href="/dashboard" className="shrink-0">
           <Image
             src="/images/logo/logo.svg"
             alt="Copilot By Umurava Logo"
