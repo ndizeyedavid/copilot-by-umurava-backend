@@ -28,6 +28,7 @@ export default function AdminJobCreateForm() {
     register,
     handleSubmit,
     control,
+    setValue,
     watch,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
@@ -62,6 +63,55 @@ export default function AdminJobCreateForm() {
     const ed = Number(weights?.education ?? 0);
     return s + e + ed;
   }, [weights]);
+
+  const clamp = (n: number) => Math.max(0, Math.min(100, Math.round(n)));
+
+  const rebalanceWeights = (
+    key: "skills" | "experience" | "education",
+    nextValue: number,
+  ) => {
+    const current = {
+      skills: Number(weights?.skills ?? 0),
+      experience: Number(weights?.experience ?? 0),
+      education: Number(weights?.education ?? 0),
+    };
+
+    const next = {
+      ...current,
+      [key]: clamp(nextValue),
+    };
+
+    const otherKeys = (Object.keys(next) as (keyof typeof next)[]).filter(
+      (k) => k !== key,
+    ) as ("skills" | "experience" | "education")[];
+
+    const remaining = 100 - next[key];
+    const aKey = otherKeys[0];
+    const bKey = otherKeys[1];
+
+    const a = next[aKey];
+    const b = next[bKey];
+    const sum = a + b;
+
+    if (remaining <= 0) {
+      next[aKey] = 0;
+      next[bKey] = 0;
+    } else if (sum <= 0) {
+      const half = Math.floor(remaining / 2);
+      next[aKey] = half;
+      next[bKey] = remaining - half;
+    } else {
+      const aShare = Math.floor((a / sum) * remaining);
+      next[aKey] = aShare;
+      next[bKey] = remaining - aShare;
+    }
+
+    setValue("weights.skills", clamp(next.skills), { shouldDirty: true });
+    setValue("weights.experience", clamp(next.experience), {
+      shouldDirty: true,
+    });
+    setValue("weights.education", clamp(next.education), { shouldDirty: true });
+  };
 
   const onSubmit = async (values: FormValues) => {
     const payload = {
@@ -242,46 +292,64 @@ export default function AdminJobCreateForm() {
               <label className="mb-1 block text-xs font-semibold text-[#7C8493]">
                 Skills %
               </label>
-              <input
-                type="number"
-                className={fieldClass}
-                {...register("weights.skills", {
-                  required: true,
-                  valueAsNumber: true,
-                  min: 0,
-                  max: 100,
-                })}
-              />
+              <div className="flex items-center gap-3">
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={Number(weights?.skills ?? 0)}
+                  onChange={(e) =>
+                    rebalanceWeights("skills", Number(e.target.value))
+                  }
+                  className="h-2 w-full cursor-pointer accent-[#286ef0]"
+                />
+                <span className="w-12 text-right text-sm font-semibold text-[#25324B]">
+                  {Number(weights?.skills ?? 0)}%
+                </span>
+              </div>
             </div>
             <div>
               <label className="mb-1 block text-xs font-semibold text-[#7C8493]">
                 Experience %
               </label>
-              <input
-                type="number"
-                className={fieldClass}
-                {...register("weights.experience", {
-                  required: true,
-                  valueAsNumber: true,
-                  min: 0,
-                  max: 100,
-                })}
-              />
+              <div className="flex items-center gap-3">
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={Number(weights?.experience ?? 0)}
+                  onChange={(e) =>
+                    rebalanceWeights("experience", Number(e.target.value))
+                  }
+                  className="h-2 w-full cursor-pointer accent-[#286ef0]"
+                />
+                <span className="w-12 text-right text-sm font-semibold text-[#25324B]">
+                  {Number(weights?.experience ?? 0)}%
+                </span>
+              </div>
             </div>
             <div>
               <label className="mb-1 block text-xs font-semibold text-[#7C8493]">
                 Education %
               </label>
-              <input
-                type="number"
-                className={fieldClass}
-                {...register("weights.education", {
-                  required: true,
-                  valueAsNumber: true,
-                  min: 0,
-                  max: 100,
-                })}
-              />
+              <div className="flex items-center gap-3">
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={Number(weights?.education ?? 0)}
+                  onChange={(e) =>
+                    rebalanceWeights("education", Number(e.target.value))
+                  }
+                  className="h-2 w-full cursor-pointer accent-[#286ef0]"
+                />
+                <span className="w-12 text-right text-sm font-semibold text-[#25324B]">
+                  {Number(weights?.education ?? 0)}%
+                </span>
+              </div>
             </div>
           </div>
 
