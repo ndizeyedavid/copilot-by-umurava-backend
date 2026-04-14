@@ -135,7 +135,7 @@ html {
 }
 
 * {
-  scrollbar-color: #555 #1e1e1e;
+  /* scrollbar-color: #555 #1e1e1e; */
 }
 
 .PhoneInput--focus {

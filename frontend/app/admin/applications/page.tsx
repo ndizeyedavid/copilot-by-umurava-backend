@@ -1,9 +1,7 @@
-import React from "react";
+"use client";
 
-export default function page() {
-  return (
-    <section>
-      <p>Applications page</p>
-    </section>
-  );
+import AdminApplicationsJobPicker from "@/app/components/admin/applications/AdminApplicationsJobPicker";
+
+export default function ApplicationsPage() {
+  return <AdminApplicationsJobPicker />;
 }

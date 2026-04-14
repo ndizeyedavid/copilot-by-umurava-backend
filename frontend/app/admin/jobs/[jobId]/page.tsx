@@ -107,9 +107,12 @@ export default function AdminJobDetailsPage() {
             <button className="rounded-xl border border-gray-200 bg-white px-5 py-2 text-sm font-semibold text-[#25324B] hover:bg-gray-50">
               Edit job
             </button>
-            <button className="rounded-xl bg-[#286ef0] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1f5fe0]">
+            <Link
+              href={`/admin/jobs/${jobId}/applications`}
+              className="rounded-xl bg-[#286ef0] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1f5fe0]"
+            >
               View applications
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -119,14 +122,18 @@ export default function AdminJobDetailsPage() {
               <Users className="h-4 w-4" />
               Applicants
             </div>
-            <p className="mt-2 text-2xl font-bold text-[#25324B]">{job.stats.applicants}</p>
+            <p className="mt-2 text-2xl font-bold text-[#25324B]">
+              {job.stats.applicants}
+            </p>
           </div>
           <div className="rounded-2xl border border-gray-100 bg-[#F8F8FD] p-4">
             <div className="flex items-center gap-2 text-xs font-semibold text-[#7C8493]">
               <Eye className="h-4 w-4" />
               Views
             </div>
-            <p className="mt-2 text-2xl font-bold text-[#25324B]">{job.stats.views}</p>
+            <p className="mt-2 text-2xl font-bold text-[#25324B]">
+              {job.stats.views}
+            </p>
           </div>
           <div className="rounded-2xl border border-gray-100 bg-[#F8F8FD] p-4">
             <div className="flex items-center gap-2 text-xs font-semibold text-[#7C8493]">
@@ -143,7 +150,8 @@ export default function AdminJobDetailsPage() {
               Weights
             </div>
             <p className="mt-2 text-sm font-semibold text-[#25324B]">
-              Skills {job.weights.skills}% • Exp {job.weights.experience}% • Edu {job.weights.education}%
+              Skills {job.weights.skills}% • Exp {job.weights.experience}% • Edu{" "}
+              {job.weights.education}%
             </p>
           </div>
         </div>
@@ -153,14 +161,19 @@ export default function AdminJobDetailsPage() {
         <div className="xl:col-span-2 space-y-5">
           <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <p className="text-lg font-semibold text-[#25324B]">Description</p>
-            <p className="mt-3 text-sm leading-6 text-[#25324B]">{job.description}</p>
+            <p className="mt-3 text-sm leading-6 text-[#25324B]">
+              {job.description}
+            </p>
           </div>
 
           <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <p className="text-lg font-semibold text-[#25324B]">Requirements</p>
             <div className="mt-4 space-y-2">
               {job.requirements.map((r, idx) => (
-                <div key={idx} className="rounded-xl border border-gray-100 bg-[#F8F8FD] px-4 py-3 text-sm text-[#25324B]">
+                <div
+                  key={idx}
+                  className="rounded-xl border border-gray-100 bg-[#F8F8FD] px-4 py-3 text-sm text-[#25324B]"
+                >
                   {r}
                 </div>
               ))}
@@ -174,7 +187,10 @@ export default function AdminJobDetailsPage() {
             <div className="mt-4 space-y-2">
               {job.benefits.length ? (
                 job.benefits.map((b, idx) => (
-                  <div key={idx} className="rounded-xl border border-gray-100 bg-[#F8F8FD] px-4 py-3 text-sm text-[#25324B]">
+                  <div
+                    key={idx}
+                    className="rounded-xl border border-gray-100 bg-[#F8F8FD] px-4 py-3 text-sm text-[#25324B]"
+                  >
                     {b}
                   </div>
                 ))
@@ -193,11 +209,15 @@ export default function AdminJobDetailsPage() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-[#7C8493]">Posted</span>
-                <span className="font-semibold text-[#25324B]">{job.stats.postedAt}</span>
+                <span className="font-semibold text-[#25324B]">
+                  {job.stats.postedAt}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-[#7C8493]">Location label</span>
-                <span className="font-semibold text-[#25324B]">{job.locationLabel}</span>
+                <span className="font-semibold text-[#25324B]">
+                  {job.locationLabel}
+                </span>
               </div>
             </div>
           </div>
