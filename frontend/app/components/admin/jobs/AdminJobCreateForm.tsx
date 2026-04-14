@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { CalendarDays, Plus, Trash2 } from "lucide-react";
+
+import RichTextEditor from "@/app/components/admin/form/RichTextEditor";
 
 type FormValues = {
   title: string;
@@ -116,7 +118,7 @@ export default function AdminJobCreateForm() {
   const onSubmit = async (values: FormValues) => {
     const payload = {
       title: values.title.trim(),
-      description: values.description.trim(),
+      description: values.description,
       requirements: values.requirements
         .map((r) => r.value.trim())
         .filter(Boolean),
@@ -192,13 +194,26 @@ export default function AdminJobCreateForm() {
           <label className="mb-1 block text-sm font-semibold text-[#25324B]">
             Description
           </label>
-          <textarea
-            rows={5}
-            className={fieldClass}
-            {...register("description", {
+          <Controller
+            control={control}
+            name="description"
+            rules={{
               required: "Description is required",
-            })}
-            placeholder="Write a clear job description..."
+              validate: (v) => {
+                const stripped = String(v ?? "")
+                  .replace(/<[^>]*>/g, "")
+                  .replace(/&nbsp;/g, " ")
+                  .trim();
+                return stripped.length > 0 || "Description is required";
+              },
+            }}
+            render={({ field }) => (
+              <RichTextEditor
+                value={field.value}
+                onChange={(html) => field.onChange(html)}
+                placeholder="Write a clear job description..."
+              />
+            )}
           />
           {errors.description?.message && (
             <p className="mt-1 text-xs font-semibold text-red-600">
