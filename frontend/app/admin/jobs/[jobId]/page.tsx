@@ -104,6 +104,12 @@ export default function AdminJobDetailsPage() {
           </div>
 
           <div className="flex flex-wrap gap-2">
+            <Link
+              href={`/admin/jobs/${jobId}/screening`}
+              className="rounded-xl border border-blue-200 bg-blue-50 px-5 py-2 text-sm font-semibold text-[#286ef0] hover:bg-blue-100 transition-colors"
+            >
+              Start AI Screening
+            </Link>
             <button className="rounded-xl border border-gray-200 bg-white px-5 py-2 text-sm font-semibold text-[#25324B] hover:bg-gray-50">
               Edit job
             </button>

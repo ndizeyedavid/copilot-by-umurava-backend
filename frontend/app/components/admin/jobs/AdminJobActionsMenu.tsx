@@ -8,11 +8,12 @@ import {
   Lock,
   Unlock,
   Eye,
+  BrainCircuit,
 } from "lucide-react";
 
 import type { AdminJobRow } from "@/app/components/admin/jobs/AdminJobsTable";
 
-type Action = "edit" | "close" | "open" | "delete";
+type Action = "view" | "edit" | "close" | "open" | "delete";
 
 export default function AdminJobActionsMenu({
   row,
@@ -64,31 +65,46 @@ export default function AdminJobActionsMenu({
             align === "right" ? "right-0" : "left-0"
           }`}
         >
-          <button
-            type="button"
-            role="menuitem"
-            onClick={() => {
-              setOpen(false);
-              onAction("view", row);
-            }}
-            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-[#25324B] hover:bg-[#F8F8FD]"
-          >
-            <Eye className="h-4 w-4 text-[#7C8493]" />
-            View
-          </button>
+          <div className="flex flex-col gap-1">
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                onAction("view", row);
+              }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-[#25324B] hover:bg-[#F8F8FD]"
+            >
+              <Eye className="h-4 w-4 text-[#7C8493]" />
+              View Details
+            </button>
 
-          <button
-            type="button"
-            role="menuitem"
-            onClick={() => {
-              setOpen(false);
-              onAction("edit", row);
-            }}
-            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-[#25324B] hover:bg-[#F8F8FD]"
-          >
-            <Pencil className="h-4 w-4 text-[#7C8493]" />
-            Edit
-          </button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                window.location.href = `/admin/jobs/${row.id}/screening`;
+              }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-[#286ef0] hover:bg-blue-50"
+            >
+              <BrainCircuit className="h-4 w-4" />
+              AI Screening
+            </button>
+
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                onAction("edit", row);
+              }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-[#25324B] hover:bg-[#F8F8FD]"
+            >
+              <Pencil className="h-4 w-4 text-[#7C8493]" />
+              Edit Job
+            </button>
+          </div>
 
           <button
             type="button"
