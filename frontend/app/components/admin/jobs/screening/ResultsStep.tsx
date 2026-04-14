@@ -160,7 +160,7 @@ export default function ResultsStep({
                       : "bg-gray-100 text-[#25324B]"
                   }`}
                 >
-                  {c.rank === 1 ? <Trophy className="h-6 w-6" /> : `#${c.rank}`}
+                  {"#" + c.rank}
                 </div>
 
                 <div className="min-w-0 flex-1">
@@ -169,8 +169,8 @@ export default function ResultsStep({
                   </h4>
                   <div className="mt-1 flex items-center gap-3">
                     <div className="flex items-center gap-1 text-xs text-[#7C8493]">
-                      <Target className="h-3.5 w-3.5" />
-                      Match:{" "}
+                      {/* <Target className="h-3.5 w-3.5" /> */}
+                      Score:{" "}
                       <span className="font-bold text-[#25324B]">
                         {c.matchScore}%
                       </span>
