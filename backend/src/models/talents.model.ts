@@ -3,9 +3,7 @@ import { ITalent } from "../types/talents.types";
 
 const talentSchema = new Schema<ITalent>(
   {
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
-    email: { type: String, required: true },
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     headline: { type: String, required: true },
     bio: { type: String },
     location: { type: String, required: true },

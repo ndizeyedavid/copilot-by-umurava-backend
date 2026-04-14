@@ -2,8 +2,9 @@ export type UserRole = "talent" | "admin";
 
 export interface IUser {
   _id?: string;
-  googleId: string;
+  googleId?: string;
   email: string;
+  password?: string;
   firstName: string;
   lastName?: string;
   picture?: string;

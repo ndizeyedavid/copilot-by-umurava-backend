@@ -1,21 +1,21 @@
-import { Document } from "mongoose";
+import { Document, Schema } from "mongoose";
 
 interface ISkills {
   name: string;
-  level: "Beginner | Intermediate | Advanced | Expert";
+  level: "Beginner" | "Intermediate" | "Advanced" | "Expert";
   yearsOfExperience: number;
 }
 
 interface ILanguage {
   name: string;
-  proficiency: "Basic | Conversational | Fluent | Native";
+  proficiency: "Basic" | "Conversational" | "Fluent" | "Native";
 }
 
 interface IExperience {
   company: string;
   role: string;
   startDate: Date;
-  endDate: Date;
+  endDate?: Date;
   description: string;
   technologies: string[];
   IsCurrent: boolean;
@@ -39,9 +39,9 @@ interface IProjects {
   description: string;
   technologies: string[];
   role: string;
-  link: string;
+  link?: string;
   startDate: Date;
-  endDate: Date;
+  endDate?: Date;
 }
 
 interface IAvailability {
@@ -51,9 +51,7 @@ interface IAvailability {
 }
 
 export interface ITalent extends Document {
-  firstName: string;
-  lastName: string;
-  email: string;
+  userId: Schema.Types.ObjectId;
   headline: string;
   bio?: string;
   location: string;

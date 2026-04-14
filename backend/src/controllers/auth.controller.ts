@@ -3,30 +3,32 @@ import ENV from "../config/env";
 import {
   generateTokens,
   createUser,
+  createGoogleUser,
   getUserById,
   findOrCreateUser,
 } from "../services/auth.service";
-import { IGoogleProfile, UserRole } from "../types/user.types";
+import { IGoogleProfile, UserRole, IUser } from "../types/user.types";
 import User from "../models/user.model";
 
 const authController = {
   // Initiate Google OAuth
   googleAuth(req: Request, res: Response) {
     const { role } = req.query;
-    
+
     // Store role in session/state for callback
     if (role && (role === "talent" || role === "admin")) {
       (req as any).session = { role };
     }
-    
+
     // Redirect to Google OAuth
-    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+    const googleAuthUrl =
+      `https://accounts.google.com/o/oauth2/v2/auth?` +
       `client_id=${ENV.google_client_id}&` +
       `redirect_uri=${encodeURIComponent(ENV.google_callback_url)}&` +
       `response_type=code&` +
       `scope=${encodeURIComponent("openid email profile")}&` +
       `state=${role || ""}`;
-    
+
     res.redirect(googleAuthUrl);
   },
 
@@ -34,10 +36,12 @@ const authController = {
   async googleCallback(req: Request, res: Response) {
     try {
       const { code, state } = req.query;
-      const role = state as UserRole || "talent";
+      const role = (state as UserRole) || "talent";
 
       if (!code) {
-        return res.redirect(`${ENV.frontend_url}/auth/error?message=No authorization code received`);
+        return res.redirect(
+          `${ENV.frontend_url}/auth/error?message=No authorization code received`,
+        );
       }
 
       // Exchange code for tokens
@@ -56,7 +60,9 @@ const authController = {
       const tokenData = await tokenResponse.json();
 
       if (!tokenResponse.ok) {
-        return res.redirect(`${ENV.frontend_url}/auth/error?message=Failed to exchange code`);
+        return res.redirect(
+          `${ENV.frontend_url}/auth/error?message=Failed to exchange code`,
+        );
       }
 
       // Get user info from Google
@@ -64,13 +70,15 @@ const authController = {
         "https://www.googleapis.com/oauth2/v2/userinfo",
         {
           headers: { Authorization: `Bearer ${tokenData.access_token}` },
-        }
+        },
       );
 
       const googleUser = await userInfoResponse.json();
 
       if (!userInfoResponse.ok) {
-        return res.redirect(`${ENV.frontend_url}/auth/error?message=Failed to get user info`);
+        return res.redirect(
+          `${ENV.frontend_url}/auth/error?message=Failed to get user info`,
+        );
       }
 
       // Build Google profile
@@ -81,7 +89,9 @@ const authController = {
           familyName: googleUser.family_name,
           givenName: googleUser.given_name,
         },
-        emails: [{ value: googleUser.email, verified: googleUser.verified_email }],
+        emails: [
+          { value: googleUser.email, verified: googleUser.verified_email },
+        ],
         photos: [{ value: googleUser.picture }],
       };
 
@@ -92,7 +102,8 @@ const authController = {
       const tokens = generateTokens(user);
 
       // Redirect to frontend with tokens
-      const redirectUrl = `${ENV.frontend_url}/auth/callback?` +
+      const redirectUrl =
+        `${ENV.frontend_url}/auth/callback?` +
         `token=${tokens.accessToken}&` +
         `isNew=${isNew}&` +
         `role=${user.role}`;
@@ -100,14 +111,20 @@ const authController = {
       res.redirect(redirectUrl);
     } catch (error: any) {
       console.error("Google callback error:", error);
-      res.redirect(`${ENV.frontend_url}/auth/error?message=${encodeURIComponent(error.message)}`);
+      res.redirect(
+        `${ENV.frontend_url}/auth/error?message=${encodeURIComponent(error.message)}`,
+      );
     }
   },
 
-  // Register new user with role selection
-  async register(req: Request, res: Response) {
+  // Register new user with role selection (Google)
+  async registerGoogle(req: Request, res: Response) {
     try {
-      const { googleProfile, role, talentProfileId }: {
+      const {
+        googleProfile,
+        role,
+        talentProfileId,
+      }: {
         googleProfile: IGoogleProfile;
         role: UserRole;
         talentProfileId?: string;
@@ -122,7 +139,7 @@ const authController = {
       // Check if user already exists
       const existingUser = await User.findOne({ googleId: googleProfile.id });
       if (existingUser) {
-        const tokens = generateTokens(existingUser);
+        const tokens = generateTokens(existingUser as IUser);
         return res.status(200).json({
           message: "User already exists",
           user: {
@@ -139,7 +156,7 @@ const authController = {
       }
 
       // Create new user
-      const user = await createUser(googleProfile, role, talentProfileId);
+      const user = await createGoogleUser(googleProfile, role, talentProfileId);
       const tokens = generateTokens(user);
 
       return res.status(201).json({
@@ -163,17 +180,104 @@ const authController = {
     }
   },
 
+  // Local Registration (Email/Password)
+  async registerLocal(req: Request, res: Response) {
+    try {
+      const { email, password, firstName, lastName, role }: any = req.body;
+
+      if (!email || !password || !firstName || !role) {
+        return res.status(400).json({
+          message: "Email, password, first name and role are required",
+        });
+      }
+
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res
+          .status(400)
+          .json({ message: "User already exists with this email" });
+      }
+
+      const user = await createUser(email, firstName, lastName, role, password);
+      const tokens = generateTokens(user);
+
+      return res.status(201).json({
+        message: "User registered successfully",
+        user: {
+          _id: user._id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+        },
+        tokens,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: "Registration failed",
+        error: error.message,
+      });
+    }
+  },
+
+  // Local Login
+  async loginLocal(req: Request, res: Response) {
+    try {
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        return res
+          .status(400)
+          .json({ message: "Email and password are required" });
+      }
+
+      const user = await User.findOne({ email }).select("+password");
+      if (!user) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+
+      const isMatch = await (user as any).comparePassword(password);
+      if (!isMatch) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+
+      if (!user.isActive) {
+        return res.status(401).json({ message: "Account is deactivated" });
+      }
+
+      const tokens = generateTokens(user as IUser);
+
+      return res.status(200).json({
+        message: "Login successful",
+        user: {
+          _id: user._id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+          talentProfileId: user.talentProfileId,
+        },
+        tokens,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: "Login failed",
+        error: error.message,
+      });
+    }
+  },
+
   // Get current user
   async getMe(req: Request, res: Response) {
     try {
       const userId = (req as any).user?.userId;
-      
+
       if (!userId) {
         return res.status(401).json({ message: "Not authenticated" });
       }
 
       const user = await getUserById(userId);
-      
+
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -193,13 +297,13 @@ const authController = {
   async refreshToken(req: Request, res: Response) {
     try {
       const userId = (req as any).user?.userId;
-      
+
       if (!userId) {
         return res.status(401).json({ message: "Not authenticated" });
       }
 
       const user = await User.findById(userId);
-      
+
       if (!user || !user.isActive) {
         return res.status(401).json({ message: "User not found or inactive" });
       }
@@ -238,7 +342,7 @@ const authController = {
       const user = await User.findByIdAndUpdate(
         userId,
         { firstName, lastName, picture },
-        { new: true }
+        { new: true },
       ).select("-googleId");
 
       if (!user) {

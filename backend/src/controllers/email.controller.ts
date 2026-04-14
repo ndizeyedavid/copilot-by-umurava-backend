@@ -12,13 +12,21 @@ const emailController = {
   async sendScreeningResults(req: Request, res: Response) {
     try {
       const { screeningId } = req.params;
-      const { mode, selectedCandidateId }: { mode: EmailMode; selectedCandidateId?: string } = req.body;
+      const {
+        mode,
+        selectedCandidateId,
+      }: { mode: EmailMode; selectedCandidateId?: string } = req.body;
 
       // Validate mode
-      const validModes: EmailMode[] = ["selected_only", "all_with_ranking", "decision_only"];
+      const validModes: EmailMode[] = [
+        "selected_only",
+        "all_with_ranking",
+        "decision_only",
+      ];
       if (!validModes.includes(mode)) {
         return res.status(400).json({
-          message: "Invalid mode. Use: selected_only | all_with_ranking | decision_only",
+          message:
+            "Invalid mode. Use: selected_only | all_with_ranking | decision_only",
         });
       }
 
@@ -44,13 +52,20 @@ const emailController = {
       // Build candidate results with email data
       const candidates: CandidateResult[] = [];
       for (const candidate of screening.candidates) {
-        const talent = await Talent.findById(candidate.candidateId);
+        const talent = await Talent.findById(candidate.candidateId).populate(
+          "userId",
+        );
+        // @ts-ignore
         if (!talent || !talent.email) continue;
 
         candidates.push({
+          // @ts-ignore
           candidateId: candidate.candidateId,
+          // @ts-ignore
           email: talent.email,
+          // @ts-ignore
           firstName: talent.firstName,
+          // @ts-ignore
           lastName: talent.lastName,
           rank: candidate.rank,
           matchScore: candidate.matchScore,
@@ -62,7 +77,9 @@ const emailController = {
       }
 
       if (candidates.length === 0) {
-        return res.status(400).json({ message: "No candidates with email addresses found" });
+        return res
+          .status(400)
+          .json({ message: "No candidates with email addresses found" });
       }
 
       // Send emails
@@ -70,7 +87,7 @@ const emailController = {
         candidates,
         { title: job.title, company: "Our Company" },
         mode,
-        selectedCandidateId
+        selectedCandidateId,
       );
 
       return res.status(200).json({
@@ -101,7 +118,11 @@ const emailController = {
         lastName: "Doe",
         rank: 1,
         matchScore: 92,
-        strengths: ["5+ years React experience", "AWS certification", "Strong leadership"],
+        strengths: [
+          "5+ years React experience",
+          "AWS certification",
+          "Strong leadership",
+        ],
         gaps: ["No Python experience"],
         reasoning: "Excellent full-stack background with cloud expertise.",
         finalRecommendation: "Strong hire",
@@ -111,11 +132,12 @@ const emailController = {
         message: "Email preview generated",
         mode,
         preview: {
-          subject: mode === "selected_only"
-            ? "Congratulations! You're Selected"
-            : mode === "all_with_ranking"
-            ? "Your Application Results"
-            : "Email Decision Preview",
+          subject:
+            mode === "selected_only"
+              ? "Congratulations! You're Selected"
+              : mode === "all_with_ranking"
+                ? "Your Application Results"
+                : "Email Decision Preview",
           sampleData: sampleCandidate,
         },
       });

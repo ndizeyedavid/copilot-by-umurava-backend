@@ -91,6 +91,32 @@ export function verifyToken(token: string): IJwtPayload {
 }
 
 export async function createUser(
+  email: string,
+  firstName: string,
+  lastName: string,
+  role: UserRole,
+  password?: string,
+  googleId?: string,
+  picture?: string,
+  talentProfileId?: string,
+): Promise<IUser> {
+  const userDoc = new User({
+    googleId,
+    email,
+    password,
+    firstName,
+    lastName,
+    picture,
+    role,
+    talentProfileId,
+  });
+
+  await userDoc.save();
+  const user = userDoc.toObject() as IUser;
+  return user;
+}
+
+export async function createGoogleUser(
   googleProfile: IGoogleProfile,
   role: UserRole,
   talentProfileId?: string,
@@ -100,19 +126,16 @@ export async function createUser(
     throw new Error("No email provided from Google");
   }
 
-  const userDoc = new User({
-    googleId: googleProfile.id,
+  return createUser(
     email,
-    firstName: googleProfile.name.givenName,
-    lastName: googleProfile.name.familyName,
-    picture: googleProfile.photos?.[0]?.value,
+    googleProfile.name.givenName,
+    googleProfile.name.familyName,
     role,
+    undefined,
+    googleProfile.id,
+    googleProfile.photos?.[0]?.value,
     talentProfileId,
-  });
-
-  await userDoc.save();
-  const user = userDoc.toObject() as IUser;
-  return user;
+  );
 }
 
 export async function findOrCreateUser(
@@ -126,7 +149,7 @@ export async function findOrCreateUser(
     return { user, isNew: false };
   }
 
-  const user = await createUser(googleProfile, role);
+  const user = await createGoogleUser(googleProfile, role);
   return { user, isNew: true };
 }
 

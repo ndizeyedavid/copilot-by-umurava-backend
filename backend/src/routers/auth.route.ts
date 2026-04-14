@@ -8,7 +8,11 @@ authRouter.get("/google", authController.googleAuth);
 authRouter.get("/google/callback", authController.googleCallback);
 
 // Registration
-authRouter.post("/register", authController.register);
+authRouter.post("/register/google", authController.registerGoogle);
+authRouter.post("/register/local", authController.registerLocal);
+
+// Login
+authRouter.post("/login/local", authController.loginLocal);
 
 // Current user
 authRouter.get("/me", authController.getMe);

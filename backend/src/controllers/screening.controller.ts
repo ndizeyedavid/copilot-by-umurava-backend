@@ -124,7 +124,9 @@ const screeningController = {
       }
 
       const talentIds = applications.map((app) => app.talentId);
-      const talents = await Talent.find({ _id: { $in: talentIds } });
+      const talents = await Talent.find({ _id: { $in: talentIds } }).populate(
+        "userId",
+      );
 
       if (!talents.length) {
         return res.status(400).json({ message: "No candidate profiles found" });
@@ -137,10 +139,10 @@ const screeningController = {
         weights: job.weights,
       };
 
-      const candidatesData: CandidateData[] = talents.map((t) => ({
+      const candidatesData: CandidateData[] = talents.map((t: any) => ({
         id: t._id.toString(),
-        firstName: t.firstName,
-        lastName: t.lastName,
+        firstName: t.userId?.firstName || "Unknown",
+        lastName: t.userId?.lastName || "",
         headline: t.headline,
         bio: t.bio,
         skills: t.skills,
