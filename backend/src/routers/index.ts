@@ -6,6 +6,7 @@ import screeningRouter from "./screening.route";
 import applicationRouter from "./application.route";
 import emailRouter from "./email.route";
 import authRouter from "./auth.route";
+import externalScreeningRouter from "./external-screening.route";
 
 const router = Router();
 
@@ -16,5 +17,6 @@ router.use("/screening", screeningRouter);
 router.use("/applications", applicationRouter);
 router.use("/email", emailRouter);
 router.use("/auth", authRouter);
+router.use("/external-screening", externalScreeningRouter);
 
 export default router;
