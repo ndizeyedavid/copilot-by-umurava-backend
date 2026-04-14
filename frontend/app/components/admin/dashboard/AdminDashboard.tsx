@@ -1,6 +1,7 @@
 "use client";
 
 import AdminKpiCards from "@/app/components/admin/dashboard/AdminKpiCards";
+import AdminJobsPreview from "@/app/components/admin/dashboard/AdminJobsPreview";
 import AdminRecentApplicationsTable from "@/app/components/admin/dashboard/AdminRecentApplicationsTable";
 import AdminCandidateCompositionChart from "@/app/components/admin/charts/AdminCandidateCompositionChart";
 import AdminJobStatisticsChart from "@/app/components/admin/charts/AdminJobStatisticsChart";
@@ -29,7 +30,12 @@ export default function AdminDashboard() {
 
   const composition = [
     { label: "Junior", value: 312, color: "#4F46E5", icon: "single" as const },
-    { label: "Mid-level", value: 401, color: "#10B981", icon: "group" as const },
+    {
+      label: "Mid-level",
+      value: 401,
+      color: "#10B981",
+      icon: "group" as const,
+    },
     { label: "Senior", value: 143, color: "#F59E0B", icon: "single" as const },
   ];
 
@@ -63,6 +69,69 @@ export default function AdminDashboard() {
     },
   ];
 
+  const jobsPreview = [
+    {
+      id: "j1",
+      title: "Senior Frontend Engineer",
+      company: "Umurava",
+      location: "Kigali, Rwanda",
+      type: "Full-time" as const,
+      status: "Open" as const,
+      postedAtLabel: "2d ago",
+      applicants: 48,
+    },
+    {
+      id: "j2",
+      title: "Product Designer",
+      company: "Copilot Team",
+      location: "Remote",
+      type: "Contract" as const,
+      status: "Open" as const,
+      postedAtLabel: "5d ago",
+      applicants: 31,
+    },
+    {
+      id: "j3",
+      title: "Backend Developer",
+      company: "TechCorp Solutions",
+      location: "Nairobi, Kenya",
+      type: "Full-time" as const,
+      status: "Open" as const,
+      postedAtLabel: "1w ago",
+      applicants: 64,
+    },
+    {
+      id: "j4",
+      title: "Data Analyst",
+      company: "Digital Innovations",
+      location: "Hybrid",
+      type: "Part-time" as const,
+      status: "Closed" as const,
+      postedAtLabel: "3w ago",
+      applicants: 92,
+    },
+    {
+      id: "j5",
+      title: "DevOps Engineer",
+      company: "CloudTech Inc",
+      location: "Remote",
+      type: "Full-time" as const,
+      status: "Open" as const,
+      postedAtLabel: "4d ago",
+      applicants: 27,
+    },
+    {
+      id: "j6",
+      title: "UI/UX Designer (Intern)",
+      company: "Creative Studios",
+      location: "Kampala, Uganda",
+      type: "Internship" as const,
+      status: "Open" as const,
+      postedAtLabel: "6d ago",
+      applicants: 18,
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <AdminKpiCards
@@ -72,6 +141,8 @@ export default function AdminDashboard() {
       />
 
       <AdminJobStatisticsChart data={jobStats} rangeLabel="This Month" />
+
+      <AdminJobsPreview jobs={jobsPreview.slice(0, 6)} />
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="xl:col-span-2">

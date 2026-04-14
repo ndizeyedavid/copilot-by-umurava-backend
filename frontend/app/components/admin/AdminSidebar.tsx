@@ -15,6 +15,7 @@ import {
   HelpCircle,
   LogOut,
   UserSquare2,
+  ScanTextIcon,
 } from "lucide-react";
 
 type NavItem = {
@@ -45,9 +46,9 @@ const mainNav: NavItem[] = [
     icon: <UserSquare2 className="h-5 w-5" />,
   },
   {
-    label: "Calendar",
-    href: "/admin/calendar",
-    icon: <CalendarDays className="h-5 w-5" />,
+    label: "Screening",
+    href: "/admin/screening",
+    icon: <ScanTextIcon className="h-5 w-5" />,
   },
 ];
 

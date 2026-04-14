@@ -14,6 +14,7 @@ export default function AdminHeader() {
             alt="Copilot By Umurava Logo"
             width={110}
             height={20}
+            loading="eager"
           />
         </Link>
 
