@@ -1,5 +1,6 @@
 import express, { type Router } from "express";
 import { authController } from "../controllers/auth.controller";
+import { requireAuth } from "../middleware/auth.middleware";
 
 const authRouter: Router = express.Router();
 
@@ -7,6 +8,13 @@ const authRouter: Router = express.Router();
 authRouter.get("/google", authController.googleAuth);
 authRouter.get("/google/callback", authController.googleCallback);
 authRouter.post("/google/one-tap", authController.googleOneTap);
+
+// Link Google account (requires existing session)
+authRouter.post(
+  "/google/link/one-tap",
+  requireAuth,
+  authController.linkGoogleOneTap,
+);
 
 // Registration
 authRouter.post("/register/google", authController.registerGoogle);
@@ -16,15 +24,18 @@ authRouter.post("/register/local", authController.registerLocal);
 authRouter.post("/login/local", authController.loginLocal);
 
 // Current user
-authRouter.get("/me", authController.getMe);
+authRouter.get("/me", requireAuth, authController.getMe);
 
 // Refresh token
-authRouter.post("/refresh", authController.refreshToken);
+authRouter.post("/refresh", requireAuth, authController.refreshToken);
 
 // Logout
-authRouter.post("/logout", authController.logout);
+authRouter.post("/logout", requireAuth, authController.logout);
 
 // Update profile
-authRouter.put("/profile", authController.updateProfile);
+authRouter.put("/profile", requireAuth, authController.updateProfile);
+
+// Update password
+authRouter.put("/password", requireAuth, authController.updatePassword);
 
 export default authRouter;

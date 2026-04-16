@@ -181,6 +181,66 @@ const authController = {
     }
   },
 
+  // Link Google One Tap credential to existing account
+  async linkGoogleOneTap(req: Request, res: Response) {
+    try {
+      const userId = (req as any).user?.userId;
+      const { credential }: { credential: string } = req.body;
+
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      if (!credential) {
+        return res.status(400).json({ message: "Missing credential" });
+      }
+
+      const ticket = await googleClient.verifyIdToken({
+        idToken: credential,
+        audience: ENV.google_client_id,
+      });
+
+      const payload = ticket.getPayload();
+      if (!payload || !payload.email || !payload.sub) {
+        return res.status(401).json({ message: "Invalid Google credential" });
+      }
+
+      const currentUser = await User.findById(userId);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (currentUser.googleId) {
+        return res.status(400).json({ message: "Google already linked" });
+      }
+
+      const existingGoogleOwner = await User.findOne({ googleId: payload.sub });
+      if (existingGoogleOwner) {
+        return res
+          .status(409)
+          .json({ message: "Google account already linked to another user" });
+      }
+
+      currentUser.googleId = payload.sub;
+      if (!currentUser.picture && payload.picture) {
+        currentUser.picture = payload.picture;
+      }
+      await currentUser.save();
+
+      const safeUser = await getUserById(userId);
+
+      return res.status(200).json({
+        message: "Google account linked",
+        user: safeUser,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: "Failed to link Google account",
+        error: error.message,
+      });
+    }
+  },
+
   // Register new user with role selection (Google)
   async registerGoogle(req: Request, res: Response) {
     try {
@@ -437,6 +497,71 @@ const authController = {
     } catch (error: any) {
       return res.status(500).json({
         message: "Failed to update profile",
+        error: error.message,
+      });
+    }
+  },
+
+  // Update password (Local accounts)
+  async updatePassword(req: Request, res: Response) {
+    try {
+      const userId = (req as any).user?.userId;
+      const {
+        currentPassword,
+        newPassword,
+        confirmPassword,
+      }: {
+        currentPassword?: string;
+        newPassword?: string;
+        confirmPassword?: string;
+      } = req.body;
+
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        return res.status(400).json({
+          message: "currentPassword, newPassword, confirmPassword required",
+        });
+      }
+
+      if (newPassword !== confirmPassword) {
+        return res.status(400).json({ message: "Passwords do not match" });
+      }
+
+      if (String(newPassword).trim().length < 8) {
+        return res
+          .status(400)
+          .json({ message: "New password must be at least 8 characters" });
+      }
+
+      const user = await User.findById(userId).select("+password");
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (!user.password) {
+        return res.status(400).json({
+          message: "Password not set for this account. Use Google login.",
+        });
+      }
+
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ message: "Current password incorrect" });
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+      user.password = hashedPassword;
+      await user.save();
+
+      return res.status(200).json({ message: "Password updated" });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: "Failed to update password",
         error: error.message,
       });
     }

@@ -159,8 +159,16 @@ export async function findOrCreateUser(
 }
 
 export async function getUserById(userId: string): Promise<IUser | null> {
-  const userDoc = await User.findById(userId).select("-googleId").lean();
-  return userDoc as IUser | null;
+  const userDoc = await User.findById(userId).lean();
+  if (!userDoc) return null;
+
+  const hasGoogle = !!(userDoc as any).googleId;
+  delete (userDoc as any).googleId;
+
+  return {
+    ...(userDoc as any),
+    hasGoogle,
+  } as any;
 }
 
 export { passport };
