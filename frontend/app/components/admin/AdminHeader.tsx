@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Bell, Search } from "lucide-react";
+import NotificationDropdown from "../notifications/NotificationDropdown";
 
 export default function AdminHeader() {
   return (
@@ -28,9 +29,7 @@ export default function AdminHeader() {
           </div>
         </div>
 
-        <button className="h-10 w-10 rounded-full bg-white border border-gray-100 shadow-sm grid place-items-center hover:bg-gray-50 transition-colors">
-          <Bell className="h-5 w-5 text-gray-600" />
-        </button>
+        <NotificationDropdown role="admin" />
       </div>
     </header>
   );
