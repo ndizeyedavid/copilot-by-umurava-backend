@@ -149,15 +149,15 @@ export default function NotificationDropdown({
       >
         <Bell className="h-5 w-5 text-gray-600" />
         {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 h-4 w-4 bg-[#286ef0] text-white text-[10px] font-bold rounded-full border-2 border-white grid place-items-center">
-            {unreadCount}
+          <span className="absolute top-[-5px] right-[-5px] h-4 w-4 bg-[#286ef0] text-white text-[10px] font-bold rounded-full border-2 border-white grid place-items-center">
+            2
           </span>
         )}
       </button>
 
       {isOpen && (
         <div className="absolute right-0 mt-3 w-80 md:w-96 bg-white rounded-[20px] shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
-          <div className="px-6 py-5 border-b border-gray-50 flex items-center justify-between bg-gray-50/50">
+          <div className="px-6 pt-5 border-b border-gray-50 flex items-center justify-between bg-gray-50/50">
             <h3 className="font-black text-[#25324B]">Notifications</h3>
             <button className="text-xs font-bold text-[#286ef0] hover:underline flex items-center gap-1">
               <CheckCheck className="w-3.5 h-3.5" />
