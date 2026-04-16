@@ -38,15 +38,36 @@ export type AdminApplicationRow = {
 export default function AdminApplicationsTable({
   rows,
   onViewDetails,
+  selectedTalentIds,
+  onToggleSelect,
 }: {
   rows: AdminApplicationRow[];
   onViewDetails: (row: AdminApplicationRow) => void;
+  selectedTalentIds: string[];
+  onToggleSelect: (talentId: string) => void;
 }) {
   const [sorting, setSorting] = useState<SortingState>([
     { id: "appliedDate", desc: true },
   ]);
 
   const columns: ColumnDef<AdminApplicationRow>[] = [
+    {
+      id: "select",
+      header: "",
+      enableSorting: false,
+      cell: ({ row }) => {
+        const talentId = row.original.talentId;
+        const checked = selectedTalentIds.includes(talentId);
+        return (
+          <input
+            type="checkbox"
+            checked={checked}
+            onChange={() => onToggleSelect(talentId)}
+            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+          />
+        );
+      },
+    },
     {
       header: "Candidate",
       accessorKey: "talentName",

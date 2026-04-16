@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ArrowLeft, Search, Filter, Download, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import AdminApplicationsTable, {
   type AdminApplicationRow,
@@ -41,6 +42,8 @@ export default function AdminJobApplicationsPage({ jobId }: { jobId: string }) {
   const [query, setQuery] = useState("");
   const [selectedApplication, setSelectedApplication] =
     useState<AdminApplicationRow | null>(null);
+  const [selectedTalentIds, setSelectedTalentIds] = useState<string[]>([]);
+  const router = useRouter();
 
   const jobQuery = useQuery({
     queryKey: ["admin", "job", jobId],
@@ -89,6 +92,14 @@ export default function AdminJobApplicationsPage({ jobId }: { jobId: string }) {
       app.talentHeadline.toLowerCase().includes(query.toLowerCase()),
   );
 
+  const selectedCount = selectedTalentIds.length;
+  const canCompare = selectedCount === 2;
+  const selectedNames = selectedTalentIds
+    .map(
+      (id) => filteredApplications.find((a) => a.talentId === id)?.talentName,
+    )
+    .filter(Boolean) as string[];
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -128,6 +139,32 @@ export default function AdminJobApplicationsPage({ jobId }: { jobId: string }) {
           />
         </div>
         <div className="flex items-center gap-3">
+          <button
+            disabled={!canCompare}
+            onClick={() => {
+              if (selectedTalentIds.length !== 2) return;
+              const [a, b] = selectedTalentIds;
+              router.push(
+                `/admin/jobs/${jobId}/applications/compare?a=${encodeURIComponent(
+                  a,
+                )}&b=${encodeURIComponent(b)}`,
+              );
+            }}
+            className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${
+              canCompare
+                ? "border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+                : "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
+            }`}
+            title={
+              canCompare
+                ? `Compare ${selectedNames[0] ?? ""} vs ${
+                    selectedNames[1] ?? ""
+                  }`
+                : "Select exactly 2 applicants to compare"
+            }
+          >
+            Vs
+          </button>
           <button className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-[#25324B] hover:bg-gray-50 transition-colors">
             <Filter className="h-4 w-4 text-gray-400" />
             Filters
@@ -149,6 +186,15 @@ export default function AdminJobApplicationsPage({ jobId }: { jobId: string }) {
         <AdminApplicationsTable
           rows={filteredApplications}
           onViewDetails={(app) => setSelectedApplication(app)}
+          selectedTalentIds={selectedTalentIds}
+          onToggleSelect={(talentId) => {
+            setSelectedTalentIds((prev) => {
+              if (prev.includes(talentId))
+                return prev.filter((x) => x !== talentId);
+              if (prev.length >= 2) return prev;
+              return [...prev, talentId];
+            });
+          }}
         />
       )}
 
