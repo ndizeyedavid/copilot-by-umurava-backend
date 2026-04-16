@@ -15,8 +15,8 @@ import { Card } from "@/components/ui/Card";
 export interface Experience {
   company: string;
   role: string;
-  startDate: string | Date;
-  endDate?: string | Date;
+  startDate: string;
+  endDate?: string;
   description: string;
   technologies: string[];
   IsCurrent: boolean;
@@ -25,13 +25,15 @@ export interface Experience {
 interface ExperienceSectionProps {
   experience: Experience[];
   onAdd: () => void;
+  onEdit: (index: number) => void;
 }
 
 export default function ExperienceSection({
   experience,
   onAdd,
+  onEdit,
 }: ExperienceSectionProps) {
-  const formatDate = (date: string | Date) => {
+  const formatDate = (date: string) => {
     if (!date) return "";
     const d = new Date(date);
     return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
@@ -56,7 +58,11 @@ export default function ExperienceSection({
 
       <div className="space-y-10">
         {experience.map((exp, index) => (
-          <div key={index} className="relative group pl-10">
+          <div
+            key={index}
+            className="relative group pl-10 cursor-pointer"
+            onClick={() => onEdit(index)}
+          >
             {/* Timeline Line */}
             {index !== experience.length - 1 && (
               <div className="absolute left-[11px] top-6 bottom-[-40px] w-[2px] bg-gray-100 group-last:hidden" />

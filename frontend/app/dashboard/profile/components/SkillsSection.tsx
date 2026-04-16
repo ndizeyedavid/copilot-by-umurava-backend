@@ -14,9 +14,14 @@ export interface Skill {
 interface SkillsSectionProps {
   skills: Skill[];
   onAdd: () => void;
+  onEdit: (index: number) => void;
 }
 
-export default function SkillsSection({ skills, onAdd }: SkillsSectionProps) {
+export default function SkillsSection({
+  skills,
+  onAdd,
+  onEdit,
+}: SkillsSectionProps) {
   const getLevelColor = (level: string) => {
     switch (level) {
       case "Expert":
@@ -66,7 +71,8 @@ export default function SkillsSection({ skills, onAdd }: SkillsSectionProps) {
         {skills.map((skill, index) => (
           <div
             key={index}
-            className="group relative p-5 bg-white rounded-2xl border border-gray-100 hover:border-[#286ef0] hover:shadow-[0_4px_15px_rgba(0,0,0,0.03)] transition-all duration-300"
+            onClick={() => onEdit(index)}
+            className="group relative p-5 bg-white rounded-2xl border border-gray-100 hover:border-[#286ef0] hover:shadow-[0_4px_15px_rgba(0,0,0,0.03)] transition-all duration-300 cursor-pointer"
           >
             <div className="flex items-start justify-between">
               <div>

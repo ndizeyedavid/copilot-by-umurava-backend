@@ -5,7 +5,6 @@ import {
   User,
   MapPin,
   Edit3,
-  Save,
   Globe,
   Mail,
   CheckCircle,
@@ -16,35 +15,70 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import ExperienceSection, { Experience } from "./components/ExperienceSection";
 import SkillsSection, { Skill } from "./components/SkillsSection";
+import LanguagesSection, { Language } from "./components/LanguagesSection";
 import ProfileStatus from "./components/ProfileStatus";
+import Modal from "./components/Modal";
+import ExperienceForm from "./components/forms/ExperienceForm";
+import SkillForm from "./components/forms/SkillForm";
+import LanguageForm from "./components/forms/LanguageForm";
+import BioForm from "./components/forms/BioForm";
+import UserDetailsForm from "./components/forms/UserDetailsForm";
+import SocialsForm from "./components/forms/SocialsForm";
 import { ImGithub, ImLinkedin2 } from "react-icons/im";
 
 export default function ProfilePage() {
-  const [isEditing, setIsEditing] = useState(false);
+  const [activeModal, setActiveModal] = useState<{
+    type:
+      | "experience"
+      | "skills"
+      | "languages"
+      | "bio"
+      | "details"
+      | "socials"
+      | null;
+    index?: number;
+  }>({ type: null });
 
   // Reflected from Talents & Users Schema
-  const [userData] = useState({
+  const [userData, setUserData] = useState({
     firstName: "Ndizeye",
     lastName: "David",
     email: "david@umurava.com",
     picture: null,
   });
 
-  const [talentData] = useState({
+  const [talentData, setTalentData] = useState({
     headline: "Frontend Developer - React & AI Systems",
     bio: "Passionate about building scalable web applications with high-quality UI/UX and integrating AI solutions.",
     location: "Kigali, Rwanda",
     skills: [
-      { name: "React", level: "Expert" as const, yearsOfExperience: 3 },
-      { name: "TypeScript", level: "Advanced" as const, yearsOfExperience: 2 },
-      { name: "Node.js", level: "Intermediate" as const, yearsOfExperience: 2 },
-      { name: "Tailwind CSS", level: "Expert" as const, yearsOfExperience: 3 },
+      {
+        name: "React",
+        level: "Expert" as Skill["level"],
+        yearsOfExperience: 3,
+      },
+      {
+        name: "TypeScript",
+        level: "Advanced" as Skill["level"],
+        yearsOfExperience: 2,
+      },
+      {
+        name: "Node.js",
+        level: "Intermediate" as Skill["level"],
+        yearsOfExperience: 2,
+      },
+      {
+        name: "Tailwind CSS",
+        level: "Expert" as Skill["level"],
+        yearsOfExperience: 3,
+      },
     ],
     experience: [
       {
         company: "TechCorp Rwanda",
         role: "Senior Frontend Engineer",
         startDate: "2022-01-01",
+        endDate: "" as string,
         description:
           "Led the development of a next-gen dashboard for talent analytics, improving performance by 60%.",
         technologies: ["Next.js", "Tailwind", "Radix UI"],
@@ -67,10 +101,96 @@ export default function ProfilePage() {
     },
     socialLinks: ["https://linkedin.com/in/david", "https://github.com/david"],
     languages: [
-      { name: "English", proficiency: "Fluent" as const },
-      { name: "Kinyarwanda", proficiency: "Native" as const },
+      { name: "English", proficiency: "Fluent" as Language["proficiency"] },
+      { name: "Kinyarwanda", proficiency: "Native" as Language["proficiency"] },
     ],
   });
+
+  // Modal Handlers
+  const openModal = (type: typeof activeModal.type, index?: number) => {
+    setActiveModal({ type, index });
+  };
+
+  const closeModal = () => {
+    setActiveModal({ type: null });
+  };
+
+  const handleUpdateExperience = (updatedExp: Experience) => {
+    const newExperience = [...talentData.experience];
+    const formattedExp = {
+      ...updatedExp,
+      endDate: updatedExp.endDate || "", // Ensure string
+    };
+    if (activeModal.index !== undefined) {
+      newExperience[activeModal.index] = formattedExp;
+    } else {
+      newExperience.push(formattedExp);
+    }
+    setTalentData({ ...talentData, experience: newExperience });
+    closeModal();
+  };
+
+  const handleUpdateSkill = (updatedSkill: Skill) => {
+    const newSkills = [...talentData.skills];
+    if (activeModal.index !== undefined) {
+      newSkills[activeModal.index] = updatedSkill;
+    } else {
+      newSkills.push(updatedSkill);
+    }
+    setTalentData({ ...talentData, skills: newSkills });
+    closeModal();
+  };
+
+  const handleUpdateLanguage = (updatedLang: Language) => {
+    const newLanguages = [...talentData.languages];
+    if (activeModal.index !== undefined) {
+      newLanguages[activeModal.index] = updatedLang;
+    } else {
+      newLanguages.push(updatedLang);
+    }
+    setTalentData({ ...talentData, languages: newLanguages });
+    closeModal();
+  };
+
+  const handleUpdateBio = (newBio: string) => {
+    setTalentData({ ...talentData, bio: newBio });
+    closeModal();
+  };
+
+  const handleUpdateDetails = (data: any) => {
+    setUserData({
+      ...userData,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+    });
+    setTalentData({
+      ...talentData,
+      headline: data.headline,
+      location: data.location,
+      socialLinks: data.socialLinks,
+    });
+    closeModal();
+  };
+
+  const handleUpdateSocials = (data: any) => {
+    setTalentData({ ...talentData, socialLinks: data.socialLinks });
+    closeModal();
+  };
+
+  const removeItem = (type: typeof activeModal.type, index: number) => {
+    if (type === "experience") {
+      const newExp = talentData.experience.filter((_, i) => i !== index);
+      setTalentData({ ...talentData, experience: newExp });
+    } else if (type === "skills") {
+      const newSkills = talentData.skills.filter((_, i) => i !== index);
+      setTalentData({ ...talentData, skills: newSkills });
+    } else if (type === "languages") {
+      const newLangs = talentData.languages.filter((_, i) => i !== index);
+      setTalentData({ ...talentData, languages: newLangs });
+    }
+    closeModal();
+  };
 
   return (
     <div className="min-h-screen bg-[#F8F9FD]">
@@ -120,15 +240,11 @@ export default function ProfilePage() {
 
             <div className="flex flex-col gap-3">
               <button
-                onClick={() => setIsEditing(!isEditing)}
+                onClick={() => openModal("details")}
                 className="w-full px-8 py-4 bg-[#286ef0] text-white rounded-2xl hover:bg-[#1f5fe0] shadow-[0_4px_15px_rgba(40,110,240,0.3)] transition-all flex items-center justify-center font-bold text-sm tracking-widest uppercase"
               >
-                {isEditing ? (
-                  <Save className="w-4 h-4 mr-2" />
-                ) : (
-                  <Edit3 className="w-4 h-4 mr-2" />
-                )}
-                {isEditing ? "Save Changes" : "Edit Profile"}
+                <Edit3 className="w-4 h-4 mr-2" />
+                Edit Profile
               </button>
               <div className="flex justify-center gap-2">
                 {talentData.socialLinks.map((link, i) => (
@@ -153,11 +269,17 @@ export default function ProfilePage() {
           {/* Main Content Area */}
           <div className="lg:col-span-2 space-y-3">
             {/* Bio Section */}
-            <Card className="p-8 bg-white rounded-[10px] border border-gray-100 shadow-none">
-              <h2 className="text-xl font-bold text-[#25324B] mb-4 flex items-center gap-3">
-                <User className="w-5 h-5 text-[#286ef0]" />
-                Personal Bio
-              </h2>
+            <Card
+              className="p-8 bg-white rounded-[10px] border border-gray-100 shadow-none cursor-pointer group hover:border-[#286ef0] transition-all"
+              onClick={() => openModal("bio")}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-[#25324B] flex items-center gap-3">
+                  <User className="w-5 h-5 text-[#286ef0]" />
+                  Personal Bio
+                </h2>
+                <Edit3 className="w-4 h-4 text-gray-300 group-hover:text-[#286ef0] transition-colors" />
+              </div>
               <p className="text-sm leading-relaxed text-[#7C8493] font-medium">
                 {talentData.bio}
               </p>
@@ -165,42 +287,22 @@ export default function ProfilePage() {
 
             <ExperienceSection
               experience={talentData.experience as Experience[]}
-              onAdd={() => console.log("Add Exp")}
+              onAdd={() => openModal("experience")}
+              onEdit={(index) => openModal("experience", index)}
             />
 
             <SkillsSection
               skills={talentData.skills as Skill[]}
-              onAdd={() => console.log("Add Skill")}
+              onAdd={() => openModal("skills")}
+              onEdit={(index) => openModal("skills", index)}
             />
 
-            {/* Languages Section */}
-            <Card className="p-8 bg-white rounded-[10px] border border-gray-100 shadow-none">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-[#25324B] mb-2 flex items-center gap-3">
-                  <Globe className="w-5 h-5 text-[#286ef0]" />
-                  Languages
-                </h2>
-                <button className="p-2 text-[#286ef0] hover:bg-[#F3F4FF] rounded-xl transition-all">
-                  <Plus className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-3">
-                {talentData.languages.map((lang, index) => (
-                  <div
-                    key={index}
-                    className="px-5 py-3 bg-[#F8F9FD] border border-gray-100 rounded-2xl flex items-center gap-3"
-                  >
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span className="text-sm font-bold text-[#25324B]">
-                      {lang.name}
-                    </span>
-                    <span className="text-[10px] font-bold text-[#286ef0] uppercase tracking-widest bg-blue-50 px-2 py-0.5 rounded-full">
-                      {lang.proficiency}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </Card>
+            <LanguagesSection
+              languages={talentData.languages as Language[]}
+              onAdd={() => openModal("languages")}
+              onEdit={(index) => openModal("languages", index)}
+              onRemove={(index) => removeItem("languages", index)}
+            />
           </div>
 
           {/* Sidebar - Profile Status (The MIFOTRA-style card) */}
@@ -208,6 +310,112 @@ export default function ProfilePage() {
             <ProfileStatus />
           </div>
         </div>
+
+        {/* MODALS */}
+        <Modal
+          isOpen={activeModal.type === "experience"}
+          onClose={closeModal}
+          title={
+            activeModal.index !== undefined
+              ? "Edit Experience"
+              : "Add Experience"
+          }
+        >
+          <ExperienceForm
+            initialData={
+              activeModal.index !== undefined
+                ? talentData.experience[activeModal.index]
+                : undefined
+            }
+            onSubmit={handleUpdateExperience}
+            onDelete={
+              activeModal.index !== undefined
+                ? () => removeItem("experience", activeModal.index!)
+                : undefined
+            }
+          />
+        </Modal>
+
+        <Modal
+          isOpen={activeModal.type === "skills"}
+          onClose={closeModal}
+          title={activeModal.index !== undefined ? "Edit Skill" : "Add Skill"}
+        >
+          <SkillForm
+            initialData={
+              activeModal.index !== undefined
+                ? talentData.skills[activeModal.index]
+                : undefined
+            }
+            onSubmit={handleUpdateSkill}
+            onDelete={
+              activeModal.index !== undefined
+                ? () => removeItem("skills", activeModal.index!)
+                : undefined
+            }
+          />
+        </Modal>
+
+        <Modal
+          isOpen={activeModal.type === "languages"}
+          onClose={closeModal}
+          title={
+            activeModal.index !== undefined ? "Edit Language" : "Add Language"
+          }
+        >
+          <LanguageForm
+            initialData={
+              activeModal.index !== undefined
+                ? talentData.languages[activeModal.index]
+                : undefined
+            }
+            onSubmit={handleUpdateLanguage}
+            onDelete={
+              activeModal.index !== undefined
+                ? () => removeItem("languages", activeModal.index!)
+                : undefined
+            }
+          />
+        </Modal>
+
+        <Modal
+          isOpen={activeModal.type === "bio"}
+          onClose={closeModal}
+          title="Edit Personal Bio"
+        >
+          <BioForm initialData={talentData.bio} onSubmit={handleUpdateBio} />
+        </Modal>
+
+        <Modal
+          isOpen={activeModal.type === "details"}
+          onClose={closeModal}
+          title="Edit Profile Details"
+        >
+          <UserDetailsForm
+            initialData={{
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+              email: userData.email,
+              headline: talentData.headline,
+              location: talentData.location,
+              socialLinks: talentData.socialLinks,
+            }}
+            onSubmit={handleUpdateDetails}
+          />
+        </Modal>
+
+        <Modal
+          isOpen={activeModal.type === "socials"}
+          onClose={closeModal}
+          title="Edit Social Links"
+        >
+          <SocialsForm
+            initialData={{
+              socialLinks: talentData.socialLinks,
+            }}
+            onSubmit={handleUpdateSocials}
+          />
+        </Modal>
       </div>
     </div>
   );
