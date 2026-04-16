@@ -1,10 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Loader2, AlertTriangle, Trophy } from "lucide-react";
+import { ArrowLeft, Loader2, AlertTriangle, FileText, X } from "lucide-react";
 import { api } from "@/lib/api/client";
 
 type BackendTalent = {
@@ -18,9 +18,26 @@ type BackendTalent = {
   education?: any[];
   projects?: any[];
   availability?: { status?: string; type?: string };
-  userId?: { firstName?: string; lastName?: string; email?: string; phone?: string };
+  userId?: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
+  };
   firstName?: string;
   lastName?: string;
+};
+
+type InternalScreening = {
+  _id: string;
+  jobId: string;
+};
+
+type BackendApplication = {
+  _id: string;
+  jobId: string;
+  talentId: string;
+  resumeUrl: string;
 };
 
 function fullName(t: BackendTalent | undefined) {
@@ -52,27 +69,53 @@ function winsLabel(a: number, b: number) {
   return a > b ? "Wins" : "Loses";
 }
 
-function DiffSection({
+function Chip({
+  children,
+  tone,
+}: {
+  children: ReactNode;
+  tone: "shared" | "unique" | "missing";
+}) {
+  const cls =
+    tone === "shared"
+      ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+      : tone === "unique"
+        ? "bg-indigo-50 border-indigo-200 text-indigo-700"
+        : "bg-amber-50 border-amber-200 text-amber-800";
+
+  return (
+    <span
+      className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold ${cls}`}
+    >
+      {children}
+    </span>
+  );
+}
+
+function ChipsRow({
   title,
-  left,
-  right,
+  items,
+  tone,
 }: {
   title: string;
-  left: React.ReactNode;
-  right: React.ReactNode;
+  items: string[];
+  tone: "shared" | "unique" | "missing";
 }) {
   return (
-    <section className="rounded-2xl border border-gray-200 bg-white p-5">
-      <h3 className="text-sm font-bold text-[#25324B] mb-4">{title}</h3>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="rounded-xl border border-gray-100 bg-gray-50/40 p-4">
-          {left}
-        </div>
-        <div className="rounded-xl border border-gray-100 bg-gray-50/40 p-4">
-          {right}
-        </div>
+    <div>
+      <p className="text-xs font-semibold text-[#25324B]">{title}</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {items.length ? (
+          items.map((x) => (
+            <Chip key={`${tone}-${title}-${x}`} tone={tone}>
+              {x}
+            </Chip>
+          ))
+        ) : (
+          <span className="text-xs text-[#7C8493]">None</span>
+        )}
       </div>
-    </section>
+    </div>
   );
 }
 
@@ -82,6 +125,12 @@ export default function ScreeningComparePage() {
   const sp = useSearchParams();
   const a = sp.get("a") ?? "";
   const b = sp.get("b") ?? "";
+
+  const [resumeModal, setResumeModal] = useState<{
+    open: boolean;
+    url: string;
+    name: string;
+  }>({ open: false, url: "", name: "" });
 
   const canLoad = !!screeningId && !!a && !!b && a !== b;
 
@@ -107,24 +156,77 @@ export default function ScreeningComparePage() {
   const talentA = aQuery.data;
   const talentB = bQuery.data;
 
+  const screeningQuery = useQuery({
+    queryKey: ["admin", "screening", screeningId, "compare", "screening"],
+    enabled: !!screeningId,
+    queryFn: async () => {
+      try {
+        const res = await api.get(`/screening/${screeningId}`);
+        return res.data?.fetchedScreening as InternalScreening;
+      } catch {
+        return null;
+      }
+    },
+  });
+
+  const applicationsQuery = useQuery({
+    queryKey: [
+      "admin",
+      "screening",
+      screeningId,
+      "compare",
+      "applications",
+      screeningQuery.data?.jobId,
+    ],
+    enabled: !!screeningQuery.data?.jobId,
+    queryFn: async () => {
+      const jobId = screeningQuery.data!.jobId;
+      const res = await api.get(`/applications/job/${jobId}`);
+      return (res.data?.applications as BackendApplication[]) ?? [];
+    },
+  });
+
+  const resumeUrlByTalentId = useMemo(() => {
+    const apps = applicationsQuery.data ?? [];
+    const map = new Map<string, string>();
+    for (const app of apps) {
+      const url = String(app?.resumeUrl ?? "").trim();
+      if (!url || url === "#") continue;
+      map.set(String(app.talentId), url);
+    }
+    return map;
+  }, [applicationsQuery.data]);
+
   const computed = useMemo(() => {
     const aSkills = skillList(talentA);
     const bSkills = skillList(talentB);
     const aSet = normSet(aSkills);
     const bSet = normSet(bSkills);
 
-    const sharedSkills = aSkills.filter((s) => bSet.has(s.trim().toLowerCase()));
-    const aOnlySkills = aSkills.filter((s) => !bSet.has(s.trim().toLowerCase()));
-    const bOnlySkills = bSkills.filter((s) => !aSet.has(s.trim().toLowerCase()));
+    const sharedSkills = aSkills.filter((s) =>
+      bSet.has(s.trim().toLowerCase()),
+    );
+    const aOnlySkills = aSkills.filter(
+      (s) => !bSet.has(s.trim().toLowerCase()),
+    );
+    const bOnlySkills = bSkills.filter(
+      (s) => !aSet.has(s.trim().toLowerCase()),
+    );
 
     const aLang = langList(talentA);
     const bLang = langList(talentB);
     const aLangSet = normSet(aLang);
     const bLangSet = normSet(bLang);
 
-    const sharedLang = aLang.filter((l) => bLangSet.has(l.trim().toLowerCase()));
-    const aOnlyLang = aLang.filter((l) => !bLangSet.has(l.trim().toLowerCase()));
-    const bOnlyLang = bLang.filter((l) => !aLangSet.has(l.trim().toLowerCase()));
+    const sharedLang = aLang.filter((l) =>
+      bLangSet.has(l.trim().toLowerCase()),
+    );
+    const aOnlyLang = aLang.filter(
+      (l) => !bLangSet.has(l.trim().toLowerCase()),
+    );
+    const bOnlyLang = bLang.filter(
+      (l) => !aLangSet.has(l.trim().toLowerCase()),
+    );
 
     return {
       sharedSkills,
@@ -144,6 +246,9 @@ export default function ScreeningComparePage() {
     };
   }, [talentA, talentB]);
 
+  const aResumeUrl = resumeUrlByTalentId.get(a) ?? "";
+  const bResumeUrl = resumeUrlByTalentId.get(b) ?? "";
+
   return (
     <div className="space-y-6">
       <div>
@@ -154,7 +259,9 @@ export default function ScreeningComparePage() {
           <ArrowLeft className="h-4 w-4" />
           Back to Results
         </Link>
-        <h1 className="text-2xl font-bold text-[#25324B]">Compare Candidates</h1>
+        <h1 className="text-2xl font-bold text-[#25324B]">
+          Compare Candidates
+        </h1>
         <p className="text-sm text-[#7C8493]">Diff layout, gaps, wins.</p>
       </div>
 
@@ -164,7 +271,9 @@ export default function ScreeningComparePage() {
             <AlertTriangle className="h-4 w-4" />
             Need 2 different candidates.
           </div>
-          <p className="mt-1 text-xs">Go back, pick 2 compare checkboxes, click Vs.</p>
+          <p className="mt-1 text-xs">
+            Go back, select 2 candidates, click Vs.
+          </p>
         </div>
       ) : isLoading ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-200 bg-white py-20">
@@ -176,278 +285,308 @@ export default function ScreeningComparePage() {
           Failed load one or both talent profiles.
         </div>
       ) : (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="rounded-2xl border border-gray-200 bg-white p-5">
-              <p className="text-xs font-bold uppercase tracking-wider text-[#7C8493]">A</p>
-              <p className="mt-1 text-lg font-bold text-[#25324B]">{fullName(talentA)}</p>
+        <div className="rounded-2xl border border-gray-200 bg-white p-5">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-[1fr_auto_1fr] md:gap-0">
+            <div className="md:pr-8">
+              <p className="text-xs font-bold uppercase tracking-wider text-[#7C8493]">
+                Candidate A
+              </p>
+              <p className="mt-1 text-xl font-bold text-[#25324B]">
+                {fullName(talentA)}
+              </p>
               <p className="text-sm text-[#7C8493]">{talentA.headline}</p>
+
+              {aResumeUrl ? (
+                <div className="mt-4">
+                  <button
+                    onClick={() =>
+                      setResumeModal({
+                        open: true,
+                        url: aResumeUrl,
+                        name: fullName(talentA),
+                      })
+                    }
+                    className="inline-flex items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100 transition-colors"
+                  >
+                    <FileText className="h-4 w-4" />
+                    View Resume
+                  </button>
+                </div>
+              ) : null}
+
               <div className="mt-4 grid grid-cols-3 gap-3">
                 <div className="rounded-xl border border-gray-100 bg-gray-50/40 p-3">
-                  <p className="text-[10px] font-bold uppercase text-[#7C8493]">Skills</p>
-                  <p className="text-sm font-bold text-[#25324B]">{computed.aSkillCount}</p>
+                  <p className="text-[10px] font-bold uppercase text-[#7C8493]">
+                    Skills
+                  </p>
+                  <p className="text-sm font-bold text-[#25324B]">
+                    {computed.aSkillCount} (
+                    {winsLabel(computed.aSkillCount, computed.bSkillCount)})
+                  </p>
                 </div>
                 <div className="rounded-xl border border-gray-100 bg-gray-50/40 p-3">
-                  <p className="text-[10px] font-bold uppercase text-[#7C8493]">Experience</p>
-                  <p className="text-sm font-bold text-[#25324B]">{computed.aExp}</p>
+                  <p className="text-[10px] font-bold uppercase text-[#7C8493]">
+                    Experience
+                  </p>
+                  <p className="text-sm font-bold text-[#25324B]">
+                    {computed.aExp} ({winsLabel(computed.aExp, computed.bExp)})
+                  </p>
                 </div>
                 <div className="rounded-xl border border-gray-100 bg-gray-50/40 p-3">
-                  <p className="text-[10px] font-bold uppercase text-[#7C8493]">Projects</p>
-                  <p className="text-sm font-bold text-[#25324B]">{computed.aProj}</p>
+                  <p className="text-[10px] font-bold uppercase text-[#7C8493]">
+                    Projects
+                  </p>
+                  <p className="text-sm font-bold text-[#25324B]">
+                    {computed.aProj} (
+                    {winsLabel(computed.aProj, computed.bProj)})
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 space-y-5">
+                <div>
+                  <p className="text-sm font-bold text-[#25324B]">
+                    Skills Comparison
+                  </p>
+                  <div className="mt-3 space-y-3">
+                    <ChipsRow
+                      title="Shared"
+                      items={computed.sharedSkills}
+                      tone="shared"
+                    />
+                    <ChipsRow
+                      title="A unique"
+                      items={computed.aOnlySkills}
+                      tone="unique"
+                    />
+                    <ChipsRow
+                      title="Missing (B has)"
+                      items={computed.bOnlySkills}
+                      tone="missing"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-bold text-[#25324B]">
+                    Languages Comparison
+                  </p>
+                  <div className="mt-3 space-y-3">
+                    <ChipsRow
+                      title="Shared"
+                      items={computed.sharedLang}
+                      tone="shared"
+                    />
+                    <ChipsRow
+                      title="A unique"
+                      items={computed.aOnlyLang}
+                      tone="unique"
+                    />
+                    <ChipsRow
+                      title="Missing (B has)"
+                      items={computed.bOnlyLang}
+                      tone="missing"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl border border-gray-100 bg-gray-50/40 p-4">
+                    <p className="text-[10px] font-bold uppercase text-[#7C8493]">
+                      Education entries
+                    </p>
+                    <p className="mt-1 text-sm font-bold text-[#25324B]">
+                      {computed.aEdu}
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-gray-100 bg-gray-50/40 p-4">
+                    <p className="text-[10px] font-bold uppercase text-[#7C8493]">
+                      Availability
+                    </p>
+                    <p className="mt-1 text-xs font-semibold text-[#25324B]">
+                      {talentA.availability?.type ?? "—"} •{" "}
+                      {talentA.availability?.status ?? "—"}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-gray-200 bg-white p-5">
-              <p className="text-xs font-bold uppercase tracking-wider text-[#7C8493]">B</p>
-              <p className="mt-1 text-lg font-bold text-[#25324B]">{fullName(talentB)}</p>
+            <div className="hidden md:flex items-stretch px-8">
+              <div className="w-px border-l border-dashed border-gray-300" />
+            </div>
+
+            <div className="md:pl-8">
+              <p className="text-xs font-bold uppercase tracking-wider text-[#7C8493]">
+                Candidate B
+              </p>
+              <p className="mt-1 text-xl font-bold text-[#25324B]">
+                {fullName(talentB)}
+              </p>
               <p className="text-sm text-[#7C8493]">{talentB.headline}</p>
+
+              {bResumeUrl ? (
+                <div className="mt-4">
+                  <button
+                    onClick={() =>
+                      setResumeModal({
+                        open: true,
+                        url: bResumeUrl,
+                        name: fullName(talentB),
+                      })
+                    }
+                    className="inline-flex items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100 transition-colors"
+                  >
+                    <FileText className="h-4 w-4" />
+                    View Resume
+                  </button>
+                </div>
+              ) : null}
+
               <div className="mt-4 grid grid-cols-3 gap-3">
                 <div className="rounded-xl border border-gray-100 bg-gray-50/40 p-3">
-                  <p className="text-[10px] font-bold uppercase text-[#7C8493]">Skills</p>
-                  <p className="text-sm font-bold text-[#25324B]">{computed.bSkillCount}</p>
+                  <p className="text-[10px] font-bold uppercase text-[#7C8493]">
+                    Skills
+                  </p>
+                  <p className="text-sm font-bold text-[#25324B]">
+                    {computed.bSkillCount} (
+                    {winsLabel(computed.bSkillCount, computed.aSkillCount)})
+                  </p>
                 </div>
                 <div className="rounded-xl border border-gray-100 bg-gray-50/40 p-3">
-                  <p className="text-[10px] font-bold uppercase text-[#7C8493]">Experience</p>
-                  <p className="text-sm font-bold text-[#25324B]">{computed.bExp}</p>
+                  <p className="text-[10px] font-bold uppercase text-[#7C8493]">
+                    Experience
+                  </p>
+                  <p className="text-sm font-bold text-[#25324B]">
+                    {computed.bExp} ({winsLabel(computed.bExp, computed.aExp)})
+                  </p>
                 </div>
                 <div className="rounded-xl border border-gray-100 bg-gray-50/40 p-3">
-                  <p className="text-[10px] font-bold uppercase text-[#7C8493]">Projects</p>
-                  <p className="text-sm font-bold text-[#25324B]">{computed.bProj}</p>
+                  <p className="text-[10px] font-bold uppercase text-[#7C8493]">
+                    Projects
+                  </p>
+                  <p className="text-sm font-bold text-[#25324B]">
+                    {computed.bProj} (
+                    {winsLabel(computed.bProj, computed.aProj)})
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 space-y-5">
+                <div>
+                  <p className="text-sm font-bold text-[#25324B]">
+                    Skills Comparison
+                  </p>
+                  <div className="mt-3 space-y-3">
+                    <ChipsRow
+                      title="Shared"
+                      items={computed.sharedSkills}
+                      tone="shared"
+                    />
+                    <ChipsRow
+                      title="B unique"
+                      items={computed.bOnlySkills}
+                      tone="unique"
+                    />
+                    <ChipsRow
+                      title="Missing (A has)"
+                      items={computed.aOnlySkills}
+                      tone="missing"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-bold text-[#25324B]">
+                    Languages Comparison
+                  </p>
+                  <div className="mt-3 space-y-3">
+                    <ChipsRow
+                      title="Shared"
+                      items={computed.sharedLang}
+                      tone="shared"
+                    />
+                    <ChipsRow
+                      title="B unique"
+                      items={computed.bOnlyLang}
+                      tone="unique"
+                    />
+                    <ChipsRow
+                      title="Missing (A has)"
+                      items={computed.aOnlyLang}
+                      tone="missing"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl border border-gray-100 bg-gray-50/40 p-4">
+                    <p className="text-[10px] font-bold uppercase text-[#7C8493]">
+                      Education entries
+                    </p>
+                    <p className="mt-1 text-sm font-bold text-[#25324B]">
+                      {computed.bEdu}
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-gray-100 bg-gray-50/40 p-4">
+                    <p className="text-[10px] font-bold uppercase text-[#7C8493]">
+                      Availability
+                    </p>
+                    <p className="mt-1 text-xs font-semibold text-[#25324B]">
+                      {talentB.availability?.type ?? "—"} •{" "}
+                      {talentB.availability?.status ?? "—"}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-
-          <section className="rounded-2xl border border-indigo-200 bg-indigo-50/50 p-5">
-            <div className="flex items-center gap-2 text-indigo-700">
-              <Trophy className="h-5 w-5" />
-              <h2 className="text-sm font-bold uppercase tracking-wider">Quick Wins</h2>
-            </div>
-            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
-              <div className="rounded-xl bg-white border border-indigo-100 p-4">
-                <p className="text-[10px] font-bold uppercase text-[#7C8493]">Experience entries</p>
-                <p className="mt-1 text-sm font-bold text-[#25324B]">
-                  A: {computed.aExp} ({winsLabel(computed.aExp, computed.bExp)})
-                </p>
-                <p className="text-sm font-bold text-[#25324B]">
-                  B: {computed.bExp} ({winsLabel(computed.bExp, computed.aExp)})
-                </p>
-              </div>
-              <div className="rounded-xl bg-white border border-indigo-100 p-4">
-                <p className="text-[10px] font-bold uppercase text-[#7C8493]">Skills count</p>
-                <p className="mt-1 text-sm font-bold text-[#25324B]">
-                  A: {computed.aSkillCount} ({winsLabel(computed.aSkillCount, computed.bSkillCount)})
-                </p>
-                <p className="text-sm font-bold text-[#25324B]">
-                  B: {computed.bSkillCount} ({winsLabel(computed.bSkillCount, computed.aSkillCount)})
-                </p>
-              </div>
-              <div className="rounded-xl bg-white border border-indigo-100 p-4">
-                <p className="text-[10px] font-bold uppercase text-[#7C8493]">Projects count</p>
-                <p className="mt-1 text-sm font-bold text-[#25324B]">
-                  A: {computed.aProj} ({winsLabel(computed.aProj, computed.bProj)})
-                </p>
-                <p className="text-sm font-bold text-[#25324B]">
-                  B: {computed.bProj} ({winsLabel(computed.bProj, computed.aProj)})
-                </p>
-              </div>
-            </div>
-          </section>
-
-          <DiffSection
-            title="Skills Diff"
-            left={
-              <div className="space-y-3">
-                <div>
-                  <p className="text-xs font-semibold text-[#25324B]">Shared</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {computed.sharedSkills.length ? (
-                      computed.sharedSkills.map((s) => (
-                        <span
-                          key={`shared-a-${s}`}
-                          className="rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-700"
-                        >
-                          {s}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-xs text-[#7C8493]">None</span>
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-[#25324B]">A only (gaps vs B)</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {computed.aOnlySkills.length ? (
-                      computed.aOnlySkills.map((s) => (
-                        <span
-                          key={`aonly-${s}`}
-                          className="rounded-full bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 text-[10px] font-semibold text-indigo-700"
-                        >
-                          {s}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-xs text-[#7C8493]">None</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            }
-            right={
-              <div className="space-y-3">
-                <div>
-                  <p className="text-xs font-semibold text-[#25324B]">Shared</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {computed.sharedSkills.length ? (
-                      computed.sharedSkills.map((s) => (
-                        <span
-                          key={`shared-b-${s}`}
-                          className="rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-700"
-                        >
-                          {s}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-xs text-[#7C8493]">None</span>
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-[#25324B]">B only (gaps vs A)</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {computed.bOnlySkills.length ? (
-                      computed.bOnlySkills.map((s) => (
-                        <span
-                          key={`bonly-${s}`}
-                          className="rounded-full bg-violet-50 border border-violet-200 px-2.5 py-0.5 text-[10px] font-semibold text-violet-700"
-                        >
-                          {s}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-xs text-[#7C8493]">None</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            }
-          />
-
-          <DiffSection
-            title="Languages Diff"
-            left={
-              <div className="space-y-3">
-                <div>
-                  <p className="text-xs font-semibold text-[#25324B]">Shared</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {computed.sharedLang.length ? (
-                      computed.sharedLang.map((l) => (
-                        <span
-                          key={`lshared-a-${l}`}
-                          className="rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-700"
-                        >
-                          {l}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-xs text-[#7C8493]">None</span>
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-[#25324B]">A only</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {computed.aOnlyLang.length ? (
-                      computed.aOnlyLang.map((l) => (
-                        <span
-                          key={`laonly-${l}`}
-                          className="rounded-full bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 text-[10px] font-semibold text-indigo-700"
-                        >
-                          {l}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-xs text-[#7C8493]">None</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            }
-            right={
-              <div className="space-y-3">
-                <div>
-                  <p className="text-xs font-semibold text-[#25324B]">Shared</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {computed.sharedLang.length ? (
-                      computed.sharedLang.map((l) => (
-                        <span
-                          key={`lshared-b-${l}`}
-                          className="rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-700"
-                        >
-                          {l}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-xs text-[#7C8493]">None</span>
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-[#25324B]">B only</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {computed.bOnlyLang.length ? (
-                      computed.bOnlyLang.map((l) => (
-                        <span
-                          key={`lbonly-${l}`}
-                          className="rounded-full bg-violet-50 border border-violet-200 px-2.5 py-0.5 text-[10px] font-semibold text-violet-700"
-                        >
-                          {l}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-xs text-[#7C8493]">None</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            }
-          />
-
-          <DiffSection
-            title="Education / Availability"
-            left={
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-[#25324B]">Education entries</span>
-                  <span className="text-xs font-bold text-[#25324B]">{computed.aEdu}</span>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-[#25324B]">Availability</p>
-                  <p className="mt-1 text-xs text-[#7C8493]">
-                    {talentA.availability?.type ?? "—"} • {talentA.availability?.status ?? "—"}
-                  </p>
-                </div>
-              </div>
-            }
-            right={
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-[#25324B]">Education entries</span>
-                  <span className="text-xs font-bold text-[#25324B]">{computed.bEdu}</span>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-[#25324B]">Availability</p>
-                  <p className="mt-1 text-xs text-[#7C8493]">
-                    {talentB.availability?.type ?? "—"} • {talentB.availability?.status ?? "—"}
-                  </p>
-                </div>
-              </div>
-            }
-          />
         </div>
       )}
+
+      {resumeModal.open ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-150">
+          <div className="relative h-full max-h-[90vh] w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl">
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white px-5 py-4">
+              <div className="min-w-0">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#7C8493]">
+                  Resume
+                </p>
+                <p className="truncate text-sm font-bold text-[#25324B]">
+                  {resumeModal.name}
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <a
+                  href={resumeModal.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors"
+                >
+                  <FileText className="h-4 w-4" />
+                  Open
+                </a>
+                <button
+                  onClick={() =>
+                    setResumeModal({ open: false, url: "", name: "" })
+                  }
+                  className="rounded-full p-2 hover:bg-gray-100 transition-colors"
+                >
+                  <X className="h-5 w-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="h-[calc(90vh-72px)] bg-gray-50">
+              <iframe
+                title="Resume preview"
+                src={resumeModal.url}
+                className="h-full w-full"
+              />
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

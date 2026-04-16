@@ -10,8 +10,6 @@ import {
   ChevronRight,
   Loader2,
   Mail,
-  Target,
-  Trophy,
 } from "lucide-react";
 
 export type CandidateResult = {
@@ -29,13 +27,11 @@ export type CandidateResult = {
 
 export default function ResultsStep({
   results,
-  selectedForEmail,
-  selectedForCompare,
+  selectedCandidateIds,
   isSendingEmails,
   emailSent,
   expandedCandidate,
-  onToggleEmail,
-  onToggleCompare,
+  onToggleSelect,
   onToggleExpand,
   onSendEmails,
   onCompare,
@@ -43,13 +39,11 @@ export default function ResultsStep({
   onBack,
 }: {
   results: CandidateResult[];
-  selectedForEmail: string[];
-  selectedForCompare: string[];
+  selectedCandidateIds: string[];
   isSendingEmails: boolean;
   emailSent: boolean;
   expandedCandidate: string | null;
-  onToggleEmail: (id: string) => void;
-  onToggleCompare: (id: string) => void;
+  onToggleSelect: (id: string) => void;
   onToggleExpand: (id: string | null) => void;
   onSendEmails: () => void;
   onCompare: () => void;
@@ -71,7 +65,7 @@ export default function ResultsStep({
     return { total, high };
   }, [results]);
 
-  const canCompare = selectedForCompare.length === 2;
+  const canCompare = selectedCandidateIds.length === 2;
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -163,11 +157,11 @@ export default function ResultsStep({
 
           <button
             onClick={onSendEmails}
-            disabled={selectedForEmail.length === 0 || isSendingEmails}
+            disabled={selectedCandidateIds.length === 0 || isSendingEmails}
             className={`inline-flex items-center gap-2 rounded-xl px-6 py-2 text-sm font-bold transition-all ${
               emailSent
                 ? "bg-green-500 text-white"
-                : selectedForEmail.length > 0
+                : selectedCandidateIds.length > 0
                   ? "bg-[#286ef0] text-white shadow-md shadow-blue-100 hover:bg-[#1f5fe0]"
                   : "bg-gray-100 text-gray-400 cursor-not-allowed"
             }`}
@@ -183,7 +177,7 @@ export default function ResultsStep({
               ? "Sending..."
               : emailSent
                 ? "Sent!"
-                : `Send Email to Selected (${selectedForEmail.length})`}
+                : `Send Email to Selected (${selectedCandidateIds.length})`}
           </button>
         </div>
       </div>
@@ -192,7 +186,7 @@ export default function ResultsStep({
         {results.map((c) => {
           const isExpanded =
             view === "detailed" || expandedCandidate === c.candidateId;
-          const selected = selectedForCompare.includes(c.candidateId);
+          const selected = selectedCandidateIds.includes(c.candidateId);
           return (
             <div
               key={c.candidateId}
@@ -206,17 +200,10 @@ export default function ResultsStep({
                 <div className="pl-5 flex items-center gap-3">
                   <input
                     type="checkbox"
-                    checked={selectedForEmail.includes(c.candidateId)}
-                    onChange={() => onToggleEmail(c.candidateId)}
-                    className="h-5 w-5 cursor-pointer rounded-md border-gray-300 text-[#286ef0] focus:ring-[#286ef0]"
-                    title="Select for email"
-                  />
-                  <input
-                    type="checkbox"
                     checked={selected}
-                    onChange={() => onToggleCompare(c.candidateId)}
-                    className="h-5 w-5 cursor-pointer rounded-md border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                    title="Select for compare"
+                    onChange={() => onToggleSelect(c.candidateId)}
+                    className="h-5 w-5 cursor-pointer rounded-md border-gray-300 text-[#286ef0] focus:ring-[#286ef0]"
+                    title="Select candidate"
                   />
                 </div>
 

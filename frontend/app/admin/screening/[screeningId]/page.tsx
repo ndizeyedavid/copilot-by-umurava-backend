@@ -17,8 +17,9 @@ export default function ScreeningResultsPage() {
   const [expandedCandidate, setExpandedCandidate] = useState<string | null>(
     null,
   );
-  const [selectedForEmail, setSelectedForEmail] = useState<string[]>([]);
-  const [selectedForCompare, setSelectedForCompare] = useState<string[]>([]);
+  const [selectedCandidateIds, setSelectedCandidateIds] = useState<string[]>(
+    [],
+  );
   const [emailSent, setEmailSent] = useState(false);
 
   type InternalScreening = {
@@ -190,25 +191,17 @@ export default function ScreeningResultsPage() {
 
   const handleSendEmails = async () => {
     if (!isInternal) return;
-    if (selectedForEmail.length === 0) return;
-    for (const candidateId of selectedForEmail) {
+    if (selectedCandidateIds.length === 0) return;
+    for (const candidateId of selectedCandidateIds) {
       // eslint-disable-next-line no-await-in-loop
       await emailMutation.mutateAsync(candidateId);
     }
   };
 
-  const toggleCandidateEmail = (id: string) => {
-    setSelectedForEmail((prev) =>
+  const toggleCandidateSelect = (id: string) => {
+    setSelectedCandidateIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
-  };
-
-  const toggleCandidateCompare = (id: string) => {
-    setSelectedForCompare((prev) => {
-      if (prev.includes(id)) return prev.filter((x) => x !== id);
-      if (prev.length >= 2) return prev;
-      return [...prev, id];
-    });
   };
 
   const emailDisabled = !isInternal;
@@ -224,23 +217,19 @@ export default function ScreeningResultsPage() {
 
       <ResultsStep
         results={results}
-        selectedForEmail={selectedForEmail}
-        selectedForCompare={selectedForCompare}
+        selectedCandidateIds={selectedCandidateIds}
         isSendingEmails={isSendingEmails}
         emailSent={emailSent}
         expandedCandidate={expandedCandidate}
-        onToggleEmail={(id) => {
+        onToggleSelect={(id) => {
           if (emailDisabled) return;
-          toggleCandidateEmail(id);
-        }}
-        onToggleCompare={(id) => {
-          toggleCandidateCompare(id);
+          toggleCandidateSelect(id);
         }}
         onToggleExpand={setExpandedCandidate}
         onSendEmails={handleSendEmails}
         onCompare={() => {
-          if (selectedForCompare.length !== 2) return;
-          const [a, b] = selectedForCompare;
+          if (selectedCandidateIds.length !== 2) return;
+          const [a, b] = selectedCandidateIds;
           router.push(
             `/admin/screening/${screeningId}/compare?a=${encodeURIComponent(
               a,
