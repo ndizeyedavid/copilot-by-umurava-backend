@@ -13,7 +13,7 @@ const talentController = {
     try {
       const talents = await Talent.find().populate(
         "userId",
-        "firstName lastName email picture",
+        "firstName lastName email picture phone",
       );
 
       return res
@@ -32,7 +32,7 @@ const talentController = {
 
       const fetchedTalent = await Talent.findById(talentId).populate(
         "userId",
-        "firstName lastName email picture",
+        "firstName lastName email picture phone",
       );
 
       if (!fetchedTalent)

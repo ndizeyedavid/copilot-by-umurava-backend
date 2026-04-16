@@ -40,6 +40,8 @@ export default function LoginForm() {
     onSuccess: (data) => {
       dispatch(setAuth({ user: data.user, tokens: data.tokens }));
       toast.success("Login successful");
+      // console.log(data.user.role);
+      if (data.user.role === "admin") return router.push("/admin");
       router.push("/dashboard");
     },
     onError: (error) => {

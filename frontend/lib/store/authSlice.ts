@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
 
 type User = {
   _id: string;
@@ -35,8 +36,16 @@ const authSlice = createSlice({
       if (typeof window !== "undefined") {
         localStorage.setItem("accessToken", action.payload.tokens.accessToken);
         if (action.payload.tokens.refreshToken) {
-          localStorage.setItem("refreshToken", action.payload.tokens.refreshToken);
+          localStorage.setItem(
+            "refreshToken",
+            action.payload.tokens.refreshToken,
+          );
         }
+
+        setAuthCookies({
+          accessToken: action.payload.tokens.accessToken,
+          role: action.payload.user.role,
+        });
       }
     },
     logout(state) {
@@ -46,6 +55,8 @@ const authSlice = createSlice({
       if (typeof window !== "undefined") {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
+
+        clearAuthCookies();
       }
     },
   },
