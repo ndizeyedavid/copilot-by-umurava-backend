@@ -2,7 +2,7 @@
 
 All notable changes made during admin dashboard refactor + auth improvements.
 
-## Unreleased
+## 16 / 04 / 2026
 
 ### Added
 
