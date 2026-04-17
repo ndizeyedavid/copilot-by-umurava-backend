@@ -12,6 +12,25 @@ export interface IUser {
   role: UserRole;
   isActive: boolean;
   talentProfileId?: string;
+  twoFactorEnabled: boolean;
+  notifications: {
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+    marketing: boolean;
+  };
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface ISession {
+  _id?: string;
+  userId: string;
+  token: string;
+  ipAddress?: string;
+  userAgent?: string;
+  lastAccess: Date;
+  isActive: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }

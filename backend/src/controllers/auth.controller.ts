@@ -8,9 +8,11 @@ import {
   createGoogleUser,
   getUserById,
   findOrCreateUser,
+  createSession,
 } from "../services/auth.service";
 import { IGoogleProfile, UserRole, IUser } from "../types/user.types";
 import User from "../models/user.model";
+import Session from "../models/session.model";
 
 const googleClient = new OAuth2Client(ENV.google_client_id);
 
@@ -158,6 +160,14 @@ const authController = {
         resolvedRole,
       );
       const tokens = generateTokens(user);
+
+      // Create session
+      await createSession(
+        user._id!.toString(),
+        tokens.accessToken,
+        req.ip,
+        req.get("User-Agent"),
+      );
 
       return res.status(200).json({
         message: "Login successful",
@@ -465,9 +475,20 @@ const authController = {
 
   // Logout
   async logout(req: Request, res: Response) {
-    return res.status(200).json({
-      message: "Logged out successfully",
-    });
+    try {
+      const authHeader = req.headers.authorization;
+      if (authHeader) {
+        const token = authHeader.split(" ")[1];
+        await Session.findOneAndUpdate({ token }, { isActive: false });
+      }
+      return res.status(200).json({
+        message: "Logged out successfully",
+      });
+    } catch (error: any) {
+      return res
+        .status(500)
+        .json({ message: "Logout failed", error: error.message });
+    }
   },
 
   // Update user profile

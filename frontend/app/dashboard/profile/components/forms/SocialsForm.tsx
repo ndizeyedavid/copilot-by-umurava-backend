@@ -47,7 +47,7 @@ export default function SocialsForm({ initialData, onSubmit }: SocialsFormProps)
           />
         </div>
       </div>
-      <button type="submit" className="w-full py-4 bg-[#286ef0] text-white rounded-2xl font-bold uppercase tracking-widest text-sm">
+      <button type="submit" className="w-full py-4 bg-[#286ef0] text-white rounded-[10px] font-bold uppercase tracking-widest text-sm">
         Save Social Links
       </button>
     </form>

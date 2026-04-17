@@ -160,7 +160,7 @@ export default function AdminDashboard() {
       jobId: string;
       status: string;
     }) => {
-      const res = await api.patch(`/jobs/${jobId}/status`, { status });
+      const res = await api.put(`/jobs/${jobId}`, { status });
       return res.data;
     },
     onSuccess: async () => {

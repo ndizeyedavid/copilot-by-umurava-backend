@@ -152,10 +152,10 @@ export default function JobDetailsModal({
                   Apply Now
                   <CheckCircle2 className="w-5 h-5" />
                 </button>
-                <button className="w-full py-5 border-2 border-gray-100 text-[#25324B] rounded-[10px] font-black uppercase tracking-widest text-sm hover:bg-gray-50 transition-all flex items-center justify-center gap-3">
+                {/* <button className="w-full py-5 border-2 border-gray-100 text-[#25324B] rounded-[10px] font-black uppercase tracking-widest text-sm hover:bg-gray-50 transition-all flex items-center justify-center gap-3">
                   Save for Later
                   <Share2 className="w-5 h-5" />
-                </button>
+                </button> */}
               </div>
             </div>
           </div>

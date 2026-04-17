@@ -311,12 +311,12 @@ export default function AdminCandidatesPage() {
 
       {/* Content */}
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-200 bg-white py-20">
+        <div className="flex flex-col items-center justify-center rounded-[10px] border border-gray-200 bg-white py-20">
           <Loader2 className="h-8 w-8 animate-spin text-indigo-600 mb-2" />
           <p className="text-sm text-[#7C8493]">Loading candidates...</p>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-200 bg-white py-20">
+        <div className="flex flex-col items-center justify-center rounded-[10px] border border-gray-200 bg-white py-20">
           <p className="text-sm font-semibold text-[#25324B]">
             No candidates found
           </p>
@@ -329,7 +329,7 @@ export default function AdminCandidatesPage() {
           {filtered.map((candidate) => (
             <div
               key={candidate.id}
-              className="group flex flex-col rounded-2xl border border-gray-200 bg-white p-6 transition-all hover:border-indigo-100 hover:shadow-lg"
+              className="group flex flex-col rounded-[10px] border border-gray-200 bg-white p-6 transition-all hover:border-indigo-100 hover:shadow-lg"
             >
               <div className="flex items-start justify-between">
                 <div className="h-12 w-12 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-700 font-bold text-lg border border-indigo-100 uppercase">

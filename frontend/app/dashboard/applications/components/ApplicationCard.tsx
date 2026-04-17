@@ -67,7 +67,7 @@ export default function ApplicationCard({
   onClick,
 }: ApplicationCardProps) {
   const config = statusConfig[application.status];
-
+  // console.log(application);
   return (
     <Card
       className="group relative bg-white border shadow-none border-gray-100 rounded-[10px] p-5 hover:border-[#286ef0]/30 transition-all duration-500 cursor-pointer"

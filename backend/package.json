@@ -39,6 +39,7 @@
     "swagger-ui-express": "^5.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.2",
+    "uploadthing": "^7.7.4",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

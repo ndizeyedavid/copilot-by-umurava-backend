@@ -4,7 +4,7 @@ dotenv.config();
 const ENV = {
   port: process.env.PORT,
   mongo_uri: process.env.MONGO_URI as string,
-  gemingi_api_key: process.env.GEMINI_API_KEY,
+  gemini_api_key: process.env.GEMINI_API_KEY,
   gemini_model: process.env.GEMINI_MODEL as string,
   smtp_host: process.env.SMTP_HOST as string,
   smtp_port: parseInt(process.env.SMTP_PORT || "587"),
@@ -17,6 +17,9 @@ const ENV = {
   google_client_secret: process.env.GOOGLE_CLIENT_SECRET as string,
   google_callback_url: process.env.GOOGLE_CALLBACK_URL as string,
   frontend_url: process.env.FRONTEND_URL as string,
+  uploadthing_secret: process.env.UPLOADTHING_SECRET as string,
+  uploadthing_app_id: process.env.UPLOADTHING_APP_ID as string,
+  uploadthing_token: process.env.UPLOADTHING_TOKEN as string,
 };
 
 export default ENV;

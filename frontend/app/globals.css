@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "uploadthing/tw/v4";
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
@@ -141,4 +142,21 @@ html {
 .PhoneInput--focus {
   border: none !important;
   outline: none !important;
+}
+
+phantom-ui {
+  --shimmer-color: rgba(6, 118, 179, 0.3);
+}
+
+phantom-ui[loading] * {
+  margin: 2px 0;
+}
+
+phantom-ui[loading] img,
+phantom-ui[loading] svg,
+phantom-ui[loading] video,
+phantom-ui[loading] canvas,
+phantom-ui[loading] button,
+phantom-ui[loading] [role="button"] {
+  margin: 2px 0;
 }

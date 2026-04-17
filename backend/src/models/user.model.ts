@@ -44,25 +44,25 @@ const userSchema = new Schema<IUser>(
       type: String,
       ref: "Talent",
     },
+    twoFactorEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    notifications: {
+      email: { type: Boolean, default: true },
+      push: { type: Boolean, default: false },
+      sms: { type: Boolean, default: true },
+      marketing: { type: Boolean, default: false },
+    },
   },
   { timestamps: true },
 );
 
-// // Hash password before saving
-// userSchema.pre("save", async function (next) {
-//   if (!this.isModified("password") || !this.password) {
-//     return next();
-//   }
-//   const salt = await bcrypt.genSalt(10);
-//   this.password = await bcrypt.hash(this.password, salt);
-//   next();
-// });
-
-// // Method to compare password
-// userSchema.methods.comparePassword = async function (password: string) {
-//   if (!this.password) return false;
-//   return await bcrypt.compare(password, this.password);
-// };
+// Method to compare password
+userSchema.methods.comparePassword = async function (password: string) {
+  if (!this.password) return false;
+  return await bcrypt.compare(password, this.password);
+};
 
 userSchema.index({ email: 1 });
 userSchema.index({ googleId: 1 });

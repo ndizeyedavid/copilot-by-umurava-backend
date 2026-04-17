@@ -41,7 +41,7 @@ export default function LanguagesSection({
           <div
             key={index}
             onClick={() => onEdit(index)}
-            className="group relative px-5 py-3 bg-[#F8F9FD] border border-gray-100 rounded-2xl flex items-center gap-3 cursor-pointer hover:border-[#286ef0] transition-all"
+            className="group relative px-5 py-3 bg-[#F8F9FD] border border-gray-100 rounded-[10px] flex items-center gap-3 cursor-pointer hover:border-[#286ef0] transition-all"
           >
             <CheckCircle className="w-4 h-4 text-green-500" />
             <span className="text-sm font-bold text-[#25324B]">

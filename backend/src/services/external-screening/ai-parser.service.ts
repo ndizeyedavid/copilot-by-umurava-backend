@@ -7,7 +7,7 @@ import { GoogleGenAI } from "@google/genai";
 import ENV from "../../config/env";
 import { IExternalApplicant, ParsedResume } from "../../types/external-screening.types";
 
-const genAI = new GoogleGenAI({ apiKey: ENV.gemingi_api_key });
+const genAI = new GoogleGenAI({ apiKey: ENV.gemini_api_key });
 
 export async function structureResumeWithAI(
   resumeText: string,

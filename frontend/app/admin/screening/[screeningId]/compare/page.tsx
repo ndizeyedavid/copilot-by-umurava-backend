@@ -266,7 +266,7 @@ export default function ScreeningComparePage() {
       </div>
 
       {!canLoad ? (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-800">
+        <div className="rounded-[10px] border border-amber-200 bg-amber-50 p-5 text-sm text-amber-800">
           <div className="flex items-center gap-2 font-semibold">
             <AlertTriangle className="h-4 w-4" />
             Need 2 different candidates.
@@ -276,16 +276,16 @@ export default function ScreeningComparePage() {
           </p>
         </div>
       ) : isLoading ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-200 bg-white py-20">
+        <div className="flex flex-col items-center justify-center rounded-[10px] border border-gray-200 bg-white py-20">
           <Loader2 className="h-8 w-8 animate-spin text-indigo-600 mb-2" />
           <p className="text-sm text-[#7C8493]">Loading comparison...</p>
         </div>
       ) : !talentA || !talentB ? (
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
+        <div className="rounded-[10px] border border-red-200 bg-red-50 p-5 text-sm text-red-700">
           Failed load one or both talent profiles.
         </div>
       ) : (
-        <div className="rounded-2xl border border-gray-200 bg-white p-5">
+        <div className="rounded-[10px] border border-gray-200 bg-white p-5">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-[1fr_auto_1fr] md:gap-0">
             <div className="md:pr-8">
               <p className="text-xs font-bold uppercase tracking-wider text-[#7C8493]">
@@ -546,7 +546,7 @@ export default function ScreeningComparePage() {
 
       {resumeModal.open ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-150">
-          <div className="relative h-full max-h-[90vh] w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl">
+          <div className="relative h-full max-h-[90vh] w-full max-w-5xl overflow-hidden rounded-[10px] bg-white shadow-2xl">
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white px-5 py-4">
               <div className="min-w-0">
                 <p className="text-xs font-bold uppercase tracking-wider text-[#7C8493]">

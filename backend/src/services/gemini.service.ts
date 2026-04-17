@@ -4,7 +4,7 @@ import ENV from "../config/env";
 
 dotenv.config();
 
-const genAI = new GoogleGenAI({ apiKey: ENV.gemingi_api_key });
+const genAI = new GoogleGenAI({ apiKey: ENV.gemini_api_key });
 
 export interface JobData {
   title: string;

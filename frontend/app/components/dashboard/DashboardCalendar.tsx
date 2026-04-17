@@ -5,11 +5,44 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-export default function DashboardCalendar() {
+interface DashboardCalendarProps {
+  deadlines?: {
+    name: string;
+    company: string;
+    time: string;
+    avatar: string;
+  }[];
+}
+
+export default function DashboardCalendar({
+  deadlines = [],
+}: DashboardCalendarProps) {
   const [value, onChange] = useState<any>(new Date());
 
+  const tileContent = ({ date, view }: { date: Date; view: string }) => {
+    if (view !== "month") return null;
+
+    const hasDeadline = deadlines.some((d) => {
+      const deadlineDate = new Date(d.time);
+      return (
+        deadlineDate.getDate() === date.getDate() &&
+        deadlineDate.getMonth() === date.getMonth() &&
+        deadlineDate.getFullYear() === date.getFullYear()
+      );
+    });
+
+    if (hasDeadline) {
+      return (
+        <div className="flex justify-center mt-1">
+          <div className="w-1.5 h-1.5 bg-red-500 rounded-full" />
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
-    <div className="rounded-2xl bg-white border border-gray-100 p-6 calendar-container">
+    <div className="rounded-[10px] bg-white border border-gray-100 p-6 calendar-container">
       <style jsx global>{`
         .calendar-container .react-calendar {
           width: 100%;
@@ -91,6 +124,7 @@ export default function DashboardCalendar() {
       <Calendar
         onChange={onChange}
         value={value}
+        tileContent={tileContent}
         prevLabel={<ChevronLeft className="h-4 w-4 text-gray-600" />}
         nextLabel={<ChevronRight className="h-4 w-4 text-gray-600" />}
         formatShortWeekday={(locale, date) =>

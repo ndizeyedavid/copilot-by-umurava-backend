@@ -10,12 +10,14 @@ type Deadline = {
 
 export default function DashboardRightSidebar({
   deadlines,
+  allDeadlines,
 }: {
   deadlines: Deadline[];
+  allDeadlines: Deadline[];
 }) {
   return (
     <aside className="space-y-6">
-      <DashboardCalendar />
+      <DashboardCalendar deadlines={allDeadlines} />
       <UpcomingDeadlines deadlines={deadlines} />
     </aside>
   );

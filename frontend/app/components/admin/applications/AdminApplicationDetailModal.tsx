@@ -83,7 +83,7 @@ export default function AdminApplicationDetailModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
-      <div className="relative h-full max-h-[90vh] w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-2xl animate-in slide-in-from-bottom-4 duration-300">
+      <div className="relative h-full max-h-[90vh] w-full max-w-4xl overflow-hidden rounded-[10px] bg-white shadow-2xl animate-in slide-in-from-bottom-4 duration-300">
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-4">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-700 font-bold text-sm uppercase">
@@ -229,7 +229,7 @@ export default function AdminApplicationDetailModal({
                       talent.projects.map((project, idx) => (
                         <div
                           key={idx}
-                          className="rounded-2xl border border-gray-100 bg-white p-5"
+                          className="rounded-[10px] border border-gray-100 bg-white p-5"
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div>
@@ -264,7 +264,7 @@ export default function AdminApplicationDetailModal({
               </div>
 
               <div className="space-y-8">
-                <section className="rounded-2xl border border-gray-100 bg-gray-50/30 p-5">
+                <section className="rounded-[10px] border border-gray-100 bg-gray-50/30 p-5">
                   <h3 className="text-base font-bold text-[#25324B] mb-4">
                     Contact & Social
                   </h3>
@@ -345,7 +345,7 @@ export default function AdminApplicationDetailModal({
                   </div>
                 </section>
 
-                <section className="rounded-2xl bg-[#F8F8FD] p-5 border border-indigo-100/50">
+                <section className="rounded-[10px] bg-[#F8F8FD] p-5 border border-indigo-100/50">
                   <div className="flex items-center gap-2 text-indigo-700 mb-2">
                     <Award className="h-5 w-5" />
                     <span className="text-sm font-bold uppercase tracking-wider">
@@ -374,7 +374,7 @@ export default function AdminApplicationDetailModal({
               <h3 className="text-base font-bold text-[#25324B] mb-4">
                 Cover Letter
               </h3>
-              <div className="rounded-2xl bg-gray-50 p-6">
+              <div className="rounded-[10px] bg-gray-50 p-6">
                 <p className="text-sm text-[#7C8493] leading-relaxed whitespace-pre-wrap italic">
                   {application.coverLetter}
                 </p>

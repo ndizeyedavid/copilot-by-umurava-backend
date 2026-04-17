@@ -20,27 +20,51 @@ function decodeJwtPayload(token: string): any | null {
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  if (!pathname.startsWith("/admin")) {
-    return NextResponse.next();
+  // Protect /admin routes
+  if (pathname.startsWith("/admin")) {
+    const token = req.cookies.get("accessToken")?.value;
+    if (!token) {
+      const url = req.nextUrl.clone();
+      url.pathname = "/dashboard/auth/login";
+      return NextResponse.redirect(url);
+    }
+
+    const payload = decodeJwtPayload(token);
+    if (!payload || payload.role !== "admin") {
+      const url = req.nextUrl.clone();
+      url.pathname = "/dashboard/auth/login";
+      return NextResponse.redirect(url);
+    }
   }
 
-  const token = req.cookies.get("accessToken")?.value;
-  if (!token) {
-    const url = req.nextUrl.clone();
-    url.pathname = "/dashboard/auth/login";
-    return NextResponse.redirect(url);
-  }
+  // Protect /dashboard routes (excluding auth)
+  if (pathname.startsWith("/dashboard") && !pathname.startsWith("/dashboard/auth")) {
+    const token = req.cookies.get("accessToken")?.value;
+    if (!token) {
+      const url = req.nextUrl.clone();
+      url.pathname = "/dashboard/auth/login";
+      return NextResponse.redirect(url);
+    }
 
-  const payload = decodeJwtPayload(token);
-  if (!payload || payload.role !== "admin") {
-    const url = req.nextUrl.clone();
-    url.pathname = "/dashboard/auth/login";
-    return NextResponse.redirect(url);
+    const payload = decodeJwtPayload(token);
+    if (!payload || payload.role !== "talent") {
+      // If admin tries to access talent dashboard, maybe redirect to admin?
+      // Or just check if they are authenticated.
+      if (payload?.role === "admin") {
+        const url = req.nextUrl.clone();
+        url.pathname = "/admin";
+        return NextResponse.redirect(url);
+      }
+      
+      const url = req.nextUrl.clone();
+      url.pathname = "/dashboard/auth/login";
+      return NextResponse.redirect(url);
+    }
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/dashboard/:path*"],
 };

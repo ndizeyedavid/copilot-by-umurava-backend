@@ -34,7 +34,7 @@ export default function page() {
 
       {/* Centered Login Card */}
       <div className="absolute inset-0 top-[70px] flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-xl p-8 w-[420px]">
+        <div className="bg-white rounded-[10px] shadow-xl p-8 w-[420px]">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">
             Create A New Account
           </h1>

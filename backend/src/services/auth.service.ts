@@ -5,6 +5,7 @@ import {
 } from "passport-google-oauth20";
 import jwt from "jsonwebtoken";
 import User from "../models/user.model";
+import Session from "../models/session.model";
 import ENV from "../config/env";
 import {
   IUser,
@@ -12,6 +13,24 @@ import {
   IJwtPayload,
   UserRole,
 } from "../types/user.types";
+
+// ... existing passport code ...
+
+export async function createSession(
+  userId: string,
+  token: string,
+  ipAddress?: string,
+  userAgent?: string,
+) {
+  return await Session.create({
+    userId,
+    token,
+    ipAddress,
+    userAgent,
+    lastAccess: new Date(),
+    isActive: true,
+  });
+}
 
 // Configure Google OAuth Strategy
 passport.use(
@@ -79,7 +98,7 @@ export function generateTokens(user: IUser) {
     role: user.role,
   };
 
-  const expiresIn = user.role === "admin" ? "24h" : (ENV.jwt_expires_in as any);
+  const expiresIn = "24h";
 
   const accessToken = jwt.sign(payload, ENV.jwt_secret, {
     expiresIn: expiresIn as jwt.SignOptions["expiresIn"],
@@ -159,15 +178,12 @@ export async function findOrCreateUser(
 }
 
 export async function getUserById(userId: string): Promise<IUser | null> {
-  const userDoc = await User.findById(userId).lean();
+  const userDoc = await User.findById(userId).select("+password").lean();
   if (!userDoc) return null;
-
-  const hasGoogle = !!(userDoc as any).googleId;
-  delete (userDoc as any).googleId;
 
   return {
     ...(userDoc as any),
-    hasGoogle,
+    hasPassword: !!(userDoc as any).password,
   } as any;
 }
 

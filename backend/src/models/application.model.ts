@@ -3,7 +3,7 @@ import { IApplication } from "../types/application.types";
 
 const applicationSchema = new Schema<IApplication>(
   {
-    jobId: { type: String, required: true, index: true },
+    jobId: { type: String, required: true, index: true, ref: "Job" },
     talentId: { type: String, required: true, index: true },
     status: {
       type: String,

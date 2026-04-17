@@ -21,8 +21,14 @@ type AuthState = {
 };
 
 const initialState: AuthState = {
-  user: null,
-  tokens: null,
+  user:
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("user") || "null")
+      : null,
+  tokens:
+    typeof window !== "undefined"
+      ? { accessToken: localStorage.getItem("accessToken") || "" }
+      : null,
 };
 
 const authSlice = createSlice({
@@ -35,6 +41,7 @@ const authSlice = createSlice({
 
       if (typeof window !== "undefined") {
         localStorage.setItem("accessToken", action.payload.tokens.accessToken);
+        localStorage.setItem("user", JSON.stringify(action.payload.user));
         if (action.payload.tokens.refreshToken) {
           localStorage.setItem(
             "refreshToken",
@@ -55,12 +62,21 @@ const authSlice = createSlice({
       if (typeof window !== "undefined") {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
 
         clearAuthCookies();
+      }
+    },
+    updateProfile(state, action: PayloadAction<Partial<User>>) {
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+        if (typeof window !== "undefined") {
+          localStorage.setItem("user", JSON.stringify(state.user));
+        }
       }
     },
   },
 });
 
-export const { setAuth, logout } = authSlice.actions;
+export const { setAuth, logout, updateProfile } = authSlice.actions;
 export default authSlice.reducer;

@@ -3,6 +3,10 @@
 import { useState, useMemo } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api/client";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store/store";
 import {
   Calendar as CalendarIcon,
   Clock,
@@ -17,6 +21,7 @@ import {
   Briefcase,
   CalendarCheck,
   UserCheck,
+  Loader2,
 } from "lucide-react";
 
 import "./calendar.css";
@@ -40,75 +45,87 @@ const categoryColors = {
   interview: "bg-green-100 text-green-800 border-green-200",
 };
 
-const mockJobEvents: JobEvent[] = [
-  {
-    id: "1",
-    title: "Senior Frontend Developer",
-    companyName: "TechCorp Solutions",
-    description: "Application deadline for Senior Frontend Developer position",
-    date: new Date(2026, 3, 16, 23, 59), // April 16, 2026
-    category: "deadline",
-    color: "#EF4444",
-  },
-  {
-    id: "2",
-    title: "Full Stack Engineer",
-    companyName: "Digital Innovations",
-    description: "New job posting for Full Stack Engineer role",
-    date: new Date(2026, 3, 14, 9, 0), // April 14, 2026 (Today)
-    category: "posted",
-    color: "#3B82F6",
-  },
-  {
-    id: "3",
-    title: "UI/UX Designer Interview",
-    companyName: "Creative Studios",
-    description: "Technical interview for UI/UX Designer position",
-    date: new Date(2026, 3, 17, 14, 0), // April 17, 2026
-    startTime: "14:00",
-    endTime: "15:30",
-    location: "Zoom Meeting",
-    category: "interview",
-    color: "#10B981",
-  },
-  {
-    id: "4",
-    title: "Backend Developer",
-    companyName: "StartupHub",
-    description: "Application deadline for Backend Developer position",
-    date: new Date(2026, 3, 18, 23, 59), // April 18, 2026
-    category: "deadline",
-    color: "#EF4444",
-  },
-  {
-    id: "5",
-    title: "DevOps Engineer",
-    companyName: "CloudTech Inc",
-    description: "New job posting for DevOps Engineer role",
-    date: new Date(2026, 3, 15, 10, 0), // April 15, 2026
-    category: "posted",
-    color: "#3B82F6",
-  },
-  {
-    id: "6",
-    title: "Product Manager Interview",
-    companyName: "Enterprise Solutions",
-    description: "Final round interview for Product Manager position",
-    date: new Date(2026, 3, 19, 16, 0), // April 19, 2026
-    startTime: "16:00",
-    endTime: "17:00",
-    location: "Microsoft Teams",
-    category: "interview",
-    color: "#10B981",
-  },
-];
-
 export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [view, setView] = useState<"month" | "week" | "day">("week");
-  const [jobEvents, setJobEvents] = useState<JobEvent[]>(mockJobEvents);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+
+  const { user } = useSelector((state: RootState) => state.auth);
+
+  // Fetch Jobs
+  const jobsQuery = useQuery({
+    queryKey: ["jobs"],
+    queryFn: async () => {
+      const res = await api.get("/jobs/");
+      return res.data?.jobs ?? [];
+    },
+  });
+
+  // Fetch Applications
+  const applicationsQuery = useQuery({
+    queryKey: ["applications", user?._id],
+    queryFn: async () => {
+      if (!user?._id) return [];
+      // @ts-ignore
+      let talentId = user.talentProfileId;
+      if (!talentId) {
+        const talentRes = await api.get("/talents/me");
+        talentId = talentRes.data?.talent?._id;
+      }
+
+      if (!talentId) return [];
+
+      const res = await api.get(`/applications/talent/${talentId}`);
+      return res.data?.applications ?? [];
+    },
+    enabled: !!user?._id,
+  });
+
+  const jobEvents = useMemo((): JobEvent[] => {
+    const events: JobEvent[] = [];
+    const jobs = jobsQuery.data ?? [];
+    const applications = applicationsQuery.data ?? [];
+
+    // 1. Job Postings (from Jobs)
+    jobs.forEach((job: any) => {
+      events.push({
+        id: `posted-${job._id}`,
+        title: `New Posting: ${job.title}`,
+        companyName: "Umurava",
+        description: `New job opportunity for ${job.title}`,
+        date: new Date(job.createdAt),
+        category: "posted",
+        color: "#3B82F6",
+      });
+
+      // 2. Job Deadlines (from Jobs)
+      events.push({
+        id: `deadline-${job._id}`,
+        title: `Deadline: ${job.title}`,
+        companyName: "Umurava",
+        description: `Application deadline for ${job.title}`,
+        date: new Date(job.deadline),
+        category: "deadline",
+        color: "#EF4444",
+      });
+    });
+
+    // 3. User Applications (as "Applied")
+    applications.forEach((app: any) => {
+      events.push({
+        id: `applied-${app._id}`,
+        title: `Applied: ${app.jobId?.title || "Job"}`,
+        companyName: "Umurava",
+        description: `You applied for ${app.jobId?.title || "this position"}`,
+        date: new Date(app.createdAt),
+        category: "interview", // Use green color for applied/interviews
+        color: "#10B981",
+      });
+    });
+
+    return events;
+  }, [jobsQuery.data, applicationsQuery.data]);
 
   const filteredEvents = useMemo(() => {
     return jobEvents.filter((event) => {
@@ -151,7 +168,6 @@ export default function CalendarPage() {
       </div>
     );
   };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto">
@@ -207,38 +223,6 @@ export default function CalendarPage() {
                     year: "numeric",
                   })}
                 </h2>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setView("month")}
-                    className={`p-2 rounded-lg transition-colors ${
-                      view === "month"
-                        ? "bg-blue-100 text-blue-600"
-                        : "text-gray-400 hover:text-gray-600"
-                    }`}
-                  >
-                    <CalendarDays className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => setView("week")}
-                    className={`p-2 rounded-lg transition-colors ${
-                      view === "week"
-                        ? "bg-blue-100 text-blue-600"
-                        : "text-gray-400 hover:text-gray-600"
-                    }`}
-                  >
-                    <Grid3X3 className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => setView("day")}
-                    className={`p-2 rounded-lg transition-colors ${
-                      view === "day"
-                        ? "bg-blue-100 text-blue-600"
-                        : "text-gray-400 hover:text-gray-600"
-                    }`}
-                  >
-                    <List className="h-4 w-4" />
-                  </button>
-                </div>
               </div>
 
               <div className="react-calendar-wrapper">
@@ -342,7 +326,7 @@ export default function CalendarPage() {
           </div>
         </div>
       </div>
-      <style jsx global>{``}</style>
+      {/* <style jsx global>{``}</style> */}
     </div>
   );
 }

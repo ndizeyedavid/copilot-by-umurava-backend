@@ -329,3 +329,212 @@ export async function sendScreeningEmails(
 
   return results;
 }
+
+// --- Application Confirmation Addition ---
+
+export interface ApplicationConfirmationDetails {
+  candidateName: string;
+  jobTitle: string;
+  timestamp: Date;
+}
+
+// Job Application Confirmation Template
+function applicationConfirmationTemplate(
+  details: ApplicationConfirmationDetails,
+): string {
+  const formattedDate = details.timestamp.toLocaleString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  return `
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1F2937;
+            margin: 0;
+            padding: 0;
+            background-color: #F9FAFB;
+        }
+
+        .wrapper {
+            width: 100%;
+            table-layout: fixed;
+            background-color: #F9FAFB;
+            padding-bottom: 40px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #FFFFFF;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 40px;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background-color: #2F6FED;
+            padding: 32px;
+            text-align: center;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .details-box {
+            background-color: #F3F4F6;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 0;
+            border: 1px solid #E5E7EB;
+        }
+
+        .detail-item {
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #4B5563;
+            min-width: 100px;
+            display: inline-block;
+        }
+
+        .detail-value {
+            color: #1F2937;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 32px;
+        }
+
+        .button {
+            background-color: #2F6FED;
+            color: #FFFFFF !important;
+            padding: 12px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 32px;
+            color: #6B7280;
+            font-size: 13px;
+            border-top: 1px solid #F3F4F6;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #E5E7EB;
+            margin: 32px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <div class="header">
+                <div style="color: white; font-size: 32px; font-weight: 800; letter-spacing: -0.5px;">Copilot By Umurava
+                </div>
+            </div>
+            <div class="content">
+                <h1 class="title">Application Received</h1>
+                <p>Hi ${details.candidateName},</p>
+                <p>Thank you for applying to Umurava! We've successfully received your application for the
+                    <strong>${details.jobTitle}</strong> position.
+                </p>
+
+                <div class="details-box">
+                    <div class="detail-item">
+                        <span class="detail-label">Job Title:</span>
+                        <span class="detail-value">${details.jobTitle}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Submitted:</span>
+                        <span class="detail-value">${formattedDate}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Status:</span>
+                        <span class="detail-value">Under Review</span>
+                    </div>
+                </div>
+
+                <p>Our recruitment team is currently reviewing your profile. If your skills and experience match our
+                    requirements, we'll reach out to you regarding the next steps in our selection process.</p>
+
+                <p>In the meantime, you can track your application status in your dashboard.</p>
+
+                <div class="button-container">
+                    <a href="${ENV.frontend_url}/dashboard/applications" class="button">View My Dashboard</a>
+                </div>
+
+                <div class="divider"></div>
+
+                <p style="font-size: 14px; color: #6B7280;">Best regards,<br><strong>The Umurava Team</strong></p>
+            </div>
+            <div class="footer">
+                <p>&copy; 2026 Copilot By Umurava. All rights reserved.</p>
+                <p>This is an automated confirmation email. Please do not reply directly to this message.</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+  `;
+}
+
+export const sendApplicationConfirmation = async (
+  email: string,
+  details: ApplicationConfirmationDetails,
+) => {
+  if (
+    process.env.NODE_ENV === "development" &&
+    process.env.ENABLE_EMAILS !== "true"
+  ) {
+    console.log("Email skipped in development mode.");
+    return;
+  }
+
+  try {
+    const html = applicationConfirmationTemplate(details);
+    await transporter.sendMail({
+      from: `"${ENV.email_from || "Umurava Team"}" <${ENV.smtp_user}>`,
+      to: email,
+      subject: "Job Application Submitted – Next Steps Inside",
+      html,
+    });
+    console.log(`Confirmation email sent to ${email}`);
+  } catch (error) {
+    console.error("Failed to send confirmation email:", error);
+  }
+};

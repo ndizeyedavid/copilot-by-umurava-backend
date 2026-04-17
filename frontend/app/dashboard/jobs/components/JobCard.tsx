@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Building2,
   MapPin,
@@ -11,10 +11,15 @@ import {
   Bookmark,
   CheckCircle2,
   ExternalLink,
+  Loader2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { BsCash } from "react-icons/bs";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api/client";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store/store";
 
 export interface Job {
   id: string;
@@ -36,6 +41,41 @@ interface JobCardProps {
 }
 
 export default function JobCard({ job, onClick }: JobCardProps) {
+  const { user } = useSelector((state: RootState) => state.auth);
+
+  // Fetch talent info to get talentId
+  const talentQuery = useQuery({
+    queryKey: ["talent", "me"],
+    queryFn: async () => {
+      const res = await api.get("/talents/me");
+      return res.data?.talent;
+    },
+    enabled: !!user?._id,
+    staleTime: 600_000, // 10 minutes cache
+  });
+
+  const talentId = talentQuery.data?._id;
+
+  // Fetch applications for this user
+  const applicationsQuery = useQuery({
+    queryKey: ["applications", talentId],
+    queryFn: async () => {
+      const res = await api.get(`/applications/talent/${talentId}`);
+      return res.data?.applications || [];
+    },
+    enabled: !!talentId,
+    staleTime: 30_000, // 30 seconds cache
+  });
+
+  const hasUserApplied = useMemo(() => {
+    if (!applicationsQuery.data) return false;
+    return applicationsQuery.data.some(
+      (app: any) => (app.jobId?._id || app.jobId) === job.id,
+    );
+  }, [applicationsQuery.data, job.id]);
+
+  const isLoading = applicationsQuery.isLoading || talentQuery.isLoading;
+
   return (
     <Card
       className="group relative bg-white border border-gray-100 rounded-[10px] p-6 hover:border-[#286ef0] transition-all duration-500 cursor-pointer shadow-none"
@@ -51,17 +91,25 @@ export default function JobCard({ job, onClick }: JobCardProps) {
             />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-[#25324B] group-hover:text-[#286ef0] transition-colors leading-tight">
-              {job.title}
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-bold text-[#25324B] group-hover:text-[#286ef0] transition-colors leading-tight">
+                {job.title}
+              </h3>
+              <div className="absolute right-[-5px] top-[-10px]">
+                {isLoading ? (
+                  <Loader2 className="w-3 h-3 animate-spin text-gray-300" />
+                ) : hasUserApplied ? (
+                  <Badge className="bg-green-100 text-green-700 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full border-green-600 border">
+                    Applied
+                  </Badge>
+                ) : null}
+              </div>
+            </div>
             <p className="text-sm font-semibold text-[#7C8493] mt-1">
               {job.company}
             </p>
           </div>
         </div>
-        <button className="p-2 text-gray-300 hover:text-[#286ef0]  transition-all">
-          <Bookmark className="w-5 h-5" />
-        </button>
       </div>
 
       <div className="flex flex-wrap gap-y-3 gap-x-6 mb-6">
@@ -104,12 +152,6 @@ export default function JobCard({ job, onClick }: JobCardProps) {
           <ArrowRight className="w-4 h-4" />
         </div>
       </div>
-
-      {job.status === "Applied" && (
-        <div className="absolute -top-2 -right-2 bg-green-500 text-white p-0 px-2 rounded-full">
-          <span className="text-xs">Applied</span>
-        </div>
-      )}
     </Card>
   );
 }

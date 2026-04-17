@@ -6,7 +6,7 @@ const talentSchema = new Schema<ITalent>(
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     headline: { type: String, required: true },
     bio: { type: String },
-    location: { type: String, required: true },
+    location: { type: String },
     skills: [
       {
         name: { type: String, required: true },
@@ -20,49 +20,48 @@ const talentSchema = new Schema<ITalent>(
     ],
     languages: [
       {
-        name: { type: String, required: true },
+        name: { type: String },
         proficiency: {
           type: String,
           enum: ["Basic", "Conversational", "Fluent", "Native"],
-          required: true,
         },
       },
     ],
     experience: [
       {
-        company: { type: String, required: true },
-        role: { type: String, required: true },
-        startDate: { type: Date, required: true },
+        company: { type: String },
+        role: { type: String },
+        startDate: { type: Date },
         endDate: { type: Date },
-        description: { type: String, required: true },
+        description: { type: String },
         technologies: [String],
         IsCurrent: { type: Boolean, default: false },
       },
     ],
     education: [
       {
-        institution: { type: String, required: true },
-        degree: { type: String, required: true },
-        fieldOfStudy: { type: String, required: true },
-        startYear: { type: Date, required: true },
-        endYear: { type: Date, required: true },
+        institution: { type: String },
+        degree: { type: String },
+        fieldOfStudy: { type: String },
+        startYear: { type: Date },
+        endYear: { type: Date },
       },
     ],
     certifications: [
       {
-        name: { type: String, required: true },
-        issuer: { type: String, required: true },
-        issueDate: { type: Date, required: true },
+        name: { type: String },
+        issuer: { type: String },
+        issueDate: { type: Date },
       },
     ],
     projects: [
       {
-        name: { type: String, required: true },
-        description: { type: String, required: true },
+        name: { type: String },
+        description: { type: String },
         technologies: [String],
-        role: { type: String, required: true },
+        role: { type: String },
         link: String,
-        startDate: { type: Date, required: true },
+        startDate: { type: Date },
         endDate: Date,
       },
     ],
@@ -70,17 +69,16 @@ const talentSchema = new Schema<ITalent>(
       status: {
         type: String,
         enum: ["Available", "Open", "Not Available"],
-        required: true,
       },
       type: {
         type: String,
         enum: ["Full-time", "Part-time", "Contract"],
-        required: true,
       },
       startDate: Date,
     },
     socialLinks: [String],
     rawCv: Schema.Types.Mixed,
+    cvUrl: { type: String },
   },
   { timestamps: true },
 );

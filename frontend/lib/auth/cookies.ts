@@ -2,7 +2,7 @@ const ACCESS_TOKEN_COOKIE = "accessToken";
 const ROLE_COOKIE = "role";
 
 function maxAgeSecondsForRole(role?: string) {
-  return role === "admin" ? 60 * 60 * 24 : 60 * 60 * 24 * 7;
+  return 60 * 60 * 24; // 24 hours for all sessions
 }
 
 export function setAuthCookies(params: {

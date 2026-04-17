@@ -3,18 +3,31 @@
 import React, { useState, useMemo } from "react";
 import {
   Search,
-  Filter,
-  ChevronDown,
   LayoutList,
-  History,
   Clock,
   CheckCircle2,
   XCircle,
-  AlertCircle,
 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import ApplicationCard, { Application } from "./components/ApplicationCard";
 import ApplicationDetailModal from "./components/ApplicationDetailModal";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api/client";
+
+type BackendJob = {
+  _id: string;
+  title: string;
+  locationType: string;
+  jobType: string;
+};
+
+type BackendApplication = {
+  _id: string;
+  jobId: BackendJob;
+  talentId: string;
+  status: string;
+  createdAt: string;
+};
 
 export default function ApplicationsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,55 +36,50 @@ export default function ApplicationsPage() {
     useState<Application | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const applications: Application[] = [
-    {
-      id: "1",
-      jobTitle: "Senior Full Stack Developer",
-      company: "Umurava",
-      location: "Kigali, Rwanda",
-      type: "Full-time",
-      appliedDate: "Jan 12, 2024",
-      status: "Shortlisted",
-      nextStep: "Technical Interview - Jan 25",
+  const talentQuery = useQuery({
+    queryKey: ["talent", "me"],
+    queryFn: async () => {
+      const res = await api.get("/talents/me");
+      return res.data?.talent;
     },
-    {
-      id: "2",
-      jobTitle: "UI/UX Product Designer",
-      company: "Copilot Team",
-      location: "Remote",
-      type: "Contract",
-      appliedDate: "Jan 10, 2024",
-      status: "Reviewing",
+  });
+
+  const talentId = talentQuery.data?._id;
+
+  const applicationsQuery = useQuery({
+    queryKey: ["applications", talentId],
+    queryFn: async () => {
+      const res = await api.get(`/applications/talent/${talentId}`);
+      return (res.data?.applications ?? []) as BackendApplication[];
     },
-    {
-      id: "3",
-      jobTitle: "Backend Engineer (Go/Python)",
-      company: "TechCorp Global",
-      location: "Kigali, Rwanda",
-      type: "Full-time",
-      appliedDate: "Dec 28, 2023",
-      status: "Rejected",
-    },
-    {
-      id: "4",
-      jobTitle: "Frontend Developer (Next.js)",
-      company: "Innovation Hub",
-      location: "Kigali, Rwanda",
-      type: "Part-time",
-      appliedDate: "Dec 15, 2023",
-      status: "Interviewing",
-      nextStep: "CEO Coffee Chat",
-    },
-    {
-      id: "5",
-      jobTitle: "DevOps Engineer",
-      company: "CloudScale",
-      location: "Remote",
-      type: "Full-time",
-      appliedDate: "Nov 22, 2023",
-      status: "Offered",
-    },
-  ];
+    enabled: !!talentId,
+    staleTime: 30_000,
+  });
+
+  const backendApplications = applicationsQuery.data ?? [];
+  console.log(backendApplications);
+  const applications = useMemo((): Application[] => {
+    return backendApplications.map((app) => {
+      const job = app.jobId;
+      const statusMap: Record<string, Application["status"]> = {
+        pending: "Reviewing",
+        reviewing: "Reviewing",
+        shortlisted: "Shortlisted",
+        hired: "Offered",
+        rejected: "Rejected",
+      };
+
+      return {
+        id: app._id,
+        jobTitle: job?.title || "Unknown Job",
+        company: "Umurava",
+        location: job?.locationType === "remote" ? "Remote" : "Rwanda",
+        type: job?.jobType ? (job.jobType.charAt(0).toUpperCase() + job.jobType.slice(1)) as any : "Full-time",
+        appliedDate: new Date(app.createdAt).toLocaleDateString(),
+        status: statusMap[app.status] || "Reviewing",
+      };
+    });
+  }, [backendApplications]);
 
   const filteredApplications = useMemo(() => {
     return applications.filter((app) => {
@@ -88,16 +96,16 @@ export default function ApplicationsPage() {
       if (activeTab === "Past") return matchesSearch && isPast;
       return matchesSearch;
     });
-  }, [searchQuery, activeTab]);
+  }, [searchQuery, activeTab, applications]);
 
-  const stats = {
+  const stats = useMemo(() => ({
     total: applications.length,
     active: applications.filter((a) =>
       ["Reviewing", "Shortlisted", "Interviewing"].includes(a.status),
     ).length,
     shortlisted: applications.filter((a) => a.status === "Shortlisted").length,
     rejected: applications.filter((a) => a.status === "Rejected").length,
-  };
+  }), [applications]);
 
   const handleApplicationClick = (id: string) => {
     const app = applications.find((a) => a.id === id);
@@ -109,6 +117,7 @@ export default function ApplicationsPage() {
 
   return (
     <div className="min-h-screen bg-[#F8F9FD] p-2">
+      <phantom-ui loading={applicationsQuery.isLoading}>
       <div className="mx-auto space-y-6">
         {/* Header & Title */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -199,18 +208,17 @@ export default function ApplicationsPage() {
         <div className="space-y-6">
           <Card className="p-3 bg-white border border-gray-100 rounded-[10px] shadow-none">
             <div className="relative group">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#286ef0] transition-colors" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#286ef0] transition-colors" />
               <input
                 type="text"
-                placeholder="Filter by job title or company..."
-                className="w-full pl-14 pr-6 py-2 bg-[#F8F9FD] outline rounded-2xl border-none focus:ring-2 focus:ring-[#286ef0] font-semibold text-[#25324B] transition-all"
+                placeholder="Search by job title or company..."
+                className="w-full pl-12 pr-6 py-3 bg-[#F8F9FD] rounded-[8px] border-none outline-none focus:ring-2 focus:ring-[#286ef0] font-semibold text-[#25324B] transition-all"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           </Card>
-
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 gap-4">
             {filteredApplications.length > 0 ? (
               filteredApplications.map((app) => (
                 <ApplicationCard
@@ -222,28 +230,31 @@ export default function ApplicationsPage() {
             ) : (
               <div className="py-20 text-center bg-white rounded-[10px] border border-dashed border-gray-200">
                 <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <History className="w-10 h-10 text-gray-300" />
+                  <LayoutList className="w-10 h-10 text-gray-300" />
                 </div>
                 <h3 className="text-2xl font-black text-[#25324B]">
                   No applications found
                 </h3>
-                <p className="text-[#7C8493] font-semibold mt-2">
-                  You haven't applied to any jobs in this category yet
+                <p className="text-gray-500 mt-2">
+                  {searchQuery
+                    ? "Try adjusting your search query"
+                    : "You haven't applied to any jobs yet"}
                 </p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Dynamic Modal */}
+            
         {selectedApplication && (
           <ApplicationDetailModal
-            application={selectedApplication}
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
+            application={selectedApplication}
           />
         )}
       </div>
+      </phantom-ui>
     </div>
   );
 }

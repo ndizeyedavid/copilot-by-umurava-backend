@@ -1,19 +1,14 @@
 "use client";
 
-import type { ReactNode } from "react";
-import {
-  ArrowRight,
-  Briefcase,
-  CalendarDays,
-  CheckCircle2,
-  FileText,
-  Timer,
-  XCircle,
-} from "lucide-react";
+import { useMemo, type ReactNode } from "react";
+import { Briefcase, CheckCircle2, FileText, XCircle } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api/client";
 
 import DashboardRightSidebar from "@/app/components/dashboard/DashboardRightSidebar";
 import DashboardStats from "@/app/components/dashboard/DashboardStats";
 import JobRecommendations from "@/app/components/dashboard/JobRecommendations";
+import "@aejkatappaja/phantom-ui";
 
 type StatCard = {
   label: string;
@@ -22,123 +17,155 @@ type StatCard = {
   className: string;
 };
 
-type Job = {
+type BackendJob = {
+  _id: string;
   title: string;
-  company: string;
   description: string;
-  location: string;
-  type: string;
-  daysLeft: number;
-  mode: string;
+  locationType: string;
+  jobType: string;
+  deadline: string;
+  createdAt: string;
+  salary?: { amount: number; currency: string };
+  requirements?: string[];
 };
 
-type Deadline = {
-  name: string;
-  company: string;
-  time: string;
-  avatar: string;
+type BackendApplication = {
+  _id: string;
+  jobId: string;
+  talentId: string;
+  status: string;
+  createdAt: string;
 };
 
 export default function DashboardPage() {
-  const stats: StatCard[] = [
-    {
-      label: "Total Jobs",
-      value: 54,
-      icon: <Briefcase className="h-6 w-6 text-white/90" />,
-      className: "bg-[#2F6FED]",
+  const talentQuery = useQuery({
+    queryKey: ["talent", "me"],
+    queryFn: async () => {
+      const res = await api.get("/talents/me");
+      return res.data?.talent;
     },
-    {
-      label: "Applications",
-      value: 14,
-      icon: <FileText className="h-6 w-6 text-white/90" />,
-      className: "bg-[#0B1324]",
-    },
-    {
-      label: "Rejected",
-      value: 1,
-      icon: <XCircle className="h-6 w-6 text-white/90" />,
-      className: "bg-[#ff3333]",
-    },
-    {
-      label: "Accepted",
-      value: 6,
-      icon: <CheckCircle2 className="h-6 w-6 text-white/90" />,
-      className: "bg-[#20C46A]",
-    },
-  ];
+  });
 
-  const jobs: Job[] = [
-    {
-      title: "Data Analyst, IT",
-      company: "Umurava",
-      description:
-        "Looking for a Data Analyst who will be delivering several projects for our partner organizations in various fields.",
-      location: "Rwanda",
-      type: "Fulltime",
-      daysLeft: 7,
-      mode: "On Site",
-    },
-    {
-      title: "Product Designer",
-      company: "Umurava",
-      description:
-        "Help design end-to-end experiences from discovery to delivery. Work closely with engineering and product.",
-      location: "Rwanda",
-      type: "Fulltime",
-      daysLeft: 5,
-      mode: "Hybrid",
-    },
-    {
-      title: "Backend Engineer",
-      company: "Umurava",
-      description:
-        "Build scalable APIs and systems. Strong TypeScript and Node.js background required.",
-      location: "Rwanda",
-      type: "Fulltime",
-      daysLeft: 10,
-      mode: "Remote",
-    },
-    {
-      title: "AI/ML Engineer",
-      company: "Umurava",
-      description:
-        "Work on applied machine learning features and evaluation. Experience with embeddings and LLM tooling a plus.",
-      location: "Rwanda",
-      type: "Contract",
-      daysLeft: 3,
-      mode: "Remote",
-    },
-  ];
+  const talentId = talentQuery.data?._id;
 
-  const deadlines: Deadline[] = [
-    {
-      name: "Fullstack Developer",
-      company: "Umurava",
-      time: "4/13/2026",
-      avatar: "/images/companies/umurava.png",
+  const jobsQuery = useQuery({
+    queryKey: ["jobs"],
+    queryFn: async () => {
+      const res = await api.get("/jobs");
+      return (res.data?.jobs ?? []) as BackendJob[];
     },
-    {
-      name: "AI / ML Engineer",
-      company: "Umurava",
-      time: "4/13/2026",
-      avatar: "/images/companies/umurava.png",
+    staleTime: 60_000,
+  });
+
+  const applicationsQuery = useQuery({
+    queryKey: ["applications", talentId],
+    queryFn: async () => {
+      const res = await api.get(`/applications/talent/${talentId}`);
+      return (res.data?.applications ?? []) as BackendApplication[];
     },
-    {
-      name: "Devops Engineer",
-      company: "Umurava",
-      time: "4/13/2026",
-      avatar: "/images/companies/umurava.png",
-    },
-  ];
+    enabled: !!talentId,
+    staleTime: 30_000,
+  });
+
+  const jobs = jobsQuery.data ?? [];
+  const applications = applicationsQuery.data ?? [];
+
+  const stats = useMemo((): StatCard[] => {
+    const totalJobs = jobs.length;
+    const totalApplications = applications.length;
+    const rejected = applications.filter((a) => a.status === "rejected").length;
+    const accepted = applications.filter((a) => a.status === "accepted").length;
+
+    return [
+      {
+        label: "Total Jobs",
+        value: totalJobs,
+        icon: <Briefcase className="h-6 w-6 text-white/90" />,
+        className: "bg-[#2F6FED]",
+      },
+      {
+        label: "Applications",
+        value: totalApplications,
+        icon: <FileText className="h-6 w-6 text-white/90" />,
+        className: "bg-[#0B1324]",
+      },
+      {
+        label: "Rejected",
+        value: rejected,
+        icon: <XCircle className="h-6 w-6 text-white/90" />,
+        className: "bg-[#ff3333]",
+      },
+      {
+        label: "Accepted",
+        value: accepted,
+        icon: <CheckCircle2 className="h-6 w-6 text-white/90" />,
+        className: "bg-[#20C46A]",
+      },
+    ];
+  }, [jobs, applications]);
+
+  const recommendedJobs = useMemo(() => {
+    return jobs.slice(0, 4).map((j) => {
+      const deadline = new Date(j.deadline);
+      const daysLeft = Math.max(
+        0,
+        Math.ceil((deadline.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
+      );
+
+      const hasApplied = applications.some((app) => app.jobId === j._id);
+
+      return {
+        id: j._id,
+        title: j.title,
+        company: "Umurava",
+        description: j.description,
+        location: j.locationType === "remote" ? "Remote" : "Rwanda",
+        type: (j.jobType.charAt(0).toUpperCase() + j.jobType.slice(1)) as any,
+        daysLeft,
+        mode: j.locationType,
+        salary: j.salary
+          ? `${j.salary.currency} ${j.salary.amount.toLocaleString()}`
+          : "Competitive",
+        postedAt: new Date(j.createdAt).toLocaleDateString(),
+        tags: j.requirements || [],
+        status: hasApplied ? "Applied" : "Open",
+      };
+    });
+  }, [jobs, applications]);
+
+  const allDeadlines = useMemo(() => {
+    return jobs
+      .filter((j) => new Date(j.deadline).getTime() > Date.now())
+      .sort(
+        (a, b) =>
+          new Date(a.deadline).getTime() - new Date(b.deadline).getTime(),
+      )
+      .map((j) => ({
+        name: j.title,
+        company: "Umurava",
+        time: j.deadline,
+        avatar: "/images/companies/umurava.png",
+      }));
+  }, [jobs]);
+
+  const deadlines = useMemo(() => {
+    return allDeadlines.slice(0, 3);
+  }, [allDeadlines]);
 
   return (
-    <div className="grid grid-cols-[1fr_320px] gap-3">
-      <div className="space-y-8">
-        <DashboardStats stats={stats} />
-        <JobRecommendations jobs={jobs} />
-      </div>
+    <phantom-ui loading={jobsQuery.isLoading} animation="shimmer">
+      <div className="grid grid-cols-[1fr_320px] gap-3">
+        <div className="space-y-8">
+          <DashboardStats stats={stats} />
+          {/* @ts-ignore */}
+          <JobRecommendations jobs={recommendedJobs} />
+        </div>
 
-      <DashboardRightSidebar deadlines={deadlines} />
-    </div>
+        <DashboardRightSidebar
+          deadlines={deadlines}
+          allDeadlines={allDeadlines}
+        />
+      </div>
+    </phantom-ui>
   );
 }

@@ -52,7 +52,7 @@ export default function SkillsSection({
     <Card className="p-8 bg-white rounded-[10px] border border-gray-100 shadow-none">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-3">
-          <div className="p-2 bg-[#F3F4FF] rounded-xl">
+          <div>
             <Award className="w-5 h-5 text-[#286ef0]" />
           </div>
           <h2 className="text-xl font-bold text-[#25324B]">
@@ -72,7 +72,7 @@ export default function SkillsSection({
           <div
             key={index}
             onClick={() => onEdit(index)}
-            className="group relative p-5 bg-white rounded-2xl border border-gray-100 hover:border-[#286ef0] hover:shadow-[0_4px_15px_rgba(0,0,0,0.03)] transition-all duration-300 cursor-pointer"
+            className="group relative p-5 bg-white rounded-[10px] border border-gray-100 hover:border-[#286ef0] hover:shadow-[0_4px_15px_rgba(0,0,0,0.03)] transition-all duration-300 cursor-pointer"
           >
             <div className="flex items-start justify-between">
               <div>

@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import GoogleOneTap from "./components/GoogleOneTap";
 import Providers from "./providers";
+import "@aejkatappaja/phantom-ui/ssr.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 

@@ -208,12 +208,12 @@ export default function ApplicationDetailModal({
 
         {/* Footer Actions */}
         <div className="p-8 border-t border-gray-100 flex gap-4 hidden">
-          <button className="flex-1 py-4 bg-[#286ef0] text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-100 hover:bg-[#1f5fe0] transition-all">
+          <button className="flex-1 py-4 bg-[#286ef0] text-white rounded-[10px] font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-100 hover:bg-[#1f5fe0] transition-all">
             Withdraw Application
           </button>
           <button
             onClick={onClose}
-            className="flex-1 py-4 bg-gray-50 text-[#25324B] rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-gray-100 transition-all"
+            className="flex-1 py-4 bg-gray-50 text-[#25324B] rounded-[10px] font-black uppercase tracking-widest text-xs hover:bg-gray-100 transition-all"
           >
             Close Details
           </button>

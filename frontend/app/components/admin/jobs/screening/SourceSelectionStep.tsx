@@ -24,7 +24,7 @@ export default function SourceSelectionStep({
           onClick={() => onSelect("internal")}
           className="group flex flex-col items-center rounded-3xl border-2 border-dashed border-gray-200 bg-white p-10 text-center transition-all hover:border-[#286ef0] hover:bg-blue-50/30"
         >
-          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-blue-50 text-[#286ef0] transition-transform group-hover:scale-110">
+          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-[10px] bg-blue-50 text-[#286ef0] transition-transform group-hover:scale-110">
             <Users className="h-10 w-10" />
           </div>
           <h3 className="mb-2 text-xl font-bold text-[#25324B]">
@@ -48,7 +48,7 @@ export default function SourceSelectionStep({
               onSelect("upload", file);
             }}
           />
-          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 transition-transform group-hover:scale-110">
+          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-[10px] bg-indigo-50 text-indigo-600 transition-transform group-hover:scale-110">
             <FileUp className="h-10 w-10" />
           </div>
           <h3 className="mb-2 text-xl font-bold text-[#25324B]">
