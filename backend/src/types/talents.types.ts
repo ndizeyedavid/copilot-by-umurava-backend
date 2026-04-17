@@ -64,4 +64,5 @@ export interface ITalent extends Document {
   availability: IAvailability;
   socialLinks: string[];
   rawCv?: any;
+  cvUrl?: string;
 }

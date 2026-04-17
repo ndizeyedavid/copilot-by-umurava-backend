@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
-import { useMutation } from "@tanstack/react-query";
-import { Upload, FileText, ArrowRight, X, Loader2 } from "lucide-react";
-import { api } from "@/lib/api/client";
+import { FileText, ArrowRight, X } from "lucide-react";
 import toast from "react-hot-toast";
+import { UploadDropzone } from "@/lib/uploadthing";
+import { getCookie } from "cookies-next";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ProfileCompletionModalProps {
   missingFields: string[];
@@ -21,57 +22,8 @@ export default function ProfileCompletionModal({
   onComplete,
 }: ProfileCompletionModalProps) {
   const router = useRouter();
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [dragActive, setDragActive] = useState(false);
-
-  const parseResumeMutation = useMutation({
-    mutationFn: async (formData: FormData) => {
-      const res = await api.post("/talents/parse-resume", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      return res.data;
-    },
-    onSuccess: (data) => {
-      toast.success("Resume parsed successfully!");
-      onComplete?.();
-      onClose();
-      router.push("/dashboard/profile");
-    },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to parse resume");
-    },
-  });
-
-  const handleFileChange = (file: File | null) => {
-    if (file && file.type === "application/pdf") {
-      setSelectedFile(file);
-    } else {
-      toast.error("Please upload a PDF file");
-    }
-  };
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setDragActive(false);
-    const file = e.dataTransfer.files?.[0];
-    handleFileChange(file || null);
-  }, []);
-
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setDragActive(true);
-  }, []);
-
-  const handleSubmit = () => {
-    if (!selectedFile) {
-      toast.error("Please select a resume file");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("resume", selectedFile);
-    parseResumeMutation.mutate(formData);
-  };
+  const token = getCookie("accessToken");
+  const queryClient = useQueryClient();
 
   const handleManualEntry = () => {
     onClose();
@@ -135,65 +87,28 @@ export default function ProfileCompletionModal({
             </div>
           )}
 
-          <div
-            className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all ${
-              dragActive
-                ? "border-[#286ef0] bg-blue-50"
-                : "border-gray-200 hover:border-[#286ef0]"
-            }`}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onDragLeave={() => setDragActive(false)}
-          >
-            <input
-              type="file"
-              accept=".pdf"
-              onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          <div className="mt-4">
+            <UploadDropzone
+              endpoint="cvUploader"
+              headers={{
+                Authorization: `Bearer ${token}`,
+              }}
+              onClientUploadComplete={(res) => {
+                 toast.success("Resume uploaded and profile parsed!");
+                 queryClient.invalidateQueries({ queryKey: ["talent", "me"] });
+                 onComplete?.();
+                 onClose();
+                 router.push("/dashboard/profile");
+               }}
+              onUploadError={(error: Error) => {
+                toast.error(`ERROR! ${error.message}`);
+              }}
+              config={{
+                mode: "manual",
+              }}
+              className="ut-label:text-[#286ef0] ut-button:bg-[#286ef0] ut-button:ut-readying:bg-[#286ef0]/50 border-2 border-dashed border-gray-200 rounded-xl p-8 hover:border-[#286ef0] transition-all"
             />
-
-            <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-
-            {selectedFile ? (
-              <div>
-                <p className="text-sm font-semibold text-[#25324B]">
-                  {selectedFile.name}
-                </p>
-                <p className="text-xs text-[#7C8493] mt-1">
-                  {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                </p>
-              </div>
-            ) : (
-              <div>
-                <p className="text-sm font-semibold text-[#25324B]">
-                  Drop your resume here or click to upload
-                </p>
-                <p className="text-xs text-[#7C8493] mt-1">
-                  PDF format only, max 10MB
-                </p>
-              </div>
-            )}
           </div>
-
-          {selectedFile && (
-            <button
-              onClick={handleSubmit}
-              disabled={parseResumeMutation.isPending}
-              className="w-full mt-4 flex items-center justify-center gap-2 px-6 py-3 bg-[#286ef0] text-white rounded-xl font-bold text-sm hover:bg-[#1f5fe0] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {parseResumeMutation.isPending ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Parsing Resume...
-                </>
-              ) : (
-                <>
-                  Parse & Fill Profile
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-          )}
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">

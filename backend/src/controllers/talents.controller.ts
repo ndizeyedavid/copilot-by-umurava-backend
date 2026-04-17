@@ -14,7 +14,7 @@ interface IQuery {
   lastName: any;
 }
 
-const genAI = new GoogleGenAI({ apiKey: ENV.gemingi_api_key });
+const genAI = new GoogleGenAI({ apiKey: ENV.gemini_api_key });
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

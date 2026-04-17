@@ -10,6 +10,8 @@ import swaggerDocument from "./swagger-output.json";
 
 import dbConnect from "./config/dbConnect";
 import router from "./routers";
+import { createRouteHandler } from "uploadthing/express";
+import { uploadRouter } from "./uploadthing";
 
 const app = express();
 dbConnect();
@@ -22,6 +24,7 @@ app.use(morgan("dev"));
 
 // routers
 app.use("/api/v1", router);
+app.use("/api/uploadthing", createRouteHandler({ router: uploadRouter }));
 
 // API Documentation
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));

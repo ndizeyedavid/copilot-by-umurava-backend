@@ -81,6 +81,7 @@ const talentSchema = new Schema<ITalent>(
     },
     socialLinks: [String],
     rawCv: Schema.Types.Mixed,
+    cvUrl: { type: String },
   },
   { timestamps: true },
 );

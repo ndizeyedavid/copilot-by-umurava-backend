@@ -1,7 +1,11 @@
 "use client";
 
 import React from "react";
-import { CheckCircle2, FileText } from "lucide-react";
+import { CheckCircle2, FileText, Upload } from "lucide-react";
+import { UploadButton } from "@/lib/uploadthing";
+import { getCookie } from "cookies-next";
+import toast from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface StatusItemProps {
   label: string;
@@ -35,6 +39,8 @@ interface ProfileStatusProps {
 
 export default function ProfileStatus({ progress }: ProfileStatusProps) {
   const { percentage, items, hasCv } = progress;
+  const token = getCookie("accessToken");
+  const queryClient = useQueryClient();
 
   return (
     <div className="bg-white rounded-[10px] overflow-hidden shadow-none border border-gray-100">
@@ -91,7 +97,7 @@ export default function ProfileStatus({ progress }: ProfileStatusProps) {
           </div>
         </div>
 
-        {hasCv && (
+        {hasCv ? (
           <button className="w-full bg-[#f8f9fa] cursor-pointer hover:bg-gray-100 border border-gray-200 rounded-2xl p-4 transition-colors flex items-center gap-4">
             <div className="bg-white p-2 rounded-lg shadow-sm">
               <FileText className="w-6 h-6 text-[#d93025]" />
@@ -103,6 +109,26 @@ export default function ProfileStatus({ progress }: ProfileStatusProps) {
               </p>
             </div>
           </button>
+        ) : (
+          <div className="space-y-4">
+            <p className="text-sm font-medium text-[#7C8493] text-center">
+              Upload your CV to complete your profile
+            </p>
+            <UploadButton
+              endpoint="cvUploader"
+              headers={{
+                Authorization: `Bearer ${token}`,
+              }}
+              onClientUploadComplete={() => {
+                toast.success("CV Uploaded successfully!");
+                queryClient.invalidateQueries({ queryKey: ["talent", "me"] });
+              }}
+              onUploadError={(error: Error) => {
+                toast.error(`Upload failed: ${error.message}`);
+              }}
+              className="ut-button:bg-[#286ef0] ut-button:w-full ut-button:rounded-xl ut-button:font-bold ut-button:text-sm"
+            />
+          </div>
         )}
       </div>
     </div>
