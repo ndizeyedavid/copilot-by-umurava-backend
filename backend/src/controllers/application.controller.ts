@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import Application from "../models/application.model";
+import Jobs from "../models/jobs.model";
+import Talent from "../models/talents.model";
+import User from "../models/user.model";
 import { IApplication } from "../types/application.types";
+import { sendApplicationConfirmation } from "../services/email.service";
 
 const applicationController = {
   async getAll(req: Request, res: Response) {
@@ -27,7 +31,9 @@ const applicationController = {
         return res.status(404).json({ message: "Application not found" });
       }
 
-      return res.status(200).json({ message: "Application found", application });
+      return res
+        .status(200)
+        .json({ message: "Application found", application });
     } catch (error: any) {
       return res.status(500).json({
         message: "Failed to fetch application",
@@ -56,7 +62,9 @@ const applicationController = {
   async getByTalentId(req: Request, res: Response) {
     try {
       const { talentId } = req.params;
-      const applications = await Application.find({ talentId }).populate("jobId");
+      const applications = await Application.find({ talentId }).populate(
+        "jobId",
+      );
 
       return res.status(200).json({
         message: `${applications.length} application(s) by talent`,
@@ -72,7 +80,8 @@ const applicationController = {
 
   async create(req: Request, res: Response) {
     try {
-      const { jobId, talentId, coverLetter, resumeUrl }: IApplication = req.body;
+      const { jobId, talentId, coverLetter, resumeUrl }: IApplication =
+        req.body;
 
       const existing = await Application.findOne({ jobId, talentId });
       if (existing) {
@@ -88,6 +97,25 @@ const applicationController = {
         resumeUrl,
         status: "pending",
       });
+
+      // Send confirmation email (async, don't block response)
+      (async () => {
+        try {
+          const job = await Jobs.findById(jobId);
+          const talent = await Talent.findById(talentId).populate("userId");
+
+          if (job && talent && (talent.userId as any)?.email) {
+            const user = talent.userId as any;
+            await sendApplicationConfirmation(user.email, {
+              candidateName: `${user.firstName} ${user.lastName || ""}`.trim(),
+              jobTitle: job.title,
+              timestamp: (application as any).createdAt || new Date(),
+            });
+          }
+        } catch (emailError) {
+          console.error("Background email task failed:", emailError);
+        }
+      })();
 
       return res.status(201).json({
         message: "Application submitted successfully",

@@ -2,6 +2,16 @@
 
 All notable changes made during admin dashboard refactor + auth improvements.
 
+## 17 / 04 / 2026
+
+### Added
+
+- Automated job-application confirmation email system.
+  - Integrated `nodemailer` for email dispatch.
+  - Responsive HTML template matching project design system.
+  - Background email processing to ensure main flow is not blocked.
+  - Environment-based configuration (`ENABLE_EMAILS`) and robust error logging.
+
 ## 16 / 04 / 2026
 
 ### Added
