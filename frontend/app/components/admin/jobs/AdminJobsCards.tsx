@@ -34,7 +34,7 @@ export default function AdminJobsCards({
       {rows.map((row) => (
         <div
           key={row.id}
-          className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+          className="rounded-[10px] border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
         >
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
@@ -106,7 +106,7 @@ export default function AdminJobsCards({
       ))}
 
       {rows.length === 0 && (
-        <div className="rounded-2xl border border-gray-200 bg-white p-10 text-center text-sm text-[#7C8493] md:col-span-2 xl:col-span-3">
+        <div className="rounded-[10px] border border-gray-200 bg-white p-10 text-center text-sm text-[#7C8493] md:col-span-2 xl:col-span-3">
           No jobs found.
         </div>
       )}

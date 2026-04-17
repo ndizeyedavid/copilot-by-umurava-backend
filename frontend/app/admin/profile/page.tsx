@@ -116,11 +116,11 @@ export default function AdminProfilePage() {
             No user session.
           </div>
         ) : (
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="rounded-[10px] border border-gray-200 bg-white p-6 shadow-sm">
             <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
               <div className="flex items-center gap-4">
                 <div className="relative">
-                  <div className="h-16 w-16 overflow-hidden rounded-2xl border border-gray-200 bg-gray-50">
+                  <div className="h-16 w-16 overflow-hidden rounded-[10px] border border-gray-200 bg-gray-50">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={form.picture || user.picture || "/images/companies/dummy.png"}

@@ -236,7 +236,7 @@ export default function AdminJobDetailsPage() {
             </div>
 
             <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-4">
-              <div className="rounded-2xl border border-gray-100 bg-[#F8F8FD] p-4">
+              <div className="rounded-[10px] border border-gray-100 bg-[#F8F8FD] p-4">
                 <div className="flex items-center gap-2 text-xs font-semibold text-[#7C8493]">
                   <Users className="h-4 w-4" />
                   Applicants
@@ -245,7 +245,7 @@ export default function AdminJobDetailsPage() {
                   {job.stats.applicants}
                 </p>
               </div>
-              <div className="rounded-2xl border border-gray-100 bg-[#F8F8FD] p-4">
+              <div className="rounded-[10px] border border-gray-100 bg-[#F8F8FD] p-4">
                 <div className="flex items-center gap-2 text-xs font-semibold text-[#7C8493]">
                   <Eye className="h-4 w-4" />
                   Views
@@ -254,7 +254,7 @@ export default function AdminJobDetailsPage() {
                   {job.stats.views}
                 </p>
               </div>
-              <div className="rounded-2xl border border-gray-100 bg-[#F8F8FD] p-4">
+              <div className="rounded-[10px] border border-gray-100 bg-[#F8F8FD] p-4">
                 <div className="flex items-center gap-2 text-xs font-semibold text-[#7C8493]">
                   <BadgeDollarSign className="h-4 w-4" />
                   Salary
@@ -263,7 +263,7 @@ export default function AdminJobDetailsPage() {
                   {job.salary.amount} {job.salary.currency}
                 </p>
               </div>
-              <div className="rounded-2xl border border-gray-100 bg-[#F8F8FD] p-4">
+              <div className="rounded-[10px] border border-gray-100 bg-[#F8F8FD] p-4">
                 <div className="flex items-center gap-2 text-xs font-semibold text-[#7C8493]">
                   <ShieldCheck className="h-4 w-4" />
                   Weights

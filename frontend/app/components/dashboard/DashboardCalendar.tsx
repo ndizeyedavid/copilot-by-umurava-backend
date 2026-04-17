@@ -9,7 +9,7 @@ export default function DashboardCalendar() {
   const [value, onChange] = useState<any>(new Date());
 
   return (
-    <div className="rounded-2xl bg-white border border-gray-100 p-6 calendar-container">
+    <div className="rounded-[10px] bg-white border border-gray-100 p-6 calendar-container">
       <style jsx global>{`
         .calendar-container .react-calendar {
           width: 100%;

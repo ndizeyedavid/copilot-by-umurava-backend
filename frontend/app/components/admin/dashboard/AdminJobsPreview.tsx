@@ -43,7 +43,7 @@ export default function AdminJobsPreview({ jobs }: { jobs: Job[] }) {
         {jobs.map((job) => (
           <div
             key={job.id}
-            className="rounded-2xl border border-gray-200 bg-white p-5 transition-shadow hover:shadow-md"
+            className="rounded-[10px] border border-gray-200 bg-white p-5 transition-shadow hover:shadow-md"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">

@@ -16,7 +16,7 @@ type Job = {
 
 export default function JobRecommendations({ jobs }: { jobs: Job[] }) {
   return (
-    <div className="rounded-2xl bg-white border border-gray-100 p-6">
+    <div className="rounded-[10px] bg-white border border-gray-100 p-6">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm text-[#7C8493]">Jobs recommendations</p>
@@ -34,7 +34,7 @@ export default function JobRecommendations({ jobs }: { jobs: Job[] }) {
         {jobs.map((job) => (
           <div
             key={`${job.title}-${job.daysLeft}`}
-            className="rounded-2xl border border-gray-100 bg-[#FBFBFF] p-5 hover:border-[#286ef0]/30 hover:shadow-sm transition-all"
+            className="rounded-[10px] border border-gray-100 bg-[#FBFBFF] p-5 hover:border-[#286ef0]/30 hover:shadow-sm transition-all"
           >
             <div className="flex items-start justify-between">
               <div className="flex items-start gap-3">

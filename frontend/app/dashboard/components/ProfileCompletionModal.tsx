@@ -47,7 +47,7 @@ export default function ProfileCompletionModal({
         onClick={onClose}
       />
 
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="relative bg-white rounded-[10px] shadow-2xl w-full max-w-lg mx-4 overflow-hidden animate-in zoom-in-95 duration-200">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100"
@@ -56,7 +56,7 @@ export default function ProfileCompletionModal({
         </button>
 
         <div className="p-8">
-          <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+          <div className="w-16 h-16 bg-blue-50 rounded-[10px] flex items-center justify-center mb-6 mx-auto">
             <FileText className="w-8 h-8 text-[#286ef0]" />
           </div>
 

@@ -292,7 +292,7 @@ export default function ProfilePage() {
             <div className="flex flex-col gap-3">
               <button
                 onClick={() => openModal("details")}
-                className="w-full px-8 py-4 bg-[#286ef0] text-white rounded-2xl hover:bg-[#1f5fe0] shadow-[0_4px_15px_rgba(40,110,240,0.3)] transition-all flex items-center justify-center font-bold text-sm tracking-widest uppercase"
+                className="w-full px-8 py-4 bg-[#286ef0] text-white rounded-[10px] hover:bg-[#1f5fe0] shadow-[0_4px_15px_rgba(40,110,240,0.3)] transition-all flex items-center justify-center font-bold text-sm tracking-widest uppercase"
               >
                 <Edit3 className="w-4 h-4 mr-2" />
                 Edit Profile

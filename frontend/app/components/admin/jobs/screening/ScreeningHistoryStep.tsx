@@ -46,7 +46,7 @@ export default function ScreeningHistoryStep({
 
       {screenings.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-gray-200 bg-white py-20 text-center">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-50 text-gray-400">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-[10px] bg-gray-50 text-gray-400">
             <BrainCircuit className="h-8 w-8" />
           </div>
           <h3 className="text-lg font-bold text-[#25324B]">
@@ -61,7 +61,7 @@ export default function ScreeningHistoryStep({
           {screenings.map((s) => (
             <div
               key={s.id}
-              className="group rounded-2xl border border-gray-200 bg-white p-5 transition-all hover:border-[#286ef0] hover:shadow-md"
+              className="group rounded-[10px] border border-gray-200 bg-white p-5 transition-all hover:border-[#286ef0] hover:shadow-md"
             >
               <div className="flex items-start justify-between">
                 <div>

@@ -158,7 +158,7 @@ export default function UserDetailsForm({ initialData, onSubmit }: UserDetailsFo
           />
         </div>
       </div>
-      <button type="submit" className="w-full py-4 bg-[#286ef0] text-white rounded-2xl font-bold uppercase tracking-widest text-sm hover:bg-[#1f5fe0] transition-all shadow-lg shadow-blue-100">
+      <button type="submit" className="w-full py-4 bg-[#286ef0] text-white rounded-[10px] font-bold uppercase tracking-widest text-sm hover:bg-[#1f5fe0] transition-all shadow-lg shadow-blue-100">
         Save Profile Details
       </button>
     </form>

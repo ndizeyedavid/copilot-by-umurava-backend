@@ -64,13 +64,13 @@ export default function CertificateForm({
         <button
           type="button"
           onClick={onCancel}
-          className="flex-1 py-4 bg-gray-100 text-[#25324B] rounded-2xl font-bold text-sm hover:bg-gray-200 transition-all"
+          className="flex-1 py-4 bg-gray-100 text-[#25324B] rounded-[10px] font-bold text-sm hover:bg-gray-200 transition-all"
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="flex-1 py-4 bg-[#286ef0] text-white rounded-2xl font-bold text-sm hover:bg-[#1f5fe0] transition-all"
+          className="flex-1 py-4 bg-[#286ef0] text-white rounded-[10px] font-bold text-sm hover:bg-[#1f5fe0] transition-all"
         >
           Save Certificate
         </button>

@@ -56,7 +56,7 @@ export default function CertificatesSection({
             <div
               key={index}
               onClick={() => onEdit(index)}
-              className="group relative p-5 bg-white rounded-2xl border border-gray-100 hover:border-[#286ef0] hover:shadow-[0_4px_15px_rgba(0,0,0,0.03)] transition-all duration-300 cursor-pointer"
+              className="group relative p-5 bg-white rounded-[10px] border border-gray-100 hover:border-[#286ef0] hover:shadow-[0_4px_15px_rgba(0,0,0,0.03)] transition-all duration-300 cursor-pointer"
             >
               <div className="flex items-start gap-4">
                 <div className="p-3 bg-amber-50 rounded-xl">

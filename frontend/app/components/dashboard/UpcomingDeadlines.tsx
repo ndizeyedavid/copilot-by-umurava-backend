@@ -14,14 +14,14 @@ export default function UpcomingDeadlines({
   deadlines: Deadline[];
 }) {
   return (
-    <div className="rounded-2xl bg-white border border-gray-100 p-6">
+    <div className="rounded-[10px] bg-white border border-gray-100 p-6">
       <p className="text-lg font-semibold text-[#25324B]">Upcoming Deadlines</p>
 
       <div className="mt-4 space-y-3">
         {deadlines.map((d) => (
           <div
             key={d.name}
-            className="flex items-center justify-between rounded-2xl bg-[#F8F8FD] px-2 py-3"
+            className="flex items-center justify-between rounded-[10px] bg-[#F8F8FD] px-2 py-3"
           >
             <div className="flex items-center gap-3">
               <div className="relative h-10 w-10">

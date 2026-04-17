@@ -117,7 +117,7 @@ export default function ExperienceForm({
       <div className="flex gap-4 pt-4">
         <button
           type="submit"
-          className="flex-1 py-4 bg-[#286ef0] text-white rounded-2xl font-bold uppercase tracking-widest text-sm"
+          className="flex-1 py-4 bg-[#286ef0] text-white rounded-[10px] font-bold uppercase tracking-widest text-sm"
         >
           Save Experience
         </button>
@@ -125,7 +125,7 @@ export default function ExperienceForm({
           <button
             type="button"
             onClick={onDelete}
-            className="px-6 py-4 bg-red-50 text-red-500 rounded-2xl font-bold uppercase tracking-widest text-sm"
+            className="px-6 py-4 bg-red-50 text-red-500 rounded-[10px] font-bold uppercase tracking-widest text-sm"
           >
             Delete
           </button>

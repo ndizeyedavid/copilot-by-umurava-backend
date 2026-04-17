@@ -107,12 +107,12 @@ export default function AdminApplicationsJobPicker() {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {isLoading ? (
-          <div className="col-span-full flex flex-col items-center justify-center py-20 rounded-2xl border border-gray-200 bg-white">
+          <div className="col-span-full flex flex-col items-center justify-center py-20 rounded-[10px] border border-gray-200 bg-white">
             <Loader2 className="h-8 w-8 animate-spin text-[#286ef0] mb-2" />
             <p className="text-sm text-[#7C8493]">Loading jobs...</p>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="col-span-full flex flex-col items-center justify-center py-20 rounded-2xl border border-gray-200 bg-white">
+          <div className="col-span-full flex flex-col items-center justify-center py-20 rounded-[10px] border border-gray-200 bg-white">
             <p className="text-sm font-semibold text-[#25324B]">
               No jobs found
             </p>
@@ -125,7 +125,7 @@ export default function AdminApplicationsJobPicker() {
             <Link
               key={job.id}
               href={`/admin/jobs/${job.id}/applications`}
-              className="group block rounded-2xl border border-gray-200 bg-white p-5 transition-all hover:border-[#286ef0] hover:shadow-md"
+              className="group block rounded-[10px] border border-gray-200 bg-white p-5 transition-all hover:border-[#286ef0] hover:shadow-md"
             >
               <div className="flex items-start justify-between">
                 <div className="min-w-0">

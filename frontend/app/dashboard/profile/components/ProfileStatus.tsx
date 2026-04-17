@@ -98,7 +98,7 @@ export default function ProfileStatus({ progress }: ProfileStatusProps) {
         </div>
 
         {hasCv ? (
-          <button className="w-full bg-[#f8f9fa] cursor-pointer hover:bg-gray-100 border border-gray-200 rounded-2xl p-4 transition-colors flex items-center gap-4">
+          <button className="w-full bg-[#f8f9fa] cursor-pointer hover:bg-gray-100 border border-gray-200 rounded-[10px] p-4 transition-colors flex items-center gap-4">
             <div className="bg-white p-2 rounded-lg shadow-sm">
               <FileText className="w-6 h-6 text-[#d93025]" />
             </div>

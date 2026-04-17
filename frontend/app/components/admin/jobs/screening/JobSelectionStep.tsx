@@ -33,7 +33,7 @@ export default function JobSelectionStep({
           <button
             key={job.id}
             onClick={() => onSelect(job.id)}
-            className="group flex flex-col rounded-2xl border border-gray-200 bg-white p-6 text-left transition-all hover:border-[#286ef0] hover:shadow-md"
+            className="group flex flex-col rounded-[10px] border border-gray-200 bg-white p-6 text-left transition-all hover:border-[#286ef0] hover:shadow-md"
           >
             <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-[#286ef0] transition-colors group-hover:bg-[#286ef0] group-hover:text-white">
               <Briefcase className="h-5 w-5" />

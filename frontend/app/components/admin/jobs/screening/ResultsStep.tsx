@@ -79,7 +79,7 @@ export default function ResultsStep({
 
       <div className="flex flex-col items-center justify-between gap-6 rounded-3xl border border-blue-100 bg-[#F8F8FD] p-6 md:flex-row">
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#286ef0] text-white">
+          <div className="flex h-14 w-14 items-center justify-center rounded-[10px] bg-[#286ef0] text-white">
             <BarChart3 className="h-7 w-7" />
           </div>
           <div>
@@ -190,7 +190,7 @@ export default function ResultsStep({
           return (
             <div
               key={c.candidateId}
-              className={`overflow-hidden rounded-2xl border bg-white transition-all ${
+              className={`overflow-hidden rounded-[10px] border bg-white transition-all ${
                 isExpanded
                   ? "border-[#286ef0] shadow-md"
                   : "border-gray-200 hover:border-gray-300"

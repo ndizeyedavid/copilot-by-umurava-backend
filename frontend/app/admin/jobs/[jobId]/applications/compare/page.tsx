@@ -87,7 +87,7 @@ function DiffSection({
   right: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-gray-200 bg-white p-5">
+    <section className="rounded-[10px] border border-gray-200 bg-white p-5">
       <h3 className="text-sm font-bold text-[#25324B] mb-4">{title}</h3>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="rounded-xl border border-gray-100 bg-gray-50/40 p-4">
@@ -193,7 +193,7 @@ export default function ApplicationsComparePage() {
       </div>
 
       {!canLoad ? (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-800">
+        <div className="rounded-[10px] border border-amber-200 bg-amber-50 p-5 text-sm text-amber-800">
           <div className="flex items-center gap-2 font-semibold">
             <AlertTriangle className="h-4 w-4" />
             Need 2 different applicants.
@@ -203,18 +203,18 @@ export default function ApplicationsComparePage() {
           </p>
         </div>
       ) : isLoading ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-200 bg-white py-20">
+        <div className="flex flex-col items-center justify-center rounded-[10px] border border-gray-200 bg-white py-20">
           <Loader2 className="h-8 w-8 animate-spin text-indigo-600 mb-2" />
           <p className="text-sm text-[#7C8493]">Loading comparison...</p>
         </div>
       ) : !talentA || !talentB ? (
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
+        <div className="rounded-[10px] border border-red-200 bg-red-50 p-5 text-sm text-red-700">
           Failed load one or both profiles.
         </div>
       ) : (
         <div className="space-y-6">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <div className="rounded-[10px] border border-gray-200 bg-white p-5">
               <p className="text-xs font-bold uppercase tracking-wider text-[#7C8493]">
                 Applicant A
               </p>
@@ -250,7 +250,7 @@ export default function ApplicationsComparePage() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <div className="rounded-[10px] border border-gray-200 bg-white p-5">
               <p className="text-xs font-bold uppercase tracking-wider text-[#7C8493]">
                 Applicant B
               </p>
@@ -287,7 +287,7 @@ export default function ApplicationsComparePage() {
             </div>
           </div>
 
-          <section className="rounded-2xl border border-indigo-200 bg-indigo-50/50 p-5">
+          <section className="rounded-[10px] border border-indigo-200 bg-indigo-50/50 p-5">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-indigo-700">
                 <Trophy className="h-5 w-5" />
