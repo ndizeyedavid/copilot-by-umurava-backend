@@ -81,9 +81,16 @@ export default function JobRecommendations({ jobs }: { jobs: RecommendedJob[] })
                     />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-[#25324B] line-clamp-2 group-hover:text-[#286ef0] transition-colors">
-                      {job.title}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-semibold text-[#25324B] line-clamp-2 group-hover:text-[#286ef0] transition-colors">
+                        {job.title}
+                      </p>
+                      {job.status === "Applied" && (
+                        <span className="shrink-0 bg-green-100 text-green-700 px-1.5 py-0.5 text-[9px] font-bold uppercase rounded-full">
+                          Applied
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-[#7C8493]">{job.company}</p>
                   </div>
                 </div>
