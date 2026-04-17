@@ -1,6 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import { UploadButton } from "@/lib/uploadthing";
+import { getCookie } from "cookies-next";
+import toast from "react-hot-toast";
+import { Camera } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface UserDetailsFormProps {
   initialData: {
@@ -10,11 +15,16 @@ interface UserDetailsFormProps {
     headline: string;
     location: string;
     socialLinks: string[];
+    picture?: string | null;
   };
   onSubmit: (data: any) => void;
 }
 
 export default function UserDetailsForm({ initialData, onSubmit }: UserDetailsFormProps) {
+  const [pictureUrl, setPictureUrl] = useState(initialData.picture || "");
+  const token = getCookie("accessToken");
+  const queryClient = useQueryClient();
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -28,6 +38,7 @@ export default function UserDetailsForm({ initialData, onSubmit }: UserDetailsFo
         formData.get("linkedin") as string,
         formData.get("github") as string,
       ].filter(Boolean),
+      picture: pictureUrl,
     };
     onSubmit(data);
   };
@@ -37,75 +48,117 @@ export default function UserDetailsForm({ initialData, onSubmit }: UserDetailsFo
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Profile Picture Upload */}
+      <div className="flex flex-col items-center mb-6">
+        <div className="relative group">
+          <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-[#286ef0] to-[#5c95ff] p-1">
+            {pictureUrl ? (
+              <div className="w-full h-full rounded-full bg-white overflow-hidden">
+                <img
+                  src={pictureUrl}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ) : (
+              <div className="w-full h-full rounded-full bg-gray-100 flex items-center justify-center">
+                <Camera className="w-8 h-8 text-gray-400" />
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="mt-3">
+          <UploadButton
+            endpoint="profilePictureUploader"
+            headers={{
+              Authorization: `Bearer ${token}`,
+            }}
+            onClientUploadComplete={(res) => {
+              if (res && res[0]?.url) {
+                setPictureUrl(res[0].url);
+                queryClient.invalidateQueries({ queryKey: ["user", "me"] });
+                queryClient.invalidateQueries({ queryKey: ["talent", "me"] });
+                toast.success("Profile picture uploaded!");
+              }
+            }}
+            onUploadError={(error: Error) => {
+              toast.error(`Upload failed: ${error.message}`);
+            }}
+            className="ut-button:bg-[#286ef0] ut-button:text-white ut-button:rounded-full ut-button:px-4 ut-button:py-2 ut-button:text-sm ut-button:font-bold ut-button:hover:bg-[#1f5fe0] ut-button:transition-all ut-button:shadow-lg"
+          />
+        </div>
+        <p className="text-xs text-gray-400 mt-2">Click to upload a new picture</p>
+      </div>
+
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <label className="text-sm font-bold text-[#25324B]">First Name</label>
-          <input 
-            name="firstName" 
-            defaultValue={initialData.firstName} 
-            className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#286ef0]" 
-            required 
+          <input
+            name="firstName"
+            defaultValue={initialData.firstName}
+            className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#286ef0]"
+            required
           />
         </div>
         <div className="space-y-2">
           <label className="text-sm font-bold text-[#25324B]">Last Name</label>
-          <input 
-            name="lastName" 
-            defaultValue={initialData.lastName} 
-            className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#286ef0]" 
-            required 
+          <input
+            name="lastName"
+            defaultValue={initialData.lastName}
+            className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#286ef0]"
+            required
           />
         </div>
       </div>
       <div className="space-y-2">
         <label className="text-sm font-bold text-[#25324B]">Email</label>
-        <input 
-          name="email" 
-          type="email" 
-          defaultValue={initialData.email} 
-          className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#286ef0]" 
-          required 
+        <input
+          name="email"
+          type="email"
+          defaultValue={initialData.email}
+          className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#286ef0]"
+          required
         />
       </div>
       <div className="space-y-2">
         <label className="text-sm font-bold text-[#25324B]">Headline</label>
-        <input 
-          name="headline" 
-          defaultValue={initialData.headline} 
-          className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#286ef0]" 
-          required 
+        <input
+          name="headline"
+          defaultValue={initialData.headline}
+          className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#286ef0]"
+          required
         />
       </div>
       <div className="space-y-2">
         <label className="text-sm font-bold text-[#25324B]">Location</label>
-        <input 
-          name="location" 
-          defaultValue={initialData.location} 
-          className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#286ef0]" 
-          required 
+        <input
+          name="location"
+          defaultValue={initialData.location}
+          className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#286ef0]"
+          required
         />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <label className="text-sm font-bold text-[#25324B]">LinkedIn URL</label>
-          <input 
-            name="linkedin" 
-            defaultValue={linkedin} 
-            className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#286ef0]" 
+          <input
+            name="linkedin"
+            defaultValue={linkedin}
+            className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#286ef0]"
             placeholder="https://linkedin.com/in/username"
           />
         </div>
         <div className="space-y-2">
           <label className="text-sm font-bold text-[#25324B]">GitHub URL</label>
-          <input 
-            name="github" 
-            defaultValue={github} 
-            className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#286ef0]" 
+          <input
+            name="github"
+            defaultValue={github}
+            className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#286ef0]"
             placeholder="https://github.com/username"
           />
         </div>
       </div>
-      <button type="submit" className="w-full py-4 bg-[#286ef0] text-white rounded-2xl font-bold uppercase tracking-widest text-sm">
+      <button type="submit" className="w-full py-4 bg-[#286ef0] text-white rounded-2xl font-bold uppercase tracking-widest text-sm hover:bg-[#1f5fe0] transition-all shadow-lg shadow-blue-100">
         Save Profile Details
       </button>
     </form>

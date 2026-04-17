@@ -59,7 +59,7 @@ Return ONLY valid JSON with this exact structure:
 
 export const uploadRouter = {
   cvUploader: f({
-    pdf: { maxFileSize: "1024KB", maxFileCount: 1 },
+    pdf: { maxFileSize: "1024KB", maxFileCount: 1 }
   })
     .middleware(async ({ req }) => {
       const authHeader = req.headers["authorization"];
@@ -92,7 +92,7 @@ export const uploadRouter = {
           talent = new Talent({
             userId: metadata.userId,
             headline: "Talent",
-            location: "Remote", // Default
+            location: "Remote",
             skills: [],
             experience: [],
             availability: { status: "Available", type: "Full-time" },
@@ -101,9 +101,8 @@ export const uploadRouter = {
         }
 
         // Fetch file content for parsing if it's a PDF
-        // Note: UploadThing's file.type can be "application/pdf" or just "pdf" depending on version
         const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
-        
+
         if (isPdf) {
           try {
             const response = await axios.get(file.url, { responseType: "arraybuffer" });
@@ -131,7 +130,7 @@ export const uploadRouter = {
                   talent.headline = parsedData.headline || talent.headline || "";
                   talent.bio = parsedData.summary || talent.bio || "";
                   talent.location = parsedData.location || talent.location || "";
-                  
+
                   if (parsedData.skills && Array.isArray(parsedData.skills)) {
                     talent.skills = parsedData.skills.map((s: string) => ({
                       name: s,
@@ -169,7 +168,7 @@ export const uploadRouter = {
                       issueDate: new Date(),
                     }));
                   }
-                  
+
                   talent.rawCv = { text: resumeText, parsedAt: new Date() };
                 } catch (jsonError) {
                   console.error("Failed to parse AI response JSON:", jsonError);
@@ -184,12 +183,44 @@ export const uploadRouter = {
         talent.cvUrl = file.url;
         await talent.save();
 
-        await User.findByIdAndUpdate(metadata.userId, { 
+        await User.findByIdAndUpdate(metadata.userId, {
           talentProfileId: talent._id,
         });
 
       } catch (error) {
         console.error("Failed to process uploaded CV:", error);
+      }
+
+      return { uploadedBy: metadata.userId, url: file.url };
+    }),
+
+  profilePictureUploader: f({
+    image: { maxFileSize: "1024MB", maxFileCount: 1 },
+  })
+    .middleware(async ({ req }) => {
+      const authHeader = req.headers["authorization"];
+      const token = authHeader && authHeader.split(" ")[1];
+
+      if (!token) throw new Error("Unauthorized: No token provided");
+
+      try {
+        const user = verifyToken(token);
+        if (!user || user.role !== "talent") throw new Error("Unauthorized: Invalid role");
+        return { userId: user.userId };
+      } catch (error: any) {
+        throw new Error(`Unauthorized: ${error.message}`);
+      }
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      console.log("Profile picture upload complete for userId:", metadata.userId);
+      console.log("File URL:", file.url);
+
+      try {
+        await User.findByIdAndUpdate(metadata.userId, {
+          picture: file.url,
+        });
+      } catch (error) {
+        console.error("Failed to update user profile picture:", error);
       }
 
       return { uploadedBy: metadata.userId, url: file.url };

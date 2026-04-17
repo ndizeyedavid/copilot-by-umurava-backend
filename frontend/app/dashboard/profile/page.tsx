@@ -16,11 +16,13 @@ import { Badge } from "@/components/ui/Badge";
 import ExperienceSection, { Experience } from "./components/ExperienceSection";
 import SkillsSection, { Skill } from "./components/SkillsSection";
 import LanguagesSection, { Language } from "./components/LanguagesSection";
+import CertificatesSection, { Certificate } from "./components/CertificatesSection";
 import ProfileStatus from "./components/ProfileStatus";
 import Modal from "./components/Modal";
 import ExperienceForm from "./components/forms/ExperienceForm";
 import SkillForm from "./components/forms/SkillForm";
 import LanguageForm from "./components/forms/LanguageForm";
+import CertificateForm from "./components/forms/CertificateForm";
 import BioForm from "./components/forms/BioForm";
 import UserDetailsForm from "./components/forms/UserDetailsForm";
 import SocialsForm from "./components/forms/SocialsForm";
@@ -36,6 +38,7 @@ export default function ProfilePage() {
       | "experience"
       | "skills"
       | "languages"
+      | "certificates"
       | "bio"
       | "details"
       | "socials"
@@ -73,6 +76,7 @@ export default function ProfilePage() {
     },
     socialLinks: [] as string[],
     languages: [] as Language[],
+    certifications: [] as Certificate[],
   });
 
   useEffect(() => {
@@ -92,6 +96,7 @@ export default function ProfilePage() {
         availability: talent.availability || { status: "Available", type: "Full-time" },
         socialLinks: talent.socialLinks || [],
         languages: talent.languages || [],
+        certifications: talent.certifications || [],
       });
     }
   }, [talent]);
@@ -152,6 +157,17 @@ export default function ProfilePage() {
     closeModal();
   };
 
+  const handleUpdateCertificate = (updatedCert: Certificate) => {
+    const newCerts = [...talentData.certifications];
+    if (activeModal.index !== undefined) {
+      newCerts[activeModal.index] = updatedCert;
+    } else {
+      newCerts.push(updatedCert);
+    }
+    updateTalentMutation.mutate({ certifications: newCerts });
+    closeModal();
+  };
+
   const handleUpdateBio = (newBio: string) => {
     updateTalentMutation.mutate({ bio: newBio });
     closeModal();
@@ -181,6 +197,9 @@ export default function ProfilePage() {
     } else if (type === "languages") {
       const newLangs = talentData.languages.filter((_, i) => i !== index);
       updateTalentMutation.mutate({ languages: newLangs });
+    } else if (type === "certificates") {
+      const newCerts = talentData.certifications.filter((_, i) => i !== index);
+      updateTalentMutation.mutate({ certifications: newCerts });
     }
     closeModal();
   };
@@ -225,12 +244,21 @@ export default function ProfilePage() {
               {/* Profile Picture */}
               <div className="relative group">
                 <div className="w-32 h-32 sm:w-32 sm:h-32 rounded-full bg-linear-to-tr from-[#286ef0] to-[#5c95ff] p-1 ">
-                  <div className="w-full h-full rounded-full bg-white overflow-hidden flex items-center justify-center border-4 border-white">
-                    <span className="text-4xl sm:text-5xl font-bold text-[#286ef0]">
-                      {userData.firstName[0]}
-                      {userData.lastName[0]}
-                    </span>
-                  </div>
+                  {userData.picture ? (
+                    <div className="w-full h-full rounded-full bg-white overflow-hidden border-4 border-white">
+                      <img
+                        src={userData.picture}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-full h-full rounded-full bg-white overflow-hidden flex items-center justify-center border-4 border-white">
+                      <span className="text-4xl sm:text-5xl font-bold text-[#286ef0]">
+                        {userData.firstName[0]}{userData.lastName[0]}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -326,6 +354,12 @@ export default function ProfilePage() {
               onEdit={(index) => openModal("languages", index)}
               onRemove={(index) => removeItem("languages", index)}
             />
+
+            <CertificatesSection
+              certificates={talentData.certifications as Certificate[]}
+              onAdd={() => openModal("certificates")}
+              onEdit={(index) => openModal("certificates", index)}
+            />
           </div>
 
           {/* Sidebar - Profile Status (The MIFOTRA-style card) */}
@@ -402,6 +436,24 @@ export default function ProfilePage() {
         </Modal>
 
         <Modal
+          isOpen={activeModal.type === "certificates"}
+          onClose={closeModal}
+          title={
+            activeModal.index !== undefined ? "Edit Certificate" : "Add Certificate"
+          }
+        >
+          <CertificateForm
+            initialData={
+              activeModal.index !== undefined
+                ? talentData.certifications[activeModal.index]
+                : undefined
+            }
+            onSubmit={handleUpdateCertificate}
+            onCancel={closeModal}
+          />
+        </Modal>
+
+        <Modal
           isOpen={activeModal.type === "bio"}
           onClose={closeModal}
           title="Edit Personal Bio"
@@ -422,6 +474,7 @@ export default function ProfilePage() {
               headline: talentData.headline,
               location: talentData.location,
               socialLinks: talentData.socialLinks,
+              picture: userData.picture,
             }}
             onSubmit={handleUpdateDetails}
           />
