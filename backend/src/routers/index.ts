@@ -8,6 +8,7 @@ import emailRouter from "./email.route";
 import authRouter from "./auth.route";
 import userRouter from "./user.route";
 import externalScreeningRouter from "./external-screening.route";
+import umuravaRouter from "./umurava.route";
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use("/email", emailRouter);
 router.use("/auth", authRouter);
 router.use("/users", userRouter);
 router.use("/external-screening", externalScreeningRouter);
+router.use("/umurava", umuravaRouter);
 
 export default router;

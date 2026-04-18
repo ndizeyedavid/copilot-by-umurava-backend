@@ -187,6 +187,154 @@ const screeningController = {
       });
     }
   },
+
+  async runAiScreeningFromUmurava(req: Request, res: Response) {
+    try {
+      const {
+        jobId,
+        topN = 10,
+        talents,
+      }: {
+        jobId?: string;
+        topN?: number;
+        talents?: any[];
+      } = req.body;
+
+      if (!jobId) {
+        return res.status(400).json({ message: "jobId is required" });
+      }
+
+      const job = await Jobs.findById(jobId);
+      if (!job) return res.status(404).json({ message: "Job not found" });
+
+      const list = Array.isArray(talents) ? talents : [];
+      if (list.length === 0) {
+        return res.status(400).json({ message: "talents array is required" });
+      }
+
+      const n = Number(topN);
+      const safeTopN = Number.isFinite(n)
+        ? Math.min(Math.max(Math.floor(n), 1), list.length)
+        : Math.min(10, list.length);
+
+      const jobData: JobData = {
+        title: job.title,
+        description: job.description,
+        requirements: job.requirements,
+        weights: job.weights,
+      };
+
+      const candidatesData: CandidateData[] = list.map(
+        (t: any, idx: number) => {
+          const email = String(t?.email ?? "").trim();
+          const id = email ? `umurava:${email}` : `umurava:${idx + 1}`;
+
+          const skills = Array.isArray(t?.skills) ? t.skills : [];
+          const experience = Array.isArray(t?.experience) ? t.experience : [];
+          const education = Array.isArray(t?.education) ? t.education : [];
+          const certifications = Array.isArray(t?.certifications)
+            ? t.certifications
+            : [];
+          const projects = Array.isArray(t?.projects) ? t.projects : [];
+
+          return {
+            id,
+            firstName: String(t?.firstName ?? "Unknown"),
+            lastName: String(t?.lastName ?? ""),
+            headline: String(t?.headline ?? ""),
+            bio: t?.bio ? String(t.bio) : undefined,
+            skills: skills
+              .filter(Boolean)
+              .map((s: any) => ({
+                name: String(s?.name ?? ""),
+                level: String(s?.level ?? "Intermediate"),
+                yearsOfExperience: Number(s?.yearsOfExperience ?? 0),
+              }))
+              .filter((s: any) => s.name),
+            experience: experience.filter(Boolean).map((e: any) => ({
+              company: String(e?.company ?? ""),
+              role: String(e?.role ?? ""),
+              description: String(e?.description ?? ""),
+              technologies: Array.isArray(e?.technologies)
+                ? e.technologies.map((x: any) => String(x))
+                : [],
+              startDate: e?.startDate ? new Date(e.startDate) : new Date(),
+              endDate: e?.endDate ? new Date(e.endDate) : undefined,
+            })),
+            education: education.filter(Boolean).map((ed: any) => ({
+              institution: String(ed?.institution ?? ""),
+              degree: String(ed?.degree ?? ""),
+              fieldOfStudy: String(ed?.fieldOfStudy ?? ""),
+            })),
+            certifications: certifications
+              .filter(Boolean)
+              .map((c: any) => ({
+                name: String(c?.name ?? ""),
+                issuer: String(c?.issuer ?? ""),
+              }))
+              .filter((c: any) => c.name),
+            projects: projects
+              .filter(Boolean)
+              .map((p: any) => ({
+                name: String(p?.name ?? ""),
+                description: String(p?.description ?? ""),
+                technologies: Array.isArray(p?.technologies)
+                  ? p.technologies.map((x: any) => String(x))
+                  : [],
+              }))
+              .filter((p: any) => p.name),
+          };
+        },
+      );
+
+      const aiResult = await evaluateCandidates(jobData, candidatesData);
+
+      const sortedCandidates = (aiResult.candidates ?? [])
+        .slice()
+        .sort((a, b) => a.rank - b.rank);
+      const trimmed = sortedCandidates.slice(0, safeTopN);
+
+      const screening = await Screening.create({
+        jobId: job._id.toString(),
+        candidates: trimmed,
+        comparisonSummary: aiResult.comparisonSummary,
+      });
+
+      const metaById = new Map(
+        list.map((t: any, idx: number) => {
+          const email = String(t?.email ?? "").trim();
+          const id = email ? `umurava:${email}` : `umurava:${idx + 1}`;
+          return [
+            id,
+            {
+              email,
+              firstName: String(t?.firstName ?? ""),
+              lastName: String(t?.lastName ?? ""),
+              headline: String(t?.headline ?? ""),
+              location: String(t?.location ?? ""),
+            },
+          ];
+        }),
+      );
+
+      return res.status(200).json({
+        message: `AI screening complete. ${trimmed.length} Umurava talents ranked`,
+        screening,
+        topN: safeTopN,
+        rankedTalents: trimmed.map((c) => ({
+          candidateId: c.candidateId,
+          rank: c.rank,
+          matchScore: c.matchScore,
+          meta: metaById.get(c.candidateId) ?? null,
+        })),
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: "AI screening failed",
+        error: error.message,
+      });
+    }
+  },
 };
 
 export { screeningController };
