@@ -55,6 +55,23 @@ type BackendApplication = {
   jobId: string;
 };
 
+type UmuravaTalent = {
+  email: string;
+  firstName: string;
+  lastName?: string;
+  headline: string;
+  bio?: string;
+  location?: string;
+  skills?: Array<{ name: string; level: string; yearsOfExperience: number }>;
+  languages?: Array<{ name?: string; proficiency?: string }>;
+  experience?: Array<any>;
+  education?: Array<any>;
+  certifications?: Array<any>;
+  projects?: Array<any>;
+  availability?: any;
+  socialLinks?: string[];
+};
+
 export default function AdminJobScreeningPage({
   jobId: initialJobId,
 }: {
@@ -80,6 +97,25 @@ export default function AdminJobScreeningPage({
         res.data?.fetchedScreening ??
         []) as BackendScreening[];
       return Array.isArray(list) ? list : [];
+    },
+  });
+
+  const startUmuravaMutation = useMutation({
+    mutationFn: async ({ jobId, topN }: { jobId: string; topN: number }) => {
+      const dummyRes = await api.get("/umurava/talents/dummy");
+      const talents = (dummyRes.data?.talents ?? []) as UmuravaTalent[];
+
+      const res = await api.post("/screening/import/umurava", {
+        jobId,
+        topN,
+        talents,
+      });
+
+      return res.data?.screening as BackendScreening;
+    },
+    onSuccess: (screening) => {
+      if (!screening?._id) return;
+      router.push(`/admin/screening/${screening._id}`);
     },
   });
 
@@ -111,10 +147,19 @@ export default function AdminJobScreeningPage({
   });
 
   const startExternalMutation = useMutation({
-    mutationFn: async ({ jobId, file }: { jobId: string; file: File }) => {
+    mutationFn: async ({
+      jobId,
+      file,
+      topN,
+    }: {
+      jobId: string;
+      file: File;
+      topN: number;
+    }) => {
       const form = new FormData();
       form.append("file", file);
       form.append("jobId", jobId);
+      form.append("topN", String(topN));
       const res = await api.post("/external-screening/upload", form, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -129,7 +174,9 @@ export default function AdminJobScreeningPage({
   });
 
   const isProcessing =
-    runInternalMutation.isPending || startExternalMutation.isPending;
+    runInternalMutation.isPending ||
+    startExternalMutation.isPending ||
+    startUmuravaMutation.isPending;
 
   const jobs = useMemo((): JobSummary[] => {
     const rawJobs = jobsQuery.data || [];
@@ -239,18 +286,32 @@ export default function AdminJobScreeningPage({
 
       {step === "select_source" && (
         <SourceSelectionStep
-          onSelect={(source, file) => {
+          onSelect={(source, params) => {
             if (!selectedJobId) return;
             setStep("processing");
             if (source === "internal") {
               runInternalMutation.mutate(selectedJobId);
               return;
             }
+
+            if (source === "umurava") {
+              startUmuravaMutation.mutate({
+                jobId: selectedJobId,
+                topN: params.topN,
+              });
+              return;
+            }
+
+            const file = params.file;
             if (!file) {
               setStep("select_source");
               return;
             }
-            startExternalMutation.mutate({ jobId: selectedJobId, file });
+            startExternalMutation.mutate({
+              jobId: selectedJobId,
+              file,
+              topN: params.topN,
+            });
           }}
           onBack={() => setStep("select_job")}
         />
