@@ -125,6 +125,7 @@ export default function ScreeningResultsPage() {
         const enriched: CandidateResult[] = await Promise.all(
           candidates.map(async (c) => {
             let name = c.candidateId;
+            let email = "";
             try {
               const talentRes = await api.get(`/talents/${c.candidateId}`);
               const t = talentRes.data?.fetchedTalent as any;
@@ -135,12 +136,15 @@ export default function ScreeningResultsPage() {
                 t?.userId?.lastName ?? t?.lastName ?? "",
               ).trim();
               name = `${first} ${last}`.trim() || c.candidateId;
+              email = String(t?.userId?.email ?? t?.email ?? "").trim();
             } catch {
               name = c.candidateId;
+              email = "";
             }
             return {
               candidateId: c.candidateId,
               name,
+              email,
               rank: c.rank,
               matchScore: c.matchScore,
               confidence: c.confidence,
@@ -189,6 +193,7 @@ export default function ScreeningResultsPage() {
             return {
               candidateId: r.applicantId,
               name: r.applicantId,
+              email: "",
               rank: idx + 1,
               matchScore: r.matchScore,
               confidence: conf,
@@ -291,6 +296,43 @@ export default function ScreeningResultsPage() {
       const res = await api.put(`/screening/${screeningId}`, {
         pipelineState: state,
       });
+      return res.data;
+    },
+  });
+
+  // Send interview invitation emails
+  const sendInterviewEmails = useMutation({
+    mutationFn: async (data: {
+      candidates: InterviewEmailCandidate[];
+      subject: string;
+      body: string;
+      interviewType: string;
+      date: string;
+      time: string;
+      duration: string;
+      location: string;
+    }) => {
+      const res = await api.post(
+        `/screening/${screeningId}/interview-email`,
+        data,
+      );
+      return res.data;
+    },
+  });
+
+  // Send contract emails
+  const sendContractEmails = useMutation({
+    mutationFn: async (data: {
+      candidateId: string;
+      email: string;
+      subject: string;
+      body: string;
+      contractText: string;
+    }) => {
+      const res = await api.post(
+        `/screening/${screeningId}/contract-email`,
+        data,
+      );
       return res.data;
     },
   });
@@ -478,7 +520,7 @@ export default function ScreeningResultsPage() {
             (r): ShortlistCandidate => ({
               candidateId: r.candidateId,
               name: r.name,
-              email: "", // Would need to fetch from talent
+              email: r.email,
               rank: r.rank,
               matchScore: r.matchScore,
               confidence: r.confidence,
@@ -503,14 +545,25 @@ export default function ScreeningResultsPage() {
               (r): InterviewEmailCandidate => ({
                 candidateId: r.candidateId,
                 name: r.name,
-                email: "", // Would need to fetch
+                email: r.email,
                 rank: r.rank,
                 matchScore: r.matchScore,
               }),
             )}
           jobTitle={jobQuery.data?.title || "Position"}
           onSend={async (data) => {
-            // Initialize interview candidates
+            // Send interview invitation emails first
+            await sendInterviewEmails.mutateAsync({
+              candidates: data.candidates,
+              subject: data.subject,
+              body: data.body,
+              interviewType: data.interviewType,
+              date: data.date,
+              time: data.time,
+              duration: data.duration,
+              location: data.location || "",
+            });
+            // Then initialize interview candidates
             setInterviewCandidates(
               data.candidates.map((c) => ({
                 ...c,
@@ -574,8 +627,17 @@ export default function ScreeningResultsPage() {
           candidates={contractCandidates}
           jobTitle={jobQuery.data?.title || "Position"}
           onSend={async (candidateId, emailData) => {
-            // Send email API call would go here
-            await new Promise((r) => setTimeout(r, 500));
+            const candidate = contractCandidates.find(
+              (c) => c.candidateId === candidateId,
+            );
+            if (!candidate) return;
+            await sendContractEmails.mutateAsync({
+              candidateId,
+              email: candidate.email,
+              subject: emailData.subject,
+              body: emailData.body,
+              contractText: candidate.contractText,
+            });
           }}
           onBack={() => setStep("contract_generate")}
           onComplete={() => {

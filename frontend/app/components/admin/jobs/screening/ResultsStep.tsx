@@ -15,6 +15,7 @@ import {
 export type CandidateResult = {
   candidateId: string;
   name: string;
+  email: string;
   rank: number;
   matchScore: number;
   confidence: "high" | "medium" | "low";
