@@ -18,7 +18,7 @@ import ContractGenerateStep from "@/app/components/admin/jobs/screening/Contract
 import ContractEmailStep, {
   ContractWithEmail,
 } from "@/app/components/admin/jobs/screening/ContractEmailStep";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api/client";
@@ -48,8 +48,6 @@ export default function ScreeningResultsPage() {
   const [selectedCandidateIds, setSelectedCandidateIds] = useState<string[]>(
     [],
   );
-  const [emailSent, setEmailSent] = useState(false);
-
   // Pipeline data
   const [shortlistedIds, setShortlistedIds] = useState<string[]>([]);
   const [interviewCandidates, setInterviewCandidates] = useState<
@@ -59,6 +57,9 @@ export default function ScreeningResultsPage() {
     ContractWithEmail[]
   >([]);
   const [completedHires, setCompletedHires] = useState<string[]>([]);
+
+  // Track if initial load is done
+  const [isStateLoaded, setIsStateLoaded] = useState(false);
 
   type InternalScreening = {
     _id: string;
@@ -75,6 +76,13 @@ export default function ScreeningResultsPage() {
       comparisonNotes?: string;
     }[];
     createdAt: string;
+    pipelineState?: {
+      currentStep: PipelineStep;
+      shortlistedIds: string[];
+      interviewCandidates: InterviewCandidate[];
+      contractCandidates: ContractWithEmail[];
+      completedHires: string[];
+    };
   };
 
   type ExternalResult = {
@@ -240,46 +248,119 @@ export default function ScreeningResultsPage() {
 
   const weights = jobQuery.data?.weights ?? null;
 
-  const emailMutation = useMutation({
-    mutationFn: async (candidateId: string) => {
-      const res = await api.post(`/email/send/${screeningId}`, {
-        mode: "selected_only",
-        selectedCandidateId: candidateId,
-      });
-      return res.data;
-    },
-    onSuccess: () => {
-      setEmailSent(true);
-      setTimeout(() => setEmailSent(false), 3000);
-    },
-  });
-
-  const isSendingEmails = emailMutation.isPending;
-
-  const handleSendEmails = async () => {
-    if (!isInternal) return;
-    if (selectedCandidateIds.length === 0) return;
-    for (const candidateId of selectedCandidateIds) {
-      // eslint-disable-next-line no-await-in-loop
-      await emailMutation.mutateAsync(candidateId);
-    }
-  };
-
   const toggleCandidateSelect = (id: string) => {
     setSelectedCandidateIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
   };
 
-  const emailDisabled = !isInternal;
+  // Load pipeline state from screening data
+  useEffect(() => {
+    if (isStateLoaded) return;
+    const screening = resultsQuery.data?.screening;
+    if (!screening) return; // Wait for data to load
+    if (screening.pipelineState) {
+      const ps = screening.pipelineState;
+      setStep(ps.currentStep);
+      setShortlistedIds(ps.shortlistedIds || []);
+      setInterviewCandidates(ps.interviewCandidates || []);
+      setContractCandidates(ps.contractCandidates || []);
+      setCompletedHires(ps.completedHires || []);
+      setSelectedCandidateIds(ps.shortlistedIds || []);
+      // Set prevStateRef to prevent immediate re-save
+      prevStateRef.current = JSON.stringify({
+        currentStep: ps.currentStep,
+        shortlistedIds: ps.shortlistedIds || [],
+        interviewCandidates: ps.interviewCandidates || [],
+        contractCandidates: ps.contractCandidates || [],
+        completedHires: ps.completedHires || [],
+      });
+    }
+    setIsStateLoaded(true);
+  }, [resultsQuery.data, isStateLoaded]);
+
+  // Save pipeline state mutation
+  const savePipelineState = useMutation({
+    mutationFn: async (state: {
+      currentStep: PipelineStep;
+      shortlistedIds: string[];
+      interviewCandidates: InterviewCandidate[];
+      contractCandidates: ContractWithEmail[];
+      completedHires: string[];
+    }) => {
+      const res = await api.put(`/screening/${screeningId}`, {
+        pipelineState: state,
+      });
+      return res.data;
+    },
+  });
+
+  // Helper to save current state
+  const persistState = () => {
+    if (!screeningId) return;
+    savePipelineState.mutate({
+      currentStep: step,
+      shortlistedIds,
+      interviewCandidates,
+      contractCandidates,
+      completedHires,
+    });
+  };
+
+  // Refs for auto-save comparison
+  const prevStateRef = useRef<string>("");
+
+  // Auto-save when state changes (debounced, with JSON comparison)
+  useEffect(() => {
+    if (!isStateLoaded || !screeningId) return;
+
+    const currentState = JSON.stringify({
+      step,
+      shortlistedIds,
+      interviewCandidates,
+      contractCandidates,
+      completedHires,
+    });
+
+    // Only save if state actually changed
+    if (currentState === prevStateRef.current) return;
+
+    const timeout = setTimeout(() => {
+      prevStateRef.current = currentState;
+      persistState();
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [
+    step,
+    shortlistedIds,
+    interviewCandidates,
+    contractCandidates,
+    completedHires,
+    isStateLoaded,
+    screeningId,
+  ]);
 
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#25324B]">Screening Results</h1>
-        <p className="text-sm text-[#7C8493]">
-          ID: <span className="font-mono text-[#286ef0]">{screeningId}</span>
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-[#25324B]">
+              Screening Results
+            </h1>
+            <p className="text-sm text-[#7C8493]">
+              ID:{" "}
+              <span className="font-mono text-[#286ef0]">{screeningId}</span>
+              {savePipelineState.isPending && (
+                <span className="ml-2 text-xs text-amber-500">• Saving...</span>
+              )}
+              {savePipelineState.isSuccess && !savePipelineState.isPending && (
+                <span className="ml-2 text-xs text-green-500">• Saved</span>
+              )}
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="mb-6 rounded-[10px] border border-gray-200 bg-white p-5 shadow-sm">

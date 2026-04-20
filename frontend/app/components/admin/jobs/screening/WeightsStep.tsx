@@ -233,7 +233,7 @@ export default function WeightsStep({
                   type="range"
                   min={0}
                   max={100}
-                  value={value}
+                  value={value < 0 ? value * 100 : value}
                   onChange={(e) => adjustWeights(key, parseInt(e.target.value))}
                   className={`h-2 flex-1 cursor-pointer appearance-none rounded-full bg-gray-200 accent-[#286ef0] ${config.color}`}
                   style={{
