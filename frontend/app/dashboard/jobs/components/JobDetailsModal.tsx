@@ -6,7 +6,6 @@ import {
   MapPin,
   Clock,
   Briefcase,
-  DollarSign,
   Globe,
   Users,
   Calendar,

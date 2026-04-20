@@ -11,11 +11,11 @@ import {
   MapPin,
   Briefcase,
   Users,
-  BadgeDollarSign,
   ShieldCheck,
 } from "lucide-react";
 import { api } from "@/lib/api/client";
 import SafeHtml from "@/app/components/SafeHtml";
+import { BsCash } from "react-icons/bs";
 
 type JobDetails = {
   id: string;
@@ -256,7 +256,7 @@ export default function AdminJobDetailsPage() {
               </div>
               <div className="rounded-[10px] border border-gray-100 bg-[#F8F8FD] p-4">
                 <div className="flex items-center gap-2 text-xs font-semibold text-[#7C8493]">
-                  <BadgeDollarSign className="h-4 w-4" />
+                  <BsCash className="h-4 w-4" />
                   Salary
                 </div>
                 <p className="mt-2 text-2xl font-bold text-[#25324B]">

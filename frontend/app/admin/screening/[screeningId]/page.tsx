@@ -605,19 +605,14 @@ export default function ScreeningResultsPage() {
           jobTitle={jobQuery.data?.title || "Position"}
           onContinue={(contracts) => {
             setContractCandidates(
-              contracts.map((c) => {
-                const candidate = interviewCandidates.find(
-                  (ic) => ic.candidateId === c.candidateId,
-                )!;
-                return {
-                  candidateId: c.candidateId,
-                  name: candidate.name,
-                  email: candidate.email,
-                  position: jobQuery.data?.title || "Position",
-                  contractText: c.contractText,
-                  status: "pending",
-                };
-              }),
+              contracts.map((c) => ({
+                candidateId: c.candidateId,
+                name: c.name,
+                email: c.email,
+                position: jobQuery.data?.title || "Position",
+                contractText: c.contractText,
+                status: "pending",
+              })),
             );
             setStep("contract_email");
           }}

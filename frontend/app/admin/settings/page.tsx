@@ -136,7 +136,6 @@ export default function SettingsPage() {
 
   const tabs = [
     { id: "security", label: "Security", icon: Shield },
-    { id: "notifications", label: "Notifications", icon: Bell },
     { id: "account", label: "Account", icon: Globe },
   ];
 
@@ -216,49 +215,6 @@ export default function SettingsPage() {
               {/* Security Tab */}
               {activeTab === "security" && (
                 <div className="p-6 space-y-6">
-                  <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
-                        <p className="text-sm font-semibold text-gray-900">
-                          Link Google account
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          Enables Google login for this admin account.
-                        </p>
-                        {meQuery.data?.hasGoogle ? (
-                          <p className="mt-1 text-xs font-semibold text-emerald-700">
-                            Google linked
-                          </p>
-                        ) : null}
-                      </div>
-
-                      <div className="shrink-0">
-                        {meQuery.data?.hasGoogle ? null : (
-                          <div
-                            className={
-                              linkGoogleMutation.isPending
-                                ? "opacity-60 pointer-events-none"
-                                : ""
-                            }
-                          >
-                            <GoogleLogin
-                              onSuccess={(credentialResponse) => {
-                                const credential =
-                                  credentialResponse.credential;
-                                if (!credential) {
-                                  toast.error("Missing Google credential");
-                                  return;
-                                }
-                                linkGoogleMutation.mutate(credential);
-                              }}
-                              onError={() => toast.error("Google link failed")}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
                   <div>
                     <h2 className="text-lg font-semibold text-gray-900 mb-4">
                       Change Password
@@ -342,129 +298,48 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="border-t pt-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                      Two-Factor Authentication
-                    </h3>
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-medium text-gray-900">
-                          Google account
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          Add an extra layer of security to your account
-                        </p>
-                      </div>
-                      <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                        Link with Google
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
+                    <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">
+                            Link Google account
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Enables Google login for this admin account.
+                          </p>
+                          {meQuery.data?.hasGoogle ? (
+                            <p className="mt-1 text-xs font-semibold text-emerald-700">
+                              Google linked
+                            </p>
+                          ) : null}
+                        </div>
 
-              {/* Notifications Tab */}
-              {activeTab === "notifications" && (
-                <div className="p-6 space-y-6">
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                      Notification Preferences
-                    </h2>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            Email Notifications
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Receive job updates and alerts via email
-                          </p>
+                        <div className="shrink-0">
+                          {meQuery.data?.hasGoogle ? null : (
+                            <div
+                              className={
+                                linkGoogleMutation.isPending
+                                  ? "opacity-60 pointer-events-none"
+                                  : ""
+                              }
+                            >
+                              <GoogleLogin
+                                onSuccess={(credentialResponse) => {
+                                  const credential =
+                                    credentialResponse.credential;
+                                  if (!credential) {
+                                    toast.error("Missing Google credential");
+                                    return;
+                                  }
+                                  linkGoogleMutation.mutate(credential);
+                                }}
+                                onError={() =>
+                                  toast.error("Google link failed")
+                                }
+                              />
+                            </div>
+                          )}
                         </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={formData.emailNotifications}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                emailNotifications: e.target.checked,
-                              })
-                            }
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            Push Notifications
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Receive push notifications on your devices
-                          </p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={formData.pushNotifications}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                pushNotifications: e.target.checked,
-                              })
-                            }
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            SMS Notifications
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Receive important updates via SMS
-                          </p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={formData.smsNotifications}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                smsNotifications: e.target.checked,
-                              })
-                            }
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            Marketing Emails
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Receive promotional offers and newsletters
-                          </p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={formData.marketingEmails}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                marketingEmails: e.target.checked,
-                              })
-                            }
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
                       </div>
                     </div>
                   </div>

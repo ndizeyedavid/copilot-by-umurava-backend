@@ -160,3 +160,13 @@ phantom-ui[loading] button,
 phantom-ui[loading] [role="button"] {
   margin: 2px 0;
 }
+
+ul {
+  list-style: circle;
+  margin: 2px 40px;
+}
+
+ol {
+  list-style: decimal;
+  margin: 2px 40px !important;
+}

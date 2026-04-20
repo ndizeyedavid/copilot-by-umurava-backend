@@ -6,7 +6,6 @@ import {
   MapPin,
   Clock,
   Briefcase,
-  DollarSign,
   ArrowRight,
   Bookmark,
   CheckCircle2,

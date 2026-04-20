@@ -9,13 +9,13 @@ import {
   Edit3,
   User,
   Briefcase,
-  DollarSign,
   Calendar,
   Clock,
   Download,
   Loader2,
   Eye,
 } from "lucide-react";
+import { BsCash } from "react-icons/bs";
 
 export type ContractCandidate = {
   candidateId: string;
@@ -87,7 +87,14 @@ export default function ContractGenerateStep({
 }: {
   candidates: ContractCandidate[];
   jobTitle: string;
-  onContinue: (contracts: { candidateId: string; contractText: string }[]) => void;
+  onContinue: (
+    contracts: {
+      candidateId: string;
+      contractText: string;
+      name: string;
+      email: string;
+    }[],
+  ) => void;
   onBack: () => void;
 }) {
   const [contractData, setContractData] = useState<ContractData>({
@@ -96,14 +103,21 @@ export default function ContractGenerateStep({
     employmentType: "full-time",
     probationPeriod: "3 months",
     workingHours: "8:00 AM - 5:00 PM, Monday to Friday",
-    benefits: ["Health insurance", "Annual leave (18 days)", "Paid public holidays"],
+    benefits: [
+      "Health insurance",
+      "Annual leave (18 days)",
+      "Paid public holidays",
+    ],
     terms: DEFAULT_CONTRACT_TEMPLATE,
   });
   const [isEditing, setIsEditing] = useState(false);
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const updateField = <K extends keyof ContractData>(field: K, value: ContractData[K]) => {
+  const updateField = <K extends keyof ContractData>(
+    field: K,
+    value: ContractData[K],
+  ) => {
     setContractData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -127,13 +141,16 @@ export default function ContractGenerateStep({
     const contracts = candidates.map((c) => ({
       candidateId: c.candidateId,
       contractText: generateContract(c),
+      name: c.name,
+      email: c.email,
     }));
     onContinue(contracts);
     setIsGenerating(false);
   };
 
   const canGenerate = contractData.salary && contractData.startDate;
-  const previewCandidate = candidates.find((c) => c.candidateId === previewId) || candidates[0];
+  const previewCandidate =
+    candidates.find((c) => c.candidateId === previewId) || candidates[0];
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -160,11 +177,10 @@ export default function ContractGenerateStep({
           </div>
           <div className="flex-1">
             <p className="font-semibold text-[#25324B]">
-              {candidates.length} contract{candidates.length > 1 ? "s" : ""} to generate
+              {candidates.length} contract{candidates.length > 1 ? "s" : ""} to
+              generate
             </p>
-            <p className="text-xs text-[#7C8493]">
-              Position: {jobTitle}
-            </p>
+            <p className="text-xs text-[#7C8493]">Position: {jobTitle}</p>
           </div>
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
@@ -192,7 +208,7 @@ export default function ContractGenerateStep({
           {/* Salary */}
           <div className="space-y-2">
             <label className="text-sm font-semibold text-[#25324B]">
-              <DollarSign className="inline h-4 w-4 mr-1" />
+              <BsCash className="inline h-4 w-4 mr-1" />
               Monthly Salary (RWF)
             </label>
             <input
@@ -219,10 +235,17 @@ export default function ContractGenerateStep({
 
           {/* Employment Type */}
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-[#25324B]">Employment Type</label>
+            <label className="text-sm font-semibold text-[#25324B]">
+              Employment Type
+            </label>
             <select
               value={contractData.employmentType}
-              onChange={(e) => updateField("employmentType", e.target.value as ContractData["employmentType"])}
+              onChange={(e) =>
+                updateField(
+                  "employmentType",
+                  e.target.value as ContractData["employmentType"],
+                )
+              }
               className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-[#286ef0]"
             >
               <option value="full-time">Full-time</option>
@@ -233,7 +256,9 @@ export default function ContractGenerateStep({
 
           {/* Probation */}
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-[#25324B]">Probation Period</label>
+            <label className="text-sm font-semibold text-[#25324B]">
+              Probation Period
+            </label>
             <select
               value={contractData.probationPeriod}
               onChange={(e) => updateField("probationPeriod", e.target.value)}
@@ -263,7 +288,9 @@ export default function ContractGenerateStep({
 
           {/* Benefits */}
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-[#25324B]">Benefits</label>
+            <label className="text-sm font-semibold text-[#25324B]">
+              Benefits
+            </label>
             <div className="flex flex-wrap gap-2">
               {contractData.benefits.map((benefit, i) => (
                 <span
@@ -275,7 +302,7 @@ export default function ContractGenerateStep({
                     onClick={() =>
                       updateField(
                         "benefits",
-                        contractData.benefits.filter((_, idx) => idx !== i)
+                        contractData.benefits.filter((_, idx) => idx !== i),
                       )
                     }
                     className="hover:text-green-900"
@@ -290,7 +317,10 @@ export default function ContractGenerateStep({
               placeholder="Add benefit and press Enter"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && e.currentTarget.value.trim()) {
-                  updateField("benefits", [...contractData.benefits, e.currentTarget.value.trim()]);
+                  updateField("benefits", [
+                    ...contractData.benefits,
+                    e.currentTarget.value.trim(),
+                  ]);
                   e.currentTarget.value = "";
                 }
               }}
@@ -305,9 +335,13 @@ export default function ContractGenerateStep({
             <h3 className="font-bold text-[#25324B]">Contract Template</h3>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setPreviewId(previewId ? null : candidates[0]?.candidateId)}
+                onClick={() =>
+                  setPreviewId(previewId ? null : candidates[0]?.candidateId)
+                }
                 className={`inline-flex items-center gap-1 rounded-lg px-3 py-1 text-xs font-semibold transition-colors ${
-                  previewId ? "bg-[#286ef0] text-white" : "bg-gray-100 text-[#25324B] hover:bg-gray-200"
+                  previewId
+                    ? "bg-[#286ef0] text-white"
+                    : "bg-gray-100 text-[#25324B] hover:bg-gray-200"
                 }`}
               >
                 <Eye className="h-3 w-3" />
@@ -316,7 +350,9 @@ export default function ContractGenerateStep({
               <button
                 onClick={() => setIsEditing(!isEditing)}
                 className={`inline-flex items-center gap-1 rounded-lg px-3 py-1 text-xs font-semibold transition-colors ${
-                  isEditing ? "bg-[#286ef0] text-white" : "bg-gray-100 text-[#25324B] hover:bg-gray-200"
+                  isEditing
+                    ? "bg-[#286ef0] text-white"
+                    : "bg-gray-100 text-[#25324B] hover:bg-gray-200"
                 }`}
               >
                 <Edit3 className="h-3 w-3" />
@@ -352,7 +388,10 @@ export default function ContractGenerateStep({
           )}
 
           <p className="text-xs text-[#7C8493]">
-            Variables: {"{{candidateName}}, {{position}}, {{startDate}}, {{salary}}, {{employmentType}}, {{probationPeriod}}, {{workingHours}}, {{benefits}}, {{signDate}}"}
+            Variables:{" "}
+            {
+              "{{candidateName}}, {{position}}, {{startDate}}, {{salary}}, {{employmentType}}, {{probationPeriod}}, {{workingHours}}, {{benefits}}, {{signDate}}"
+            }
           </p>
         </div>
       </div>
@@ -379,7 +418,9 @@ export default function ContractGenerateStep({
             ) : (
               <CheckCircle2 className="h-4 w-4" />
             )}
-            {isGenerating ? "Generating..." : `Generate ${candidates.length} Contracts`}
+            {isGenerating
+              ? "Generating..."
+              : `Generate ${candidates.length} Contracts`}
           </button>
         </div>
       </div>
