@@ -263,13 +263,25 @@ export default function ScreeningResultsPage() {
 
           <div className="flex flex-wrap gap-2">
             <span className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-semibold text-[#25324B]">
-              Skills {Number(weights?.skills ?? 0)}%
+              Skills{" "}
+              {Number(weights?.skills ?? 0) < 1
+                ? Number(weights?.skills) * 100
+                : Number(weights?.skills ?? 0)}
+              %
             </span>
             <span className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-semibold text-[#25324B]">
-              Experience {Number(weights?.experience ?? 0)}%
+              Experience{" "}
+              {Number(weights?.experience ?? 0) < 1
+                ? Number(weights?.experience) * 100
+                : Number(weights?.experience ?? 0)}
+              %
             </span>
             <span className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-semibold text-[#25324B]">
-              Education {Number(weights?.education ?? 0)}%
+              Education{" "}
+              {Number(weights?.education ?? 0) < 1
+                ? Number(weights?.education) * 100
+                : Number(weights?.education ?? 0)}
+              %
             </span>
           </div>
         </div>
