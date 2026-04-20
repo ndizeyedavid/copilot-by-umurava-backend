@@ -401,7 +401,7 @@ export default function AdminCandidatesPage() {
                 <div className="flex flex-wrap gap-1.5">
                   {candidate.skills.map((skill) => (
                     <span
-                      key={skill}
+                      key={`${skill} ${Math.random()}`}
                       className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-[10px] font-bold text-indigo-600 border border-indigo-100"
                     >
                       {skill}

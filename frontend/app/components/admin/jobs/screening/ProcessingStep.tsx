@@ -1,6 +1,6 @@
 "use client";
 
-import { BrainCircuit, Loader, Loader2 } from "lucide-react";
+import { BrainCircuit } from "lucide-react";
 
 export default function ProcessingStep({
   message,
@@ -12,28 +12,37 @@ export default function ProcessingStep({
   return (
     <div className="flex animate-in fade-in slide-in-from-bottom-2 duration-300 flex-col items-center justify-center rounded-[10px] border border-gray-100 bg-white py-20 shadow-sm">
       <div className="relative mb-8">
-        <Loader className="h-24 w-24 animate-spin text-[#286ef0] stroke-[1.5px]" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          {/* <BrainCircuit className="h-8 w-8 text-[#286ef0]" /> */}
+        <div className="relative flex h-24 w-24 items-center justify-center">
+          <div className="absolute inset-0 rounded-full border-4 border-[#286ef0]/20" />
+          <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#286ef0] animate-spin" />
+          <div className="absolute inset-2 rounded-full border-4 border-[#286ef0]/10" />
+          <div
+            className="absolute inset-2 rounded-full border-4 border-transparent border-b-[#286ef0]/60 animate-spin"
+            style={{ animationDirection: "reverse", animationDuration: "1.5s" }}
+          />
+          <BrainCircuit className="h-10 w-10 text-[#286ef0]" />
         </div>
       </div>
 
       <div className="space-y-3 text-center">
         <h2 className="text-2xl font-bold text-[#25324B]">
-          Screening In Progress...
+          Screening In Progress
         </h2>
-        <div className="h-6 overflow-hidden">
-          <p className="font-semibold text-[#286ef0] animate-in slide-in-from-bottom-2 duration-300">
+        <div className="h-6 overflow-hidden relative">
+          <p
+            key={message}
+            className="font-semibold text-[#286ef0] animate-in slide-in-from-top-2 fade-in duration-300"
+          >
             {message}
           </p>
         </div>
       </div>
 
-      <div className="mt-12 h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-gray-100">
+      <div className="mt-5 h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-gray-100 relative">
         <div
-          className="h-full bg-[#286ef0] transition-all duration-500 ease-out"
+          className="h-full bg-linear-to-r from-[#286ef0] via-[#5b8df0] to-[#286ef0] transition-all duration-500 ease-out relative"
           style={{ width: `${progress}%` }}
-        />
+        ></div>
       </div>
     </div>
   );
