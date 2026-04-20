@@ -4,12 +4,12 @@ import { useMemo, useState } from "react";
 import {
   AlertCircle,
   ArrowLeft,
+  ArrowRight,
   BarChart3,
   CheckCircle2,
   ChevronDown,
   ChevronRight,
   Loader2,
-  Mail,
 } from "lucide-react";
 
 export type CandidateResult = {
@@ -28,24 +28,20 @@ export type CandidateResult = {
 export default function ResultsStep({
   results,
   selectedCandidateIds,
-  isSendingEmails,
-  emailSent,
   expandedCandidate,
   onToggleSelect,
   onToggleExpand,
-  onSendEmails,
+  onNext,
   onCompare,
   onRestart,
   onBack,
 }: {
   results: CandidateResult[];
   selectedCandidateIds: string[];
-  isSendingEmails: boolean;
-  emailSent: boolean;
   expandedCandidate: string | null;
   onToggleSelect: (id: string) => void;
   onToggleExpand: (id: string | null) => void;
-  onSendEmails: () => void;
+  onNext: () => void;
   onCompare: () => void;
   onRestart: () => void;
   onBack: () => void;
@@ -153,28 +149,16 @@ export default function ResultsStep({
           </button>
 
           <button
-            onClick={onSendEmails}
-            disabled={selectedCandidateIds.length === 0 || isSendingEmails}
+            onClick={onNext}
+            disabled={selectedCandidateIds.length === 0}
             className={`inline-flex items-center gap-2 rounded-xl px-6 py-2 text-sm font-bold transition-all ${
-              emailSent
-                ? "bg-green-500 text-white"
-                : selectedCandidateIds.length > 0
-                  ? "bg-[#286ef0] text-white shadow-md shadow-blue-100 hover:bg-[#1f5fe0]"
-                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
+              selectedCandidateIds.length > 0
+                ? "bg-[#286ef0] text-white shadow-md shadow-blue-100 hover:bg-[#1f5fe0]"
+                : "bg-gray-100 text-gray-400 cursor-not-allowed"
             }`}
           >
-            {isSendingEmails ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : emailSent ? (
-              <CheckCircle2 className="h-4 w-4" />
-            ) : (
-              <Mail className="h-4 w-4" />
-            )}
-            {isSendingEmails
-              ? "Sending..."
-              : emailSent
-                ? "Sent!"
-                : `Send Email to Selected (${selectedCandidateIds.length})`}
+            <ArrowRight className="h-4 w-4" />
+            Next Step: Shortlist ({selectedCandidateIds.length})
           </button>
         </div>
       </div>

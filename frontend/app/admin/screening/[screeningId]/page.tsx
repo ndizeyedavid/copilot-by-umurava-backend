@@ -4,16 +4,44 @@ import { useParams } from "next/navigation";
 import ResultsStep, {
   CandidateResult,
 } from "@/app/components/admin/jobs/screening/ResultsStep";
+import ShortlistStep, {
+  ShortlistCandidate,
+} from "@/app/components/admin/jobs/screening/ShortlistStep";
+import InterviewEmailStep, {
+  InterviewEmailCandidate,
+} from "@/app/components/admin/jobs/screening/InterviewEmailStep";
+import InterviewManageStep, {
+  InterviewCandidate,
+  InterviewStatus,
+} from "@/app/components/admin/jobs/screening/InterviewManageStep";
+import ContractGenerateStep from "@/app/components/admin/jobs/screening/ContractGenerateStep";
+import ContractEmailStep, {
+  ContractWithEmail,
+} from "@/app/components/admin/jobs/screening/ContractEmailStep";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api/client";
+import { CheckCircle2 } from "lucide-react";
+
+type PipelineStep =
+  | "results"
+  | "shortlist"
+  | "interview_email"
+  | "interview_manage"
+  | "contract_generate"
+  | "contract_email"
+  | "complete";
 
 export default function ScreeningResultsPage() {
   const params = useParams<{ screeningId: string }>();
   const screeningId = params?.screeningId ?? "";
   const router = useRouter();
 
+  // Pipeline step state
+  const [step, setStep] = useState<PipelineStep>("results");
+
+  // Results step state
   const [expandedCandidate, setExpandedCandidate] = useState<string | null>(
     null,
   );
@@ -21,6 +49,16 @@ export default function ScreeningResultsPage() {
     [],
   );
   const [emailSent, setEmailSent] = useState(false);
+
+  // Pipeline data
+  const [shortlistedIds, setShortlistedIds] = useState<string[]>([]);
+  const [interviewCandidates, setInterviewCandidates] = useState<
+    InterviewCandidate[]
+  >([]);
+  const [contractCandidates, setContractCandidates] = useState<
+    ContractWithEmail[]
+  >([]);
+  const [completedHires, setCompletedHires] = useState<string[]>([]);
 
   type InternalScreening = {
     _id: string;
@@ -287,30 +325,205 @@ export default function ScreeningResultsPage() {
         </div>
       </div>
 
-      <ResultsStep
-        results={results}
-        selectedCandidateIds={selectedCandidateIds}
-        isSendingEmails={isSendingEmails}
-        emailSent={emailSent}
-        expandedCandidate={expandedCandidate}
-        onToggleSelect={(id) => {
-          if (emailDisabled) return;
-          toggleCandidateSelect(id);
-        }}
-        onToggleExpand={setExpandedCandidate}
-        onSendEmails={handleSendEmails}
-        onCompare={() => {
-          if (selectedCandidateIds.length !== 2) return;
-          const [a, b] = selectedCandidateIds;
-          router.push(
-            `/admin/screening/${screeningId}/compare?a=${encodeURIComponent(
-              a,
-            )}&b=${encodeURIComponent(b)}`,
-          );
-        }}
-        onRestart={() => router.push("/admin/screening")}
-        onBack={() => router.push("/admin/screening")}
-      />
+      {/* Pipeline Stepper */}
+      <div className="mb-6">
+        <div className="flex items-center gap-2 overflow-x-auto pb-2">
+          {[
+            { id: "results", label: "Results" },
+            { id: "shortlist", label: "Shortlist" },
+            { id: "interview_email", label: "Invite" },
+            { id: "interview_manage", label: "Interviews" },
+            { id: "contract_generate", label: "Contracts" },
+            { id: "contract_email", label: "Send" },
+            { id: "complete", label: "Complete" },
+          ].map((s, idx, arr) => (
+            <div key={s.id} className="flex items-center">
+              <button
+                onClick={() => setStep(s.id as PipelineStep)}
+                className={`rounded-full px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-colors ${
+                  step === s.id
+                    ? "bg-[#286ef0] text-white"
+                    : arr.findIndex((x) => x.id === step) > idx
+                      ? "bg-green-100 text-green-700"
+                      : "bg-gray-100 text-gray-500"
+                }`}
+              >
+                {arr.findIndex((x) => x.id === step) > idx && "✓ "}
+                {s.label}
+              </button>
+              {idx < arr.length - 1 && (
+                <div
+                  className={`mx-1 h-px w-4 ${
+                    arr.findIndex((x) => x.id === step) > idx
+                      ? "bg-green-300"
+                      : "bg-gray-200"
+                  }`}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Step Content */}
+      {step === "results" && (
+        <ResultsStep
+          results={results}
+          selectedCandidateIds={selectedCandidateIds}
+          expandedCandidate={expandedCandidate}
+          onToggleSelect={(id) => toggleCandidateSelect(id)}
+          onToggleExpand={setExpandedCandidate}
+          onNext={() => {
+            setShortlistedIds(selectedCandidateIds);
+            setStep("shortlist");
+          }}
+          onCompare={() => {
+            if (selectedCandidateIds.length !== 2) return;
+            const [a, b] = selectedCandidateIds;
+            router.push(
+              `/admin/screening/${screeningId}/compare?a=${encodeURIComponent(
+                a,
+              )}&b=${encodeURIComponent(b)}`,
+            );
+          }}
+          onRestart={() => router.push("/admin/screening")}
+          onBack={() => router.push("/admin/screening")}
+        />
+      )}
+
+      {step === "shortlist" && (
+        <ShortlistStep
+          candidates={results.map(
+            (r): ShortlistCandidate => ({
+              candidateId: r.candidateId,
+              name: r.name,
+              email: "", // Would need to fetch from talent
+              rank: r.rank,
+              matchScore: r.matchScore,
+              confidence: r.confidence,
+              strengths: r.strengths,
+            }),
+          )}
+          initiallySelected={shortlistedIds}
+          jobTitle={jobQuery.data?.title || "Position"}
+          onContinue={(ids) => {
+            setShortlistedIds(ids);
+            setStep("interview_email");
+          }}
+          onBack={() => setStep("results")}
+        />
+      )}
+
+      {step === "interview_email" && (
+        <InterviewEmailStep
+          candidates={results
+            .filter((r) => shortlistedIds.includes(r.candidateId))
+            .map(
+              (r): InterviewEmailCandidate => ({
+                candidateId: r.candidateId,
+                name: r.name,
+                email: "", // Would need to fetch
+                rank: r.rank,
+                matchScore: r.matchScore,
+              }),
+            )}
+          jobTitle={jobQuery.data?.title || "Position"}
+          onSend={async (data) => {
+            // Initialize interview candidates
+            setInterviewCandidates(
+              data.candidates.map((c) => ({
+                ...c,
+                status: "invited",
+                scheduledDate: data.date,
+                scheduledTime: data.time,
+              })),
+            );
+            setStep("interview_manage");
+          }}
+          onBack={() => setStep("shortlist")}
+        />
+      )}
+
+      {step === "interview_manage" && (
+        <InterviewManageStep
+          candidates={interviewCandidates}
+          jobTitle={jobQuery.data?.title || "Position"}
+          onContinue={(ids) => {
+            setStep("contract_generate");
+          }}
+          onBack={() => setStep("interview_email")}
+        />
+      )}
+
+      {step === "contract_generate" && (
+        <ContractGenerateStep
+          candidates={interviewCandidates
+            .filter((c) => c.status === "completed" && (c.rating || 0) >= 4)
+            .map((c) => ({
+              candidateId: c.candidateId,
+              name: c.name,
+              email: c.email,
+              position: jobQuery.data?.title || "Position",
+            }))}
+          jobTitle={jobQuery.data?.title || "Position"}
+          onContinue={(contracts) => {
+            setContractCandidates(
+              contracts.map((c) => {
+                const candidate = interviewCandidates.find(
+                  (ic) => ic.candidateId === c.candidateId,
+                )!;
+                return {
+                  candidateId: c.candidateId,
+                  name: candidate.name,
+                  email: candidate.email,
+                  position: jobQuery.data?.title || "Position",
+                  contractText: c.contractText,
+                  status: "pending",
+                };
+              }),
+            );
+            setStep("contract_email");
+          }}
+          onBack={() => setStep("interview_manage")}
+        />
+      )}
+
+      {step === "contract_email" && (
+        <ContractEmailStep
+          candidates={contractCandidates}
+          jobTitle={jobQuery.data?.title || "Position"}
+          onSend={async (candidateId, emailData) => {
+            // Send email API call would go here
+            await new Promise((r) => setTimeout(r, 500));
+          }}
+          onBack={() => setStep("contract_generate")}
+          onComplete={() => {
+            setCompletedHires(contractCandidates.map((c) => c.candidateId));
+            setStep("complete");
+          }}
+        />
+      )}
+
+      {step === "complete" && (
+        <div className="text-center py-12">
+          <div className="inline-flex h-20 w-20 items-center justify-center rounded-full bg-green-100 mb-4">
+            <CheckCircle2 className="h-10 w-10 text-green-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-[#25324B] mb-2">
+            Hiring Process Complete!
+          </h2>
+          <p className="text-[#7C8493] mb-6">
+            {completedHires.length} candidate(s) have been successfully hired
+            for {jobQuery.data?.title}
+          </p>
+          <button
+            onClick={() => router.push("/admin/screening")}
+            className="rounded-lg bg-[#286ef0] px-6 py-2 text-sm font-bold text-white hover:bg-[#1f5fe0]"
+          >
+            Start New Screening
+          </button>
+        </div>
+      )}
     </div>
   );
 }

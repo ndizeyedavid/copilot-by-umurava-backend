@@ -27,6 +27,8 @@ import {
   ArrowDown,
   Loader2,
 } from "lucide-react";
+import TalentExportButton from "./export/TalentExportButton";
+import type { ExportTalent } from "./export/talentExportUtils";
 import { FaLinkedin, FaGithub } from "react-icons/fa";
 import AdminApplicationDetailModal from "@/app/components/admin/applications/AdminApplicationDetailModal";
 import type { AdminApplicationRow } from "@/app/components/admin/applications/AdminApplicationsTable";
@@ -70,9 +72,9 @@ type BackendTalent = {
 
 function formatExperience(value: BackendTalent["experience"]) {
   const n = Array.isArray(value) ? value.length : 0;
-  if (n <= 0) return "Umurava";
-  if (n === 1) return "1 role";
-  return `${n} roles`;
+  if (n <= 0) return "-";
+  if (n === 1) return "1 years";
+  return `${n} years`;
 }
 
 function formatEducation(value: BackendTalent["education"]) {
@@ -298,14 +300,34 @@ export default function AdminCandidatesPage() {
           />
         </div>
         <div className="flex items-center gap-3">
-          <button className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-[#25324B] hover:bg-gray-50 transition-colors">
-            <Filter className="h-4 w-4 text-gray-400" />
-            Advanced Filter
-          </button>
-          <div className="h-8 w-px bg-gray-100 hidden md:block" />
           <p className="text-sm font-medium text-[#25324B]">
             {filtered.length} Candidates Found
           </p>
+
+          <div className="h-8 w-px bg-gray-100 hidden md:block" />
+
+          <TalentExportButton
+            talents={filtered.map(
+              (c): ExportTalent => ({
+                id: c.id,
+                name: c.name,
+                email: c.email,
+                phone: c.phone,
+                headline: c.headline,
+                location: c.location,
+                skills: c.skills,
+                experience: c.experience,
+                education: c.education,
+                availability: c.availability,
+                socialLinks: c.socialLinks || [],
+              }),
+            )}
+            disabled={isLoading}
+          />
+          <button className="items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-[#25324B] hover:bg-gray-50 transition-colors hidden">
+            <Filter className="h-4 w-4 text-gray-400" />
+            Advanced Filter
+          </button>
         </div>
       </div>
 
