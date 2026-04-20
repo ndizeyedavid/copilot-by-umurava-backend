@@ -10,13 +10,20 @@ import ScreeningHistoryStep, {
 import JobSelectionStep, { JobSummary } from "./screening/JobSelectionStep";
 import SourceSelectionStep from "./screening/SourceSelectionStep";
 import ProcessingStep from "./screening/ProcessingStep";
+import WeightsStep from "./screening/WeightsStep";
 import { api } from "@/lib/api/client";
 
-type ScreeningStep = "history" | "select_job" | "select_source" | "processing";
+type ScreeningStep =
+  | "history"
+  | "select_job"
+  | "select_source"
+  | "weights"
+  | "processing";
 
 const STEPS = [
   { id: "select_job", label: "Select Job" },
   { id: "select_source", label: "Source" },
+  { id: "weights", label: "Weights" },
   { id: "processing", label: "Screening" },
 ];
 
@@ -48,6 +55,11 @@ type BackendJob = {
   _id: string;
   title: string;
   createdAt: string;
+  weights?: {
+    skills: number;
+    experience: number;
+    education: number;
+  };
 };
 
 type BackendApplication = {
@@ -85,6 +97,15 @@ export default function AdminJobScreeningPage({
     initialJobId || "",
   );
   const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
+  const [weights, setWeights] = useState<{
+    skills: number;
+    experience: number;
+    education: number;
+  } | null>(null);
+  const [pendingSource, setPendingSource] = useState<{
+    source: "internal" | "upload" | "umurava";
+    params: { topN: number; file?: File };
+  } | null>(null);
 
   const screeningsQuery = useQuery({
     queryKey: ["admin", "screenings", initialJobId ?? "all"],
@@ -288,32 +309,42 @@ export default function AdminJobScreeningPage({
         <SourceSelectionStep
           onSelect={(source, params) => {
             if (!selectedJobId) return;
+            const job = jobsQuery.data?.find((j) => j._id === selectedJobId);
+            setWeights(
+              job?.weights ?? { skills: 40, experience: 35, education: 25 },
+            );
+            setPendingSource({ source, params });
+            setStep("weights");
+          }}
+          onBack={() => setStep("select_job")}
+        />
+      )}
+
+      {step === "weights" && weights && pendingSource && selectedJobId && (
+        <WeightsStep
+          jobId={selectedJobId}
+          initialWeights={weights}
+          onContinue={(newWeights) => {
+            setWeights(newWeights);
             setStep("processing");
+            if (!selectedJobId) return;
+            const { source, params } = pendingSource;
             if (source === "internal") {
               runInternalMutation.mutate(selectedJobId);
-              return;
-            }
-
-            if (source === "umurava") {
+            } else if (source === "umurava") {
               startUmuravaMutation.mutate({
                 jobId: selectedJobId,
                 topN: params.topN,
               });
-              return;
+            } else if (source === "upload" && params.file) {
+              startExternalMutation.mutate({
+                jobId: selectedJobId,
+                file: params.file,
+                topN: params.topN,
+              });
             }
-
-            const file = params.file;
-            if (!file) {
-              setStep("select_source");
-              return;
-            }
-            startExternalMutation.mutate({
-              jobId: selectedJobId,
-              file,
-              topN: params.topN,
-            });
           }}
-          onBack={() => setStep("select_job")}
+          onBack={() => setStep("select_source")}
         />
       )}
 
