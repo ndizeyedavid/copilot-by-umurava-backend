@@ -11,6 +11,7 @@ import {
   Save,
   ChevronRight,
   LogOut,
+  Monitor,
 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
@@ -26,6 +27,14 @@ type MeUser = {
   picture?: string;
   role?: "talent" | "admin";
   hasGoogle?: boolean;
+};
+
+type Session = {
+  id: string;
+  ip: string;
+  userAgent: string;
+  createdAt: string;
+  isCurrent: boolean;
 };
 
 export default function SettingsPage() {
@@ -63,17 +72,37 @@ export default function SettingsPage() {
     },
     onSuccess: () => {
       if (typeof window !== "undefined") {
+        // Clear all auth tokens from localStorage
         localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
+
+        // Clear all cookies
+        document.cookie.split(";").forEach((cookie) => {
+          const [name] = cookie.split("=");
+          document.cookie = `${name.trim()}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        });
       }
+      queryClient.clear();
       toast.success("Logged out");
-      router.push("/login");
+      router.push("/dashboard/auth/login");
     },
     onError: (err: any) => {
       toast.error(err?.response?.data?.message ?? "Logout failed");
       if (typeof window !== "undefined") {
+        // Clear all auth tokens from localStorage even on error
         localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
+
+        // Clear all cookies even on error
+        document.cookie.split(";").forEach((cookie) => {
+          const [name] = cookie.split("=");
+          document.cookie = `${name.trim()}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        });
       }
-      router.push("/login");
+      queryClient.clear();
+      router.push("/dashboard/auth/login");
     },
   });
 
@@ -113,6 +142,29 @@ export default function SettingsPage() {
     },
     onError: (err: any) => {
       toast.error(err?.response?.data?.message ?? "Google link failed");
+    },
+  });
+
+  const sessionsQuery = useQuery<Session[]>({
+    queryKey: ["admin-sessions"],
+    queryFn: async () => {
+      const res = await api.get("/sessions");
+      return res.data || [];
+    },
+    enabled: activeTab === "account",
+  });
+
+  const terminateSessionMutation = useMutation({
+    mutationFn: async (sessionId: string) => {
+      const res = await api.delete(`/sessions/${sessionId}`);
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success("Session ended");
+      queryClient.invalidateQueries({ queryKey: ["admin-sessions"] });
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? "Failed to end session");
     },
   });
 
@@ -374,6 +426,63 @@ export default function SettingsPage() {
                             : "Logout"}
                         </button>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Active Sessions */}
+                  <div className="border-t pt-6">
+                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                      <Monitor className="h-5 w-5" />
+                      Active Login Sessions
+                    </h2>
+                    <div className="space-y-3">
+                      {sessionsQuery.isLoading ? (
+                        <p className="text-sm text-gray-500">
+                          Loading sessions...
+                        </p>
+                      ) : sessionsQuery.data?.length === 0 ? (
+                        <p className="text-sm text-gray-500">
+                          No active sessions found.
+                        </p>
+                      ) : (
+                        sessionsQuery.data?.map((session) => (
+                          <div
+                            key={session.id}
+                            className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                          >
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">
+                                {session.userAgent}
+                                {session.isCurrent && (
+                                  <span className="ml-2 px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">
+                                    Current
+                                  </span>
+                                )}
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                IP: {session.ip}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                Started:{" "}
+                                {new Date(session.createdAt).toLocaleString()}
+                              </p>
+                            </div>
+                            {!session.isCurrent && (
+                              <button
+                                onClick={() =>
+                                  terminateSessionMutation.mutate(session.id)
+                                }
+                                disabled={terminateSessionMutation.isPending}
+                                className="px-3 py-1.5 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50 transition-colors disabled:opacity-60"
+                              >
+                                {terminateSessionMutation.isPending
+                                  ? "Ending..."
+                                  : "End Session"}
+                              </button>
+                            )}
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 </div>

@@ -63,11 +63,11 @@ const bottomNav: NavItem[] = [
     href: "/admin/settings",
     icon: <Settings className="h-5 w-5" />,
   },
-  {
-    label: "Logout",
-    href: "/admin/logout",
-    icon: <LogOut className="h-5 w-5" />,
-  },
+  // {
+  //   label: "Logout",
+  //   href: "/admin/logout",
+  //   icon: <LogOut className="h-5 w-5" />,
+  // },
 ];
 
 function NavLink({ item, active }: { item: NavItem; active: boolean }) {

@@ -9,6 +9,7 @@ import authRouter from "./auth.route";
 import userRouter from "./user.route";
 import externalScreeningRouter from "./external-screening.route";
 import umuravaRouter from "./umurava.route";
+import sessionsRouter from "./sessions.route";
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.use("/auth", authRouter);
 router.use("/users", userRouter);
 router.use("/external-screening", externalScreeningRouter);
 router.use("/umurava", umuravaRouter);
+router.use("/sessions", sessionsRouter);
 
 export default router;

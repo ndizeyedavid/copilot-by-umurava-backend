@@ -397,6 +397,14 @@ const authController = {
 
       const tokens = generateTokens(user as IUser);
 
+      // Create session for tracking
+      await createSession(
+        user._id.toString(),
+        tokens.accessToken,
+        req.ip || "unknown",
+        req.headers["user-agent"] || "unknown",
+      );
+
       return res.status(200).json({
         message: "Login successful",
         user: {

@@ -1,7 +1,20 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyToken } from "../services/auth.service";
 
-export function authenticateToken(req: Request, res: Response, next: NextFunction) {
+export interface AuthRequest extends Request {
+  user?: {
+    userId: string;
+    email: string;
+    role: string;
+  };
+  token?: string;
+}
+
+export function authenticateToken(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
 
@@ -12,6 +25,7 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
   try {
     const decoded = verifyToken(token);
     (req as any).user = decoded;
+    (req as any).token = token;
     next();
   } catch (error) {
     return res.status(403).json({ message: "Invalid or expired token" });
@@ -21,7 +35,7 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
 export function requireRole(roles: string[]) {
   return (req: Request, res: Response, next: NextFunction) => {
     const userRole = (req as any).user?.role;
-    
+
     if (!userRole) {
       return res.status(401).json({ message: "Not authenticated" });
     }
@@ -34,6 +48,10 @@ export function requireRole(roles: string[]) {
   };
 }
 
-export function requireAuth(req: Request, res: Response, next: NextFunction) {
+export function requireAuth(
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+) {
   return authenticateToken(req, res, next);
 }
