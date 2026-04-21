@@ -110,6 +110,7 @@ export default function AdminDashboard() {
   const kpis = useMemo(() => {
     const totalJobs = jobs.length;
     const openJobs = jobs.filter(
+      // @ts-ignore
       (j) => new Date(j.deadline).getTime() > now,
     ).length;
     const closedJobs = Math.max(0, totalJobs - openJobs);

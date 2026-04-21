@@ -8,6 +8,7 @@ import GoogleOneTap from "./components/GoogleOneTap";
 import ProgressBar from "./components/ProgressBar";
 import Providers from "./providers";
 import "@aejkatappaja/phantom-ui/ssr.css";
+import { Suspense } from "react";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -56,7 +57,9 @@ export default function RootLayout({
           >
             <Providers>
               {/* <GoogleOneTap /> */}
-              <ProgressBar />
+              <Suspense fallback={null}>
+                <ProgressBar />
+              </Suspense>
               {children}
             </Providers>
           </GoogleOAuthProvider>

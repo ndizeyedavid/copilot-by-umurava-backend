@@ -46,7 +46,7 @@ export default function Header() {
 
       <div className="flex items-center gap-4">
         <Link
-          href="/admin/auth/login"
+          href="/dashboard/auth/login"
           className="text-sm font-bold text-[#286ef0] hover:text-[#4338CA]"
         >
           Login
