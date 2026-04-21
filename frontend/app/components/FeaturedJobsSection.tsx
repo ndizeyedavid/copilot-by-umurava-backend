@@ -44,13 +44,13 @@ export default function FeaturedJobsSection() {
         {/* Header */}
         <div className="flex items-center justify-between mb-10">
           <h2 className="text-4xl font-bold text-[#25324B]">
-            Featured <span className="text-[#286ef0]">jobs</span>
+            Active <span className="text-[#286ef0]">Job Postings</span>
           </h2>
           <a
-            href="/dashboard/jobs"
+            href="/admin/jobs"
             className="flex items-center gap-2 text-sm font-medium text-[#4F46E5] hover:text-[#4338CA]"
           >
-            Show all jobs
+            Manage all jobs
             <ArrowRight className="w-4 h-4" />
           </a>
         </div>
@@ -67,13 +67,16 @@ export default function FeaturedJobsSection() {
             </div>
           ) : featuredJobs.length === 0 ? (
             <div className="col-span-4 py-12 text-center text-sm font-semibold text-gray-500">
-              No featured jobs available
+              No active job postings.{" "}
+              <a href="/admin/jobs" className="text-[#286ef0] hover:underline">
+                Create your first job posting
+              </a>
             </div>
           ) : (
             featuredJobs.map((job) => (
               <a
                 key={job._id}
-                href={`/dashboard/jobs?jobId=${encodeURIComponent(job._id)}`}
+                href={`/admin/jobs?jobId=${encodeURIComponent(job._id)}`}
                 className="p-6 border border-gray-100 hover:border-[#286ef0] hover:shadow-md transition-all cursor-pointer"
               >
                 {/* Header */}

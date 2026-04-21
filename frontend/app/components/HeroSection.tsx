@@ -11,11 +11,11 @@ export default function HeroSection() {
         {/* Left content */}
         <div className="max-w-2xl w-full">
           <h1 className="text-[70px] font-bold text-[#25324B] leading-tight">
-            Discover
+            AI-Powered
             <br />
-            more than
+            Talent
             <br />
-            <span className="text-[#286ef0]">1000+ Jobs</span>
+            <span className="text-[#286ef0]">Acquisition</span>
           </h1>
 
           {/* Blue underline decoration */}
@@ -25,38 +25,43 @@ export default function HeroSection() {
             className=""
           />
           <p className="text-gray-500 text-base mb-8 leading-relaxed pt-5">
-            Great platform for the job seeker that searching for
+            Streamline your hiring process with AI-driven candidate screening,
             <br />
-            new career heights and passionate about startups.
+            automated workflows, and data-driven recruitment decisions.
           </p>
 
-          {/* Search bar */}
-          <div className="flex items-center bg-white shadow-sm border border-gray-100 overflow-hidden max-w-lg w-full">
-            <div className="flex items-center gap-3 px-4 py-3 flex-1 border-r border-gray-100">
-              <Search className="w-5 h-10 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Job title or keyword"
-                className="text-sm text-gray-500 placeholder-gray-400 outline-none w-full"
-              />
-            </div>
-
-            <button className="mx-2 bg-[#286ef0] hover:bg-[#2566de] text-white px-6 py-4">
-              Search my job
-            </button>
+          {/* CTA Buttons */}
+          <div className="flex items-center gap-4">
+            <a
+              href="/admin"
+              className="bg-[#286ef0] hover:bg-[#2566de] text-white px-8 py-4 text-sm font-semibold"
+            >
+              Access Admin Dashboard
+            </a>
+            <a
+              href="/admin/jobs"
+              className="border border-gray-300 hover:border-[#286ef0] hover:text-[#286ef0] text-gray-700 px-8 py-4 text-sm font-semibold transition-all"
+            >
+              Manage Job Postings
+            </a>
           </div>
 
-          {/* Popular tags */}
-          <div className="mt-4 flex items-center gap-2 text-sm">
-            <span className="text-gray-400">Popular :</span>
-            {popularTags.map((tag, index) => (
-              <span key={tag} className="text-gray-500">
-                {tag}
-                {index < popularTags.length - 1 && (
-                  <span className="text-gray-400">, </span>
-                )}
-              </span>
-            ))}
+          {/* Stats */}
+          <div className="mt-8 flex items-center gap-8">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-[#286ef0]">500+</p>
+              <p className="text-sm text-gray-500">Companies Hiring</p>
+            </div>
+            <div className="h-10 w-px bg-gray-200" />
+            <div className="text-center">
+              <p className="text-2xl font-bold text-[#286ef0]">10K+</p>
+              <p className="text-sm text-gray-500">Talents Screened</p>
+            </div>
+            <div className="h-10 w-px bg-gray-200" />
+            <div className="text-center">
+              <p className="text-2xl font-bold text-[#286ef0]">85%</p>
+              <p className="text-sm text-gray-500">Faster Hiring</p>
+            </div>
           </div>
         </div>
 

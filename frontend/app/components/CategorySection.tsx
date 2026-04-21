@@ -1,31 +1,73 @@
 import {
   ArrowRight,
   Briefcase,
-  Code2,
-  Megaphone,
-  Palette,
-  BarChart3,
-  Monitor,
-  Wallet,
   Users,
+  BarChart3,
+  FileText,
+  Zap,
+  Shield,
+  Search,
+  Settings,
 } from "lucide-react";
 
-interface Category {
+interface Feature {
   name: string;
-  jobs: number;
+  description: string;
   icon: React.ReactNode;
+  link: string;
   highlighted?: boolean;
 }
 
-const categories: Category[] = [
-  { name: "Design", jobs: 235, icon: <Palette className="w-6 h-6" /> },
-  { name: "Sales", jobs: 756, icon: <BarChart3 className="w-6 h-6" /> },
-  { name: "Marketing", jobs: 140, icon: <Megaphone className="w-6 h-6" /> },
-  { name: "Finance", jobs: 325, icon: <Wallet className="w-6 h-6" /> },
-  { name: "Technology", jobs: 436, icon: <Monitor className="w-6 h-6" /> },
-  { name: "Engineering", jobs: 542, icon: <Code2 className="w-6 h-6" /> },
-  { name: "Business", jobs: 211, icon: <Briefcase className="w-6 h-6" /> },
-  { name: "Human Resource", jobs: 346, icon: <Users className="w-6 h-6" /> },
+const features: Feature[] = [
+  {
+    name: "Job Management",
+    description: "Create and manage job postings",
+    icon: <Briefcase className="w-6 h-6" />,
+    link: "/admin/jobs",
+  },
+  {
+    name: "AI Screening",
+    description: "Automated candidate screening",
+    icon: <Zap className="w-6 h-6" />,
+    link: "/admin/screening",
+    highlighted: true,
+  },
+  {
+    name: "Talent Pool",
+    description: "Access pre-screened candidates",
+    icon: <Users className="w-6 h-6" />,
+    link: "/admin",
+  },
+  {
+    name: "Analytics",
+    description: "Track hiring metrics",
+    icon: <BarChart3 className="w-6 h-6" />,
+    link: "/admin",
+  },
+  {
+    name: "Smart Search",
+    description: "Find ideal candidates fast",
+    icon: <Search className="w-6 h-6" />,
+    link: "/admin",
+  },
+  {
+    name: "Compliance",
+    description: "GDPR & data protection",
+    icon: <Shield className="w-6 h-6" />,
+    link: "/admin/settings",
+  },
+  {
+    name: "Resume Parser",
+    description: "Auto-extract candidate data",
+    icon: <FileText className="w-6 h-6" />,
+    link: "/admin",
+  },
+  {
+    name: "Team Settings",
+    description: "Manage admin access",
+    icon: <Settings className="w-6 h-6" />,
+    link: "/admin/settings",
+  },
 ];
 
 export default function CategorySection() {
@@ -35,48 +77,49 @@ export default function CategorySection() {
         {/* Header */}
         <div className="flex items-center justify-between mb-10">
           <h2 className="text-4xl font-bold text-[#25324B]">
-            Explore by <span className="text-[#286ef0]">category</span>
+            Powerful <span className="text-[#286ef0]">Features</span> for HR
+            Teams
           </h2>
           <a
-            href=""
+            href="/admin"
             className="flex items-center gap-2 text-sm font-medium text-[#286ef0] hover:text-[#2566de]"
           >
-            Show all jobs
+            Access Dashboard
             <ArrowRight className="w-4 h-4" />
           </a>
         </div>
 
         {/* Category Grid */}
         <div className="grid grid-cols-4 gap-6">
-          {categories.map((category) => (
+          {features.map((feature) => (
             <a
-              key={category.name}
-              href=""
+              key={feature.name}
+              href={feature.link}
               className={`group p-6 border transition-all ${
-                category.highlighted
+                feature.highlighted
                   ? "bg-[#4F46E5] border-[#4F46E5] text-white"
                   : "bg-white border-gray-100 hover:border-[#286ef0] hover:shadow-md text-[#25324B]"
               }`}
             >
               <div
                 className={`mb-4 ${
-                  category.highlighted ? "text-white" : "text-[#4F46E5]"
+                  feature.highlighted ? "text-white" : "text-[#4F46E5]"
                 }`}
               >
-                {category.icon}
+                {feature.icon}
               </div>
-              <h3 className="text-lg font-semibold mb-2">{category.name}</h3>
+              <h3 className="text-lg font-semibold mb-2">{feature.name}</h3>
               <div
                 className={`flex items-center gap-2 text-sm ${
-                  category.highlighted
+                  feature.highlighted
                     ? "text-white/80"
                     : "text-gray-500 group-hover:text-[#286ef0]"
                 }`}
               >
-                <span>{category.jobs} jobs available</span>
+                <span>{feature.description}</span>
                 <ArrowRight
                   className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${
-                    category.highlighted ? "text-white" : ""
+                    feature.highlighted ? "text-white" : ""
                   }`}
                 />
               </div>

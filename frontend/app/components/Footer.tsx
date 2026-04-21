@@ -3,8 +3,18 @@ import { BiLogoInstagramAlt } from "react-icons/bi";
 import { ImLinkedin2, ImYoutube, ImFacebook } from "react-icons/im";
 
 export default function Footer() {
-  const aboutLinks = ["Companies", "Terms", "Advice", "Privacy Policy"];
-  const resourceLinks = ["Help Docs", "Guide", "Updates", "Contact Us"];
+  const aboutLinks = [
+    { label: "Companies", href: "https://umurava.africa/" },
+    { label: "Terms", href: "/terms" },
+    { label: "Advice", href: "/advice" },
+    { label: "Privacy Policy", href: "/privacy-policy" },
+  ];
+  const resourceLinks = [
+    { label: "Help Docs", href: "/help-docs" },
+    { label: "Guide", href: "/guide" },
+    { label: "Updates", href: "/updates" },
+    { label: "Contact Us", href: "https://umurava.africa/" },
+  ];
 
   const socialLinks = [
     { icon: <BiLogoInstagramAlt className="w-5 h-5" />, href: "" },
@@ -38,12 +48,12 @@ export default function Footer() {
             <h4 className="text-base font-semibold mb-4">About</h4>
             <ul className="space-y-3">
               {aboutLinks.map((link) => (
-                <li key={link}>
+                <li key={link.label}>
                   <a
-                    href=""
+                    href={link.href}
                     className="text-gray-400 text-sm hover:text-white transition-colors"
                   >
-                    {link}
+                    {link.label}
                   </a>
                 </li>
               ))}
@@ -55,12 +65,12 @@ export default function Footer() {
             <h4 className="text-base font-semibold mb-4">Resources</h4>
             <ul className="space-y-3">
               {resourceLinks.map((link) => (
-                <li key={link}>
+                <li key={link.label}>
                   <a
-                    href=""
+                    href={link.href}
                     className="text-gray-400 text-sm hover:text-white transition-colors"
                   >
-                    {link}
+                    {link.label}
                   </a>
                 </li>
               ))}
