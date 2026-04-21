@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import {
   LayoutGrid,
   FileText,
@@ -17,6 +18,21 @@ import {
   UserSquare2,
   ScanTextIcon,
 } from "lucide-react";
+import { api } from "@/lib/api/client";
+
+type UserData = {
+  _id?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  picture?: string;
+  role?: "talent" | "admin";
+};
+
+type MeUser = {
+  user?: UserData;
+};
 
 type NavItem = {
   label: string;
@@ -102,50 +118,68 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
 export default function AdminSidebar() {
   const pathname = usePathname();
 
+  const { data: user, isLoading } = useQuery<MeUser>({
+    queryKey: ["admin-me"],
+    queryFn: async () => {
+      const res = await api.get("/auth/me");
+      return res.data as MeUser;
+    },
+  });
+
+  const meUser = user?.user;
+
+  const displayName = meUser
+    ? `${meUser.firstName || ""} ${meUser.lastName || ""}`.trim()
+    : "HR Admin";
+  const role = meUser?.role ?? "admin";
+  const avatarUrl = meUser?.picture || "/images/companies/dummy.png";
+
   return (
     <aside className="sticky top-[72px] h-[calc(100vh-72px)] w-[240px] shrink-0 bg-white border-r border-gray-100">
-      <div className="h-full px-5 py-12 flex flex-col">
-        {/* User card */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <div className="relative h-10 w-10 overflow-hidden rounded-full bg-gray-100">
-              <Image
-                src="/images/companies/dummy.png"
-                alt="User avatar"
-                fill
-                className="object-cover"
-                sizes="40px"
-              />
-            </div>
-            <div className="leading-tight">
-              <p className="text-sm font-semibold text-[#25324B]">
-                Mellow Junior
-              </p>
-              <p className="text-xs text-[#7C8493]">HR Admin</p>
+      <phantom-ui loading={isLoading}>
+        <div className="h-full px-5 py-12 flex flex-col">
+          {/* User card */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <div className="relative h-10 w-10 overflow-hidden rounded-full bg-gray-100">
+                <Image
+                  src={avatarUrl}
+                  alt="User avatar"
+                  fill
+                  className="object-cover"
+                  sizes="40px"
+                />
+              </div>
+              <div className="leading-tight">
+                <p className="text-sm font-semibold text-[#25324B]">
+                  {displayName || "Admin User"}
+                </p>
+                <p className="text-xs text-[#7C8493] capitalize">{role}</p>
+              </div>
             </div>
           </div>
+
+          {/* Main nav */}
+          <nav className="space-y-2 relative left-[-21px]">
+            {mainNav.map((item) => {
+              const active = pathname === item.href;
+              return <NavLink key={item.href} item={item} active={active} />;
+            })}
+          </nav>
+
+          <div className="my-3 h-px w-full bg-gray-100" />
+
+          {/* Bottom nav */}
+          <nav className="space-y-2 relative left-[-21px]">
+            {bottomNav.map((item) => {
+              const active = pathname === item.href;
+              return <NavLink key={item.href} item={item} active={active} />;
+            })}
+          </nav>
+
+          <div className="flex-1" />
         </div>
-
-        {/* Main nav */}
-        <nav className="space-y-2 relative left-[-21px]">
-          {mainNav.map((item) => {
-            const active = pathname === item.href;
-            return <NavLink key={item.href} item={item} active={active} />;
-          })}
-        </nav>
-
-        <div className="my-3 h-px w-full bg-gray-100" />
-
-        {/* Bottom nav */}
-        <nav className="space-y-2 relative left-[-21px]">
-          {bottomNav.map((item) => {
-            const active = pathname === item.href;
-            return <NavLink key={item.href} item={item} active={active} />;
-          })}
-        </nav>
-
-        <div className="flex-1" />
-      </div>
+      </phantom-ui>
     </aside>
   );
 }
