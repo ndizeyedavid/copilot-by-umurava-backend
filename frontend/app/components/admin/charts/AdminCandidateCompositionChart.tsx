@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { UserRound, UsersRound } from "lucide-react";
 
 type Slice = {
@@ -28,7 +22,9 @@ export default function AdminCandidateCompositionChart({
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
       <div className="mb-6">
-        <p className="text-lg font-semibold text-[#25324B]">Candidate Composition</p>
+        <p className="text-lg font-semibold text-[#25324B]">
+          Candidate Composition
+        </p>
         <p className="text-sm text-[#7C8493]">Distribution of applicants</p>
       </div>
 
@@ -60,10 +56,10 @@ export default function AdminCandidateCompositionChart({
           </ResponsiveContainer>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           {data.map((slice) => {
-            const pct = total === 0 ? 0 : Math.round((slice.value / total) * 100);
-            const Icon = slice.icon === "group" ? UsersRound : UserRound;
+            const pct =
+              total === 0 ? 0 : Math.round((slice.value / total) * 100);
             return (
               <div
                 key={slice.label}
@@ -74,14 +70,24 @@ export default function AdminCandidateCompositionChart({
                     className="grid h-9 w-9 place-items-center rounded-full"
                     style={{ backgroundColor: `${slice.color}1A` }}
                   >
-                    <Icon className="h-5 w-5" style={{ color: slice.color }} />
+                    <UserRound
+                      className="h-5 w-5"
+                      style={{ color: slice.color }}
+                    />
                   </span>
                   <div className="leading-tight">
-                    <p className="text-sm font-semibold text-[#25324B]">{slice.label}</p>
-                    <p className="text-xs text-[#7C8493]">{slice.value} candidates</p>
+                    <p className="text-sm font-semibold text-[#25324B]">
+                      {slice.label}
+                    </p>
+                    <p className="text-xs text-[#7C8493]">
+                      {slice.value} candidates
+                    </p>
                   </div>
                 </div>
-                <div className="text-sm font-bold" style={{ color: slice.color }}>
+                <div
+                  className="text-sm font-bold"
+                  style={{ color: slice.color }}
+                >
                   {pct}%
                 </div>
               </div>

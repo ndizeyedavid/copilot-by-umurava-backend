@@ -14,6 +14,8 @@ import {
   Shield,
   ArrowLeft,
 } from "lucide-react";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 import { api } from "@/lib/api/client";
 
 type MeUser = {
@@ -44,6 +46,7 @@ export default function AdminProfilePage() {
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
+    phone: "",
     picture: "",
   });
 
@@ -52,6 +55,7 @@ export default function AdminProfilePage() {
     setForm({
       firstName: String(user.firstName ?? ""),
       lastName: String(user.lastName ?? ""),
+      phone: String(user.phone ?? ""),
       picture: String(user.picture ?? ""),
     });
   }, [user?._id]);
@@ -59,14 +63,19 @@ export default function AdminProfilePage() {
   const canSave = useMemo(() => {
     if (!user) return false;
     const first = String(form.firstName).trim();
-    return first.length > 0;
-  }, [form.firstName, user]);
+    const phoneChanged = form.phone !== String(user.phone ?? "");
+    const nameChanged =
+      form.firstName !== String(user.firstName ?? "") ||
+      form.lastName !== String(user.lastName ?? "");
+    return first.length > 0 && (nameChanged || phoneChanged);
+  }, [form.firstName, form.lastName, form.phone, user]);
 
   const updateProfileMutation = useMutation({
     mutationFn: async () => {
       const payload = {
         firstName: String(form.firstName ?? "").trim(),
         lastName: String(form.lastName ?? "").trim(),
+        phone: String(form.phone ?? "").trim() || undefined,
         picture: String(form.picture ?? "").trim() || undefined,
       };
       const res = await api.put("/auth/profile", payload);
@@ -123,13 +132,14 @@ export default function AdminProfilePage() {
                   <div className="h-16 w-16 overflow-hidden rounded-[10px] border border-gray-200 bg-gray-50">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={form.picture || user.picture || "/images/companies/dummy.png"}
+                      src={
+                        form.picture ||
+                        user.picture ||
+                        "/images/companies/dummy.png"
+                      }
                       alt="Profile"
                       className="h-full w-full object-cover"
                     />
-                  </div>
-                  <div className="absolute -bottom-2 -right-2 grid h-8 w-8 place-items-center rounded-full border border-gray-200 bg-white text-gray-500">
-                    <Camera className="h-4 w-4" />
                   </div>
                 </div>
 
@@ -174,7 +184,7 @@ export default function AdminProfilePage() {
                     onChange={(e) =>
                       setForm((p) => ({ ...p, firstName: e.target.value }))
                     }
-                    className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-10 pr-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                    className="w-full rounded-xl border  bg-white py-2.5 pl-10 pr-3 text-sm outline-none focus:border-indigo-500"
                   />
                 </div>
               </div>
@@ -188,7 +198,7 @@ export default function AdminProfilePage() {
                   onChange={(e) =>
                     setForm((p) => ({ ...p, lastName: e.target.value }))
                   }
-                  className="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                  className="w-full rounded-xl border  bg-white py-2.5 pl-3 text-sm outline-none focus:border-indigo-500"
                 />
               </div>
 
@@ -210,30 +220,20 @@ export default function AdminProfilePage() {
                 <label className="mb-1 block text-sm font-semibold text-[#25324B]">
                   Phone
                 </label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                  <input
-                    value={String(user.phone ?? "")}
-                    disabled
-                    className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-3 text-sm text-gray-500"
-                  />
-                </div>
+                <PhoneInput
+                  international
+                  defaultCountry="RW"
+                  value={form.phone}
+                  onChange={(value) =>
+                    setForm((p) => ({ ...p, phone: value || "" }))
+                  }
+                  className="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm outline-none focus:border-indigo-500"
+                />
               </div>
 
               <div className="md:col-span-2">
-                <label className="mb-1 block text-sm font-semibold text-[#25324B]">
-                  Profile picture URL
-                </label>
-                <input
-                  value={form.picture}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, picture: e.target.value }))
-                  }
-                  className="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
-                />
                 <p className="mt-2 text-xs text-[#7C8493]">
-                  Password changes in Settings not supported by backend yet.
-                  {" "}
+                  Change password via settings.{" "}
                   <button
                     type="button"
                     onClick={() => router.push("/admin/settings")}
@@ -242,22 +242,6 @@ export default function AdminProfilePage() {
                     Go to Settings
                   </button>
                 </p>
-              </div>
-            </div>
-
-            <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50 p-4">
-              <div className="flex items-start gap-3">
-                <Shield className="h-5 w-5 text-indigo-600" />
-                <div>
-                  <p className="text-sm font-semibold text-[#25324B]">
-                    Security
-                  </p>
-                  <p className="text-xs text-[#7C8493]">
-                    Backend supports profile update (`PUT /auth/profile`) and
-                    session info (`GET /auth/me`). Password change endpoint not
-                    present.
-                  </p>
-                </div>
               </div>
             </div>
           </div>

@@ -503,7 +503,7 @@ const authController = {
   async updateProfile(req: Request, res: Response) {
     try {
       const userId = (req as any).user?.userId;
-      const { firstName, lastName, picture } = req.body;
+      const { firstName, lastName, picture, phone } = req.body;
 
       if (!userId) {
         return res.status(401).json({ message: "Not authenticated" });
@@ -511,7 +511,7 @@ const authController = {
 
       const user = await User.findByIdAndUpdate(
         userId,
-        { firstName, lastName, picture },
+        { firstName, lastName, picture, phone },
         { new: true },
       ).select("-googleId");
 
