@@ -12,6 +12,7 @@ import {
   ChevronRight,
   LogOut,
   Monitor,
+  HelpCircle,
 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
@@ -225,15 +226,30 @@ export default function SettingsPage() {
     toast.success("Settings saved");
   };
 
+  const handleRestartTour = () => {
+    if (typeof window === "undefined") return;
+    localStorage.removeItem("admin-onboarding-completed");
+    toast.success("Admin tour will run again on your next Dashboard visit.");
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-full px-5 mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Settings</h1>
-          <p className="text-gray-600">
-            Manage your account settings and preferences
-          </p>
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Settings</h1>
+            <p className="text-gray-600">
+              Manage your account settings and preferences
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleRestartTour}
+            className="items-center justify-center rounded-lg border border-blue-600 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100 transition-colors hidden"
+          >
+            Restart Dashboard Tour
+          </button>
         </div>
 
         <div className="flex gap-8 relative">

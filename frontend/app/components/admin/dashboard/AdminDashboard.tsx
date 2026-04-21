@@ -318,16 +318,23 @@ export default function AdminDashboard() {
   return (
     <phantom-ui loading={talentsQuery.isLoading}>
       <div className="space-y-6">
-        <AdminKpiCards
-          totalJobs={kpis.totalJobs}
-          openJobs={kpis.openJobs}
-          closedJobs={kpis.closedJobs}
-          candidates={kpis.candidates}
-        />
+        <div data-tour="kpi-cards">
+          <AdminKpiCards
+            totalJobs={kpis.totalJobs}
+            openJobs={kpis.openJobs}
+            closedJobs={kpis.closedJobs}
+            candidates={kpis.candidates}
+          />
+        </div>
 
-        <AdminJobStatisticsChart data={jobStats} rangeLabel="This Month" />
+        <div data-tour="job-statistics-chart">
+          <AdminJobStatisticsChart data={jobStats} rangeLabel="This Month" />
+        </div>
 
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div
+          className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+          data-tour="recent-jobs"
+        >
           <div className="mb-6 flex items-center justify-between">
             <div>
               <p className="text-lg font-semibold text-[#25324B]">
@@ -387,10 +394,10 @@ export default function AdminDashboard() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <div className="xl:col-span-1">
+          <div className="xl:col-span-1" data-tour="recent-applications">
             <AdminRecentApplicationsTable />
           </div>
-          <div className="xl:col-span-1">
+          <div className="xl:col-span-1" data-tour="candidate-composition">
             <AdminCandidateCompositionChart
               data={composition}
               totalLabel={`${kpis.candidates} candidates total`}

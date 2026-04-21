@@ -135,7 +135,10 @@ export default function AdminSidebar() {
   const avatarUrl = meUser?.picture || "/images/companies/dummy.png";
 
   return (
-    <aside className="sticky top-[72px] h-[calc(100vh-72px)] w-[240px] shrink-0 bg-white border-r border-gray-100">
+    <aside
+      className="sticky top-[72px] h-[calc(100vh-72px)] w-[240px] shrink-0 bg-white border-r border-gray-100"
+      data-tour="sidebar-navigation"
+    >
       <phantom-ui loading={isLoading}>
         <div className="h-full px-5 py-12 flex flex-col">
           {/* User card */}

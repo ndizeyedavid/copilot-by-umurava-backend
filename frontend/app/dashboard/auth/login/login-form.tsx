@@ -125,6 +125,7 @@ export default function LoginForm() {
       </div>
 
       <GoogleLogin
+        width={350}
         onSuccess={(credentialResponse) => {
           if (!credentialResponse.credential) {
             toast.error("Missing Google credential");
@@ -139,11 +140,11 @@ export default function LoginForm() {
       />
 
       <div className="text-center mt-2">
-        <span className="text-sm w-full">
-          Don't have an account?{" "}
+        <span className="text-sm w-full text-gray-500">
+          Reserved for Umurava's Hiring Team{" "}
           <Link
             href="/dashboard/auth/register"
-            className="text-[#286ef0] font-semibold hover:text-[#286ef0]/80"
+            className="text-[#286ef0] font-semibold hover:text-[#286ef0]/80 hidden"
           >
             Signup Now
           </Link>
