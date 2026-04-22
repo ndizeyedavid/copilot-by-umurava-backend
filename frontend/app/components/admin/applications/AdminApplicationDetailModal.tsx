@@ -53,8 +53,10 @@ type BackendTalent = {
   socialLinks: string[];
   firstName: string;
   lastName: string;
-  email: string;
   phone?: string;
+  userId: {
+    email: string;
+  };
 };
 
 export default function AdminApplicationDetailModal({
@@ -76,17 +78,18 @@ export default function AdminApplicationDetailModal({
   if (!application) return null;
 
   const talent = talentQuery.data;
+  // console.log(talent);
   const isLoading = talentQuery.isLoading;
   const hasResume =
     !!application.resumeUrl && application.resumeUrl.trim() !== "#";
   const hasCoverLetter = !!application.coverLetter?.trim();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex  h-full items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
       <div className="relative h-full max-h-[90vh] w-full max-w-4xl overflow-hidden rounded-[10px] bg-white shadow-2xl animate-in slide-in-from-bottom-4 duration-300">
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-700 font-bold text-sm uppercase">
+            <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-700 font-bold text-sm uppercase">
               {application.talentName.charAt(0)}
             </div>
             <div>
@@ -104,7 +107,7 @@ export default function AdminApplicationDetailModal({
                 href={application.resumeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors"
+                className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
               >
                 <FileText className="h-4 w-4" />
                 Download Resume
@@ -122,7 +125,7 @@ export default function AdminApplicationDetailModal({
         <div className="h-[calc(90vh-76px)] overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-gray-200">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center h-full">
-              <Loader2 className="h-8 w-8 animate-spin text-indigo-600 mb-2" />
+              <Loader2 className="h-8 w-8 animate-spin text-blue-600 mb-2" />
               <p className="text-sm text-[#7C8493]">Loading profile...</p>
             </div>
           ) : talent ? (
@@ -147,7 +150,7 @@ export default function AdminApplicationDetailModal({
                         <div key={idx} className="relative flex gap-4">
                           <div className="flex flex-col items-center">
                             <div className="h-10 w-10 rounded-xl bg-gray-50 flex items-center justify-center border border-gray-100 shrink-0">
-                              <Briefcase className="h-5 w-5 text-indigo-600" />
+                              <Briefcase className="h-5 w-5 text-blue-600" />
                             </div>
                             {idx !== talent.experience.length - 1 && (
                               <div className="h-full w-px bg-gray-100 mt-2" />
@@ -199,7 +202,7 @@ export default function AdminApplicationDetailModal({
                           key={idx}
                           className="flex gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50/50"
                         >
-                          <GraduationCap className="h-6 w-6 text-indigo-600 shrink-0" />
+                          <GraduationCap className="h-6 w-6 text-blue-600 shrink-0" />
                           <div>
                             <h4 className="text-sm font-bold text-[#25324B]">
                               {edu.degree} in {edu.fieldOfStudy}
@@ -275,7 +278,9 @@ export default function AdminApplicationDetailModal({
                     </div>
                     <div className="flex items-center gap-3 text-sm">
                       <Mail className="h-4 w-4 text-gray-400 shrink-0" />
-                      <span className="text-gray-600">{talent.email}</span>
+                      <span className="text-gray-600">
+                        {talent.userId.email}
+                      </span>
                     </div>
                     {talent.phone && (
                       <div className="flex items-center gap-3 text-sm">
@@ -290,14 +295,14 @@ export default function AdminApplicationDetailModal({
                           href={link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="h-8 w-8 rounded-lg bg-white border border-gray-100 flex items-center justify-center hover:bg-indigo-50 hover:border-indigo-100 transition-colors"
+                          className="h-8 w-8 rounded-lg bg-white border border-gray-100 flex items-center justify-center hover:bg-blue-50 hover:border-blue-100 transition-colors"
                         >
                           {link.includes("linkedin") ? (
                             <FaLinkedin className="h-4 w-4 text-[#0A66C2]" />
                           ) : link.includes("github") ? (
                             <FaGithub className="h-4 w-4 text-[#181717]" />
                           ) : (
-                            <ExternalLink className="h-4 w-4 text-indigo-400" />
+                            <ExternalLink className="h-4 w-4 text-blue-400" />
                           )}
                         </a>
                       ))}
@@ -312,11 +317,11 @@ export default function AdminApplicationDetailModal({
                   <div className="flex flex-wrap gap-2">
                     {talent.skills?.map((skill) => (
                       <div
-                        key={skill.name}
-                        className="group relative rounded-xl border border-indigo-100 bg-indigo-50/50 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100 transition-all cursor-default"
+                        key={skill.name + Math.random()}
+                        className="group relative rounded-xl border border-blue-100 bg-blue-50/50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition-all cursor-default"
                       >
                         {skill.name}
-                        <span className="ml-1 text-[10px] text-indigo-400 font-normal">
+                        <span className="ml-1 text-[10px] text-blue-700 font-normal">
                           • {skill.level}
                         </span>
                       </div>
@@ -331,13 +336,13 @@ export default function AdminApplicationDetailModal({
                   <div className="space-y-3">
                     {talent.languages?.map((lang) => (
                       <div
-                        key={lang.name}
+                        key={lang.name + Math.random()}
                         className="flex items-center justify-between"
                       >
                         <span className="text-sm text-[#25324B]">
                           {lang.name}
                         </span>
-                        <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-bold text-indigo-600 border border-indigo-100">
+                        <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-600 border border-blue-100">
                           {lang.proficiency}
                         </span>
                       </div>
@@ -345,8 +350,8 @@ export default function AdminApplicationDetailModal({
                   </div>
                 </section>
 
-                <section className="rounded-[10px] bg-[#F8F8FD] p-5 border border-indigo-100/50">
-                  <div className="flex items-center gap-2 text-indigo-700 mb-2">
+                <section className="rounded-[10px] bg-[#F8F8FD] p-5 border border-blue-100/50">
+                  <div className="flex items-center gap-2 text-blue-700 mb-2">
                     <Award className="h-5 w-5" />
                     <span className="text-sm font-bold uppercase tracking-wider">
                       Availability

@@ -25,8 +25,6 @@ export default function SlowBackendModal() {
     <Modal
       isOpen={state.visible}
       onClose={() => {
-        // don't allow manual close while requests still pending
-        if (state.pendingCount > 0) return;
         setState((s) => ({ ...s, visible: false }));
       }}
       title="Backend waking up"
@@ -42,10 +40,9 @@ export default function SlowBackendModal() {
         <div className="flex justify-end">
           <button
             className="px-4 py-2 rounded-lg bg-[#25324B] text-white disabled:opacity-50"
-            disabled={state.pendingCount > 0}
             onClick={() => setState((s) => ({ ...s, visible: false }))}
           >
-            Close
+            Ok
           </button>
         </div>
       </div>

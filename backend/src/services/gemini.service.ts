@@ -158,7 +158,7 @@ export async function evaluateCandidates(
       matchScore: score,
       strengths: score > 0 ? ["Basic requirement match"] : [],
       gaps: score > 0 ? [] : ["Low requirement match"],
-      shortReason: "Heuristic prefilter score (AI skipped)",
+      shortReason: "AI skipped because of incomplete talent's details",
     };
   });
 
@@ -314,12 +314,12 @@ Return JSON:
       "finalRecommendation": "Strong hire"
     }
   ],
-  "summary": "Short explanation of top candidates"
+  "comparisonSummary": "Short explanation of top candidates"
 }
 
 Rules:
 - Do not re-analyze resumes
-- Keep summary short
+- Keep comparisonSummary short
 - Ranked list must include all candidates`;
 }
 

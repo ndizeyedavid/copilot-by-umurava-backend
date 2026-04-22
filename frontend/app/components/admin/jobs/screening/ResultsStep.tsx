@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertCircle,
   ArrowLeft,
@@ -9,8 +9,11 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronRight,
+  Eye,
   Loader2,
 } from "lucide-react";
+import AdminApplicationDetailModal from "@/app/components/admin/applications/AdminApplicationDetailModal";
+import type { AdminApplicationRow } from "@/app/components/admin/applications/AdminApplicationsTable";
 
 export type CandidateResult = {
   candidateId: string;
@@ -51,6 +54,12 @@ export default function ResultsStep({
 }) {
   const [view, setView] = useState<"summary" | "detailed">("summary");
   const [displayedSummary, setDisplayedSummary] = useState("");
+  const [profileCandidate, setProfileCandidate] =
+    useState<CandidateResult | null>(null);
+  const [visibleCount, setVisibleCount] = useState(0);
+  const topRef = useRef<HTMLDivElement | null>(null);
+  const lastItemRef = useRef<HTMLDivElement | null>(null);
+  const revealTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Typing animation for comparison summary
   useEffect(() => {
@@ -62,8 +71,9 @@ export default function ResultsStep({
 
     const interval = setInterval(() => {
       if (index < summaryText.length) {
-        setDisplayedSummary((prev) => prev + summaryText[index]);
-        index++;
+        const nextChar = summaryText.charAt(index);
+        index += 1;
+        setDisplayedSummary((prev) => prev + nextChar);
       } else {
         clearInterval(interval);
       }
@@ -71,6 +81,55 @@ export default function ResultsStep({
 
     return () => clearInterval(interval);
   }, [comparisonSummary]);
+
+  useEffect(() => {
+    if (revealTimerRef.current) {
+      clearInterval(revealTimerRef.current);
+      revealTimerRef.current = null;
+    }
+
+    if (!results || results.length === 0) {
+      setVisibleCount(0);
+      return;
+    }
+
+    setVisibleCount(0);
+
+    revealTimerRef.current = setInterval(() => {
+      setVisibleCount((prev) => {
+        const next = Math.min(results.length, prev + 1);
+        return next;
+      });
+    }, 300);
+
+    return () => {
+      if (revealTimerRef.current) {
+        clearInterval(revealTimerRef.current);
+        revealTimerRef.current = null;
+      }
+    };
+  }, [results]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (visibleCount <= 0) return;
+
+    if (visibleCount < results.length) {
+      requestAnimationFrame(() => {
+        lastItemRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      });
+      return;
+    }
+
+    const t = setTimeout(() => {
+      topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 700);
+
+    return () => clearTimeout(t);
+  }, [visibleCount, results.length]);
 
   const confidenceColor = (conf: string) => {
     if (conf === "high") return "bg-green-100 text-green-700 border-green-200";
@@ -89,6 +148,7 @@ export default function ResultsStep({
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+      <div ref={topRef} />
       <button
         onClick={onBack}
         className="inline-flex items-center gap-2 text-sm font-semibold text-[#7C8493] hover:text-[#25324B] transition-colors"
@@ -137,7 +197,7 @@ export default function ResultsStep({
               onClick={() => setView("summary")}
               className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-colors ${
                 view === "summary"
-                  ? "bg-indigo-600 text-white"
+                  ? "bg-[#286ef0] text-white"
                   : "text-[#25324B] hover:bg-gray-50"
               }`}
             >
@@ -147,7 +207,7 @@ export default function ResultsStep({
               onClick={() => setView("detailed")}
               className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-colors ${
                 view === "detailed"
-                  ? "bg-indigo-600 text-white"
+                  ? "bg-[#286ef0] text-white"
                   : "text-[#25324B] hover:bg-gray-50"
               }`}
             >
@@ -193,18 +253,19 @@ export default function ResultsStep({
       </div>
 
       <div className="space-y-4">
-        {results.map((c) => {
+        {results.slice(0, visibleCount).map((c, idx, arr) => {
           const isExpanded =
             view === "detailed" || expandedCandidate === c.candidateId;
           const selected = selectedCandidateIds.includes(c.candidateId);
           return (
             <div
               key={c.candidateId}
+              ref={idx === arr.length - 1 ? lastItemRef : undefined}
               className={`overflow-hidden rounded-[10px] border bg-white transition-all ${
                 isExpanded
                   ? "border-[#286ef0] shadow-md"
                   : "border-gray-200 hover:border-gray-300"
-              }`}
+              } animate-in fade-in slide-in-from-bottom-2 duration-300`}
             >
               <div className="flex items-center">
                 <div
@@ -234,10 +295,14 @@ export default function ResultsStep({
                   }}
                 >
                   <div
-                    className={`flex h-12 w-12 items-center justify-center rounded-xl font-bold text-lg ${
+                    className={`flex h-12 w-12 items-center justify-center rounded-full font-bold text-lg ${
                       c.rank === 1
-                        ? "bg-amber-100 text-amber-700"
-                        : "bg-gray-100 text-[#25324B]"
+                        ? "bg-[#d5b011] text-amber-700"
+                        : c.rank === 2
+                          ? "bg-[#b7c0bf] text-[#2f3131]"
+                          : c.rank === 3
+                            ? "bg-[#7e5920] text-[#f0aa3c]"
+                            : "bg-gray-100 text-[#25324B]"
                     }`}
                   >
                     {"#" + c.rank}
@@ -263,6 +328,19 @@ export default function ResultsStep({
                       </span>
                     </div>
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setProfileCandidate(c);
+                    }}
+                    className="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100 transition-colors"
+                    title="View candidate profile"
+                  >
+                    {" "}
+                    Profile
+                  </button>
 
                   {view === "summary" && (
                     <div className="flex items-center gap-4">
@@ -359,6 +437,25 @@ export default function ResultsStep({
           );
         })}
       </div>
+
+      <AdminApplicationDetailModal
+        application={
+          profileCandidate
+            ? ({
+                id: profileCandidate.candidateId,
+                talentId: profileCandidate.candidateId,
+                talentName: profileCandidate.name,
+                talentHeadline: "",
+                talentLocation: "",
+                status: "pending",
+                appliedDate: "",
+                resumeUrl: "#",
+                coverLetter: "",
+              } as AdminApplicationRow)
+            : null
+        }
+        onClose={() => setProfileCandidate(null)}
+      />
 
       <div className="flex justify-center pt-6">
         <button
