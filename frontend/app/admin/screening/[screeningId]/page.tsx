@@ -77,6 +77,7 @@ export default function ScreeningResultsPage() {
   type InternalScreening = {
     _id: string;
     jobId: string;
+    comparisonSummary?: string;
     candidates: {
       candidateId: string;
       rank: number;
@@ -117,6 +118,7 @@ export default function ScreeningResultsPage() {
     status: "pending" | "processing" | "completed" | "failed";
     totalApplicants: number;
     processedApplicants: number;
+    comparisonSummary?: string;
     results: ExternalResult[];
   };
 
@@ -173,6 +175,7 @@ export default function ScreeningResultsPage() {
         return {
           kind: "internal" as const,
           screening,
+          comparisonSummary: screening.comparisonSummary,
           results: enriched.sort((a, b) => a.rank - b.rank),
         };
       } catch (err: any) {
@@ -220,6 +223,7 @@ export default function ScreeningResultsPage() {
         return {
           kind: "external" as const,
           status: payload?.status ?? "processing",
+          comparisonSummary: payload?.comparisonSummary,
           results: mapped,
           screeningId: payload?.screeningId ?? screeningId,
           jobId: payload?.jobId ?? "",
@@ -326,6 +330,7 @@ export default function ScreeningResultsPage() {
 
   const isInternal = resultsQuery.data?.kind === "internal";
   const results = resultsQuery.data?.results ?? [];
+  const comparisonSummary = resultsQuery.data?.comparisonSummary;
 
   const jobIdForWeights =
     resultsQuery.data?.kind === "internal"
@@ -596,6 +601,7 @@ export default function ScreeningResultsPage() {
         <div data-tour="screening-results">
           <ResultsStep
             results={results}
+            comparisonSummary={comparisonSummary}
             selectedCandidateIds={selectedCandidateIds}
             expandedCandidate={expandedCandidate}
             onToggleSelect={(id) => toggleCandidateSelect(id)}

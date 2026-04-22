@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AlertCircle,
   ArrowLeft,
@@ -28,6 +28,7 @@ export type CandidateResult = {
 
 export default function ResultsStep({
   results,
+  comparisonSummary,
   selectedCandidateIds,
   expandedCandidate,
   onToggleSelect,
@@ -38,6 +39,7 @@ export default function ResultsStep({
   onBack,
 }: {
   results: CandidateResult[];
+  comparisonSummary?: string;
   selectedCandidateIds: string[];
   expandedCandidate: string | null;
   onToggleSelect: (id: string) => void;
@@ -48,6 +50,27 @@ export default function ResultsStep({
   onBack: () => void;
 }) {
   const [view, setView] = useState<"summary" | "detailed">("summary");
+  const [displayedSummary, setDisplayedSummary] = useState("");
+
+  // Typing animation for comparison summary
+  useEffect(() => {
+    const summaryText =
+      comparisonSummary ||
+      "Top candidates show a strong correlation with job requirements.";
+    let index = 0;
+    setDisplayedSummary("");
+
+    const interval = setInterval(() => {
+      if (index < summaryText.length) {
+        setDisplayedSummary((prev) => prev + summaryText[index]);
+        index++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 20); // 20ms per character for smooth typing
+
+    return () => clearInterval(interval);
+  }, [comparisonSummary]);
 
   const confidenceColor = (conf: string) => {
     if (conf === "high") return "bg-green-100 text-green-700 border-green-200";
@@ -81,8 +104,10 @@ export default function ResultsStep({
               Screening Summary
             </h3>
             <p className="text-sm text-[#7C8493]">
-              Top candidates show a strong correlation with React mastery and
-              leadership weights.
+              {displayedSummary}
+              {displayedSummary !==
+                (comparisonSummary ||
+                  "Top candidates show a strong correlation with job requirements.")}
             </p>
           </div>
         </div>
