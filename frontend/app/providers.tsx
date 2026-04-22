@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import { store } from "@/lib/store/store";
 import { useState } from "react";
+import SlowBackendModal from "@/app/components/SlowBackendModal";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -23,6 +24,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     <ReduxProvider store={store}>
       <QueryClientProvider client={queryClient}>
         {children}
+        <SlowBackendModal />
         <Toaster position="top-center" />
       </QueryClientProvider>
     </ReduxProvider>
