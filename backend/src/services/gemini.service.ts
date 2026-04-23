@@ -674,10 +674,10 @@ async function generateJsonWithGroq<T>(
   const label = opts?.label ?? "groq-request";
   const promptPreview = prompt.slice(0, 200).replace(/\n/g, " ");
 
-  logToFile(
-    "INFO",
-    `[${label}] Groq REQUEST: model=${model} maxTokens=${maxTokens} promptPreview="${promptPreview}..."`,
-  );
+  // logToFile(
+  //   "INFO",
+  //   `[${label}] Groq REQUEST: model=${model} maxTokens=${maxTokens} promptPreview="${promptPreview}..."`,
+  // );
 
   let chatCompletion;
   try {
@@ -698,39 +698,39 @@ async function generateJsonWithGroq<T>(
       stop: null,
     });
   } catch (err: any) {
-    logToFile(
-      "ERROR",
-      `[${label}] Groq API ERROR: ${err?.message}`,
-      err?.response?.data,
-    );
+    // logToFile(
+    //   "ERROR",
+    //   `[${label}] Groq API ERROR: ${err?.message}`,
+    //   err?.response?.data,
+    // );
     throw err;
   }
 
-  logToFile("INFO", `[${label}] Groq RAW RESPONSE`, chatCompletion);
+  // logToFile("INFO", `[${label}] Groq RAW RESPONSE`, chatCompletion);
 
   const text = String(
     chatCompletion.choices?.[0]?.message?.content ?? "",
   ).trim();
 
-  logToFile("INFO", `[${label}] Groq EXTRACTED TEXT (${text.length} chars)`, {
-    text: text.slice(0, 500),
-  });
+  // logToFile("INFO", `[${label}] Groq EXTRACTED TEXT (${text.length} chars)`, {
+  //   text: text.slice(0, 500),
+  // });
 
   if (!text) {
-    logToFile(
-      "ERROR",
-      `[${label}] Groq EMPTY RESPONSE - choices:`,
-      chatCompletion.choices,
-    );
+    // logToFile(
+    //   "ERROR",
+    //   `[${label}] Groq EMPTY RESPONSE - choices:`,
+    //   chatCompletion.choices,
+    // );
     throw new Error("Empty response from Groq API");
   }
 
   try {
     const parsed = JSON.parse(text) as T;
-    logToFile("INFO", `[${label}] Groq PARSED JSON successfully`, parsed);
+    // logToFile("INFO", `[${label}] Groq PARSED JSON successfully`, parsed);
     return parsed;
   } catch (error) {
-    logToFile("ERROR", `[${label}] Groq JSON PARSE FAILED. Raw text: ${text}`);
+    // logToFile("ERROR", `[${label}] Groq JSON PARSE FAILED. Raw text: ${text}`);
     throw new Error(`Failed to parse Groq response: ${error}`);
   }
 }
