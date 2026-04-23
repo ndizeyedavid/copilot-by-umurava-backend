@@ -11,6 +11,9 @@ import JobSelectionStep, { JobSummary } from "./screening/JobSelectionStep";
 import SourceSelectionStep from "./screening/SourceSelectionStep";
 import ProcessingStep from "./screening/ProcessingStep";
 import WeightsStep from "./screening/WeightsStep";
+import ModelSelectionStep, {
+  type ScreeningModel,
+} from "./screening/ModelSelectionStep";
 import { api } from "@/lib/api/client";
 
 type ScreeningStep =
@@ -18,12 +21,14 @@ type ScreeningStep =
   | "select_job"
   | "select_source"
   | "weights"
+  | "model"
   | "processing";
 
 const STEPS = [
   { id: "select_job", label: "Select Job" },
   { id: "select_source", label: "Source" },
   { id: "weights", label: "Weights" },
+  { id: "model", label: "Model" },
   { id: "processing", label: "Screening" },
 ];
 
@@ -109,6 +114,7 @@ export default function AdminJobScreeningPage({
     source: "internal" | "upload" | "umurava";
     params: { topN: number; file?: File };
   } | null>(null);
+  const [model, setModel] = useState<ScreeningModel>("gemini");
 
   const screeningsQuery = useQuery({
     queryKey: ["admin", "screenings", initialJobId ?? "all"],
@@ -121,6 +127,25 @@ export default function AdminJobScreeningPage({
         res.data?.fetchedScreening ??
         []) as BackendScreening[];
       return Array.isArray(list) ? list : [];
+    },
+  });
+
+  const startUmuravaGroqMutation = useMutation({
+    mutationFn: async ({ jobId, topN }: { jobId: string; topN: number }) => {
+      const dummyRes = await api.get("/umurava/talents/dummy");
+      const talents = (dummyRes.data?.talents ?? []) as UmuravaTalent[];
+
+      const res = await api.post("/screening/import/umurava-groq", {
+        jobId,
+        topN,
+        talents,
+      });
+
+      return res.data?.screening as BackendScreening;
+    },
+    onSuccess: (screening) => {
+      if (!screening?._id) return;
+      router.push(`/admin/screening/${screening._id}`);
     },
   });
 
@@ -170,6 +195,17 @@ export default function AdminJobScreeningPage({
     },
   });
 
+  const runInternalGroqMutation = useMutation({
+    mutationFn: async (jobId: string) => {
+      const res = await api.post(`/screening/ai-groq/${jobId}`);
+      return res.data?.screening as BackendScreening;
+    },
+    onSuccess: (screening) => {
+      if (!screening?._id) return;
+      router.push(`/admin/screening/${screening._id}`);
+    },
+  });
+
   const startExternalMutation = useMutation({
     mutationFn: async ({
       jobId,
@@ -198,6 +234,34 @@ export default function AdminJobScreeningPage({
     },
   });
 
+  const startExternalGroqMutation = useMutation({
+    mutationFn: async ({
+      jobId,
+      file,
+      topN,
+    }: {
+      jobId: string;
+      file: File;
+      topN: number;
+    }) => {
+      const form = new FormData();
+      form.append("file", file);
+      form.append("jobId", jobId);
+      form.append("topN", String(topN));
+      const res = await api.post("/external-screening/upload-groq", form, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return {
+        screeningId: String(res.data?.screeningId ?? ""),
+      };
+    },
+    onSuccess: (data) => {
+      if (data.screeningId) {
+        router.push(`/admin/screening/${data.screeningId}`);
+      }
+    },
+  });
+
   const deleteScreeningMutation = useMutation({
     mutationFn: async (screeningId: string) => {
       const res = await api.delete(`/screening/${screeningId}`);
@@ -210,8 +274,11 @@ export default function AdminJobScreeningPage({
 
   const isProcessing =
     runInternalMutation.isPending ||
+    runInternalGroqMutation.isPending ||
     startExternalMutation.isPending ||
-    startUmuravaMutation.isPending;
+    startExternalGroqMutation.isPending ||
+    startUmuravaMutation.isPending ||
+    startUmuravaGroqMutation.isPending;
 
   const jobs = useMemo((): JobSummary[] => {
     const rawJobs = jobsQuery.data || [];
@@ -342,25 +409,52 @@ export default function AdminJobScreeningPage({
           initialWeights={weights}
           onContinue={(newWeights) => {
             setWeights(newWeights);
+            setStep("model");
+          }}
+          onBack={() => setStep("select_source")}
+        />
+      )}
+
+      {step === "model" && weights && pendingSource && selectedJobId && (
+        <ModelSelectionStep
+          initialModel={model}
+          onBack={() => setStep("weights")}
+          onContinue={(m) => {
+            setModel(m);
             setStep("processing");
             if (!selectedJobId) return;
             const { source, params } = pendingSource;
             if (source === "internal") {
-              runInternalMutation.mutate(selectedJobId);
+              if (m === "groq") runInternalGroqMutation.mutate(selectedJobId);
+              else runInternalMutation.mutate(selectedJobId);
             } else if (source === "umurava") {
-              startUmuravaMutation.mutate({
-                jobId: selectedJobId,
-                topN: params.topN,
-              });
+              if (m === "groq") {
+                startUmuravaGroqMutation.mutate({
+                  jobId: selectedJobId,
+                  topN: params.topN,
+                });
+              } else {
+                startUmuravaMutation.mutate({
+                  jobId: selectedJobId,
+                  topN: params.topN,
+                });
+              }
             } else if (source === "upload" && params.file) {
-              startExternalMutation.mutate({
-                jobId: selectedJobId,
-                file: params.file,
-                topN: params.topN,
-              });
+              if (m === "groq") {
+                startExternalGroqMutation.mutate({
+                  jobId: selectedJobId,
+                  file: params.file,
+                  topN: params.topN,
+                });
+              } else {
+                startExternalMutation.mutate({
+                  jobId: selectedJobId,
+                  file: params.file,
+                  topN: params.topN,
+                });
+              }
             }
           }}
-          onBack={() => setStep("select_source")}
         />
       )}
 
