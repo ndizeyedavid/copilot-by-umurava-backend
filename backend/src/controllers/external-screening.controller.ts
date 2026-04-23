@@ -11,6 +11,7 @@ import {
 } from "../services/external-screening.service";
 import {
   evaluateCandidates,
+  evaluateCandidatesGroqOnly,
   JobData,
   CandidateData,
 } from "../services/gemini.service";
@@ -110,6 +111,84 @@ const externalScreeningController = {
         jobId,
         applicants,
         parseInt(topN),
+        "gemini",
+      );
+
+      return res.status(202).json({
+        message: "Screening started",
+        screeningId: screening._id,
+        totalApplicants: applicants.length,
+        status: "processing",
+      });
+    } catch (error: any) {
+      const reqFile = (req as any).file as Express.Multer.File | undefined;
+      if (reqFile) cleanupUploadedFile(reqFile.path);
+      return res.status(500).json({
+        message: "Screening upload failed",
+        error: error.message,
+      });
+    }
+  },
+
+  async uploadAndScreenGroq(req: Request, res: Response) {
+    try {
+      const { jobId, topN = 10 } = req.body;
+      const file = req.file;
+
+      if (!jobId || !file) {
+        return res.status(400).json({
+          message: "Job ID and spreadsheet file are required",
+        });
+      }
+
+      const uploadedFile = file as Express.Multer.File;
+
+      // Verify job exists
+      const job = await Jobs.findById(jobId);
+      if (!job) {
+        cleanupUploadedFile(uploadedFile.path);
+        return res.status(404).json({ message: "Job not found" });
+      }
+
+      // Create screening record
+      const screening = await ExternalScreening.create({
+        jobId,
+        totalApplicants: 0,
+        processedApplicants: 0,
+        topCandidates: [],
+        allResults: [],
+        status: "processing",
+        sourceFile: uploadedFile.originalname,
+      });
+
+      // Parse spreadsheet
+      let applicants: IExternalApplicant[];
+      try {
+        applicants = await parseSpreadsheet(uploadedFile.path);
+      } catch (parseError: any) {
+        cleanupUploadedFile(uploadedFile.path);
+        screening.status = "failed";
+        await screening.save();
+        return res.status(400).json({
+          message: "Failed to parse spreadsheet",
+          error: parseError.message,
+        });
+      }
+
+      // Update total applicants
+      screening.totalApplicants = applicants.length;
+      await screening.save();
+
+      // Cleanup uploaded file after parsing
+      cleanupUploadedFile(uploadedFile.path);
+
+      // Start async screening process
+      processApplicantsAsync(
+        String(screening._id),
+        jobId,
+        applicants,
+        parseInt(topN),
+        "groq",
       );
 
       return res.status(202).json({
@@ -222,6 +301,7 @@ async function processApplicantsAsync(
   jobId: string,
   applicants: IExternalApplicant[],
   topN: number,
+  provider: "gemini" | "groq",
 ) {
   try {
     const job = await Jobs.findById(jobId);
@@ -286,11 +366,10 @@ async function processApplicantsAsync(
       }
     }
 
-    // Run AI evaluation
-    const evaluationResult = await evaluateCandidates(
-      jobData,
-      candidateDataList,
-    );
+    const evaluationResult =
+      provider === "groq"
+        ? await evaluateCandidatesGroqOnly(jobData, candidateDataList)
+        : await evaluateCandidates(jobData, candidateDataList);
 
     // Map results to external screening format
     const results: IExternalScreeningResult[] = evaluationResult.candidates.map(

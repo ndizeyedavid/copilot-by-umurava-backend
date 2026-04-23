@@ -1,0 +1,1243 @@
+[2026-04-23T06:13:52.001Z] [INFO] [stage1:candidate:1/10] Groq REQUEST: model=llama-3.1-8b-instant maxTokens=256 promptPreview="Evaluate this candidate for the job.  JOB: Title: Backend API Developer Key Requirements: - 4+ years experience with Node.js or Python - Strong understanding of REST API design - Experience with micro..."
+[2026-04-23T06:13:52.004Z] [INFO] [stage1:candidate:2/10] Groq REQUEST: model=llama-3.1-8b-instant maxTokens=256 promptPreview="Evaluate this candidate for the job.  JOB: Title: Backend API Developer Key Requirements: - 4+ years experience with Node.js or Python - Strong understanding of REST API design - Experience with micro..."
+[2026-04-23T06:13:52.006Z] [INFO] [stage1:candidate:3/10] Groq REQUEST: model=llama-3.1-8b-instant maxTokens=256 promptPreview="Evaluate this candidate for the job.  JOB: Title: Backend API Developer Key Requirements: - 4+ years experience with Node.js or Python - Strong understanding of REST API design - Experience with micro..."
+[2026-04-23T06:13:52.008Z] [INFO] [stage1:candidate:4/10] Groq REQUEST: model=llama-3.1-8b-instant maxTokens=256 promptPreview="Evaluate this candidate for the job.  JOB: Title: Backend API Developer Key Requirements: - 4+ years experience with Node.js or Python - Strong understanding of REST API design - Experience with micro..."
+[2026-04-23T06:13:52.010Z] [INFO] [stage1:candidate:5/10] Groq REQUEST: model=llama-3.1-8b-instant maxTokens=256 promptPreview="Evaluate this candidate for the job.  JOB: Title: Backend API Developer Key Requirements: - 4+ years experience with Node.js or Python - Strong understanding of REST API design - Experience with micro..."
+[2026-04-23T06:13:52.625Z] [INFO] [stage1:candidate:4/10] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-4ac520bc-4293-4561-b93d-0d432c620a6e",
+  "object": "chat.completion",
+  "created": 1776924833,
+  "model": "llama-3.1-8b-instant",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"candidateId\": \"69e9ae7a628a5f64e24cff65\",\n  \"matchScore\": 65,\n  \"strengths\": [\n    \"4+ years experience with Python\",\n    \"Knowledge of PostgreSQL\",\n    \"Experience with AWS\"\n  ],\n  \"gaps\": [\n    \"No experience with Node.js\",\n    \"No experience with RabbitMQ/Kafka\",\n    \"No experience with microservices architecture\",\n    \"No experience with database design and optimization skills\"\n  ],\n  \"shortReason\": \"Linda has some relevant experience, but lacks key skills for the Backend API Developer role.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.018756263,
+    "prompt_tokens": 352,
+    "prompt_time": 0.019624002,
+    "completion_tokens": 132,
+    "completion_time": 0.155403064,
+    "total_tokens": 484,
+    "total_time": 0.175027066
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_6a1eabf260",
+  "x_groq": {
+    "id": "req_01kpwfjd50fy6v7bn24bg8fyre",
+    "seed": 268740024
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:13:52.627Z] [INFO] [stage1:candidate:4/10] Groq EXTRACTED TEXT (508 chars)
+{
+  "text": "{\n  \"candidateId\": \"69e9ae7a628a5f64e24cff65\",\n  \"matchScore\": 65,\n  \"strengths\": [\n    \"4+ years experience with Python\",\n    \"Knowledge of PostgreSQL\",\n    \"Experience with AWS\"\n  ],\n  \"gaps\": [\n    \"No experience with Node.js\",\n    \"No experience with RabbitMQ/Kafka\",\n    \"No experience with microservices architecture\",\n    \"No experience with database design and optimization skills\"\n  ],\n  \"shortReason\": \"Linda has some relevant experience, but lacks key skills for the Backend API Developer "
+}
+[2026-04-23T06:13:52.628Z] [INFO] [stage1:candidate:4/10] Groq PARSED JSON successfully
+{
+  "candidateId": "69e9ae7a628a5f64e24cff65",
+  "matchScore": 65,
+  "strengths": [
+    "4+ years experience with Python",
+    "Knowledge of PostgreSQL",
+    "Experience with AWS"
+  ],
+  "gaps": [
+    "No experience with Node.js",
+    "No experience with RabbitMQ/Kafka",
+    "No experience with microservices architecture",
+    "No experience with database design and optimization skills"
+  ],
+  "shortReason": "Linda has some relevant experience, but lacks key skills for the Backend API Developer role."
+}
+[2026-04-23T06:13:52.630Z] [INFO] [stage1:candidate:6/10] Groq REQUEST: model=llama-3.1-8b-instant maxTokens=256 promptPreview="Evaluate this candidate for the job.  JOB: Title: Backend API Developer Key Requirements: - 4+ years experience with Node.js or Python - Strong understanding of REST API design - Experience with micro..."
+[2026-04-23T06:13:52.883Z] [INFO] [stage1:candidate:1/10] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-ce8b0c70-962b-435f-b98f-0c5891df394e",
+  "object": "chat.completion",
+  "created": 1776924833,
+  "model": "llama-3.1-8b-instant",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"candidateId\": \"69e9b89fc2bbbcc45ba7ce81\",\n  \"matchScore\": 75,\n  \"strengths\": [\n    \"4+ years experience with Node.js\",\n    \"Strong understanding of REST API design\",\n    \"Experience with microservices architecture\"\n  ],\n  \"gaps\": [\n    \"No experience with Python\",\n    \"No knowledge of message queues (RabbitMQ/Kafka)\",\n    \"No database design and optimization skills\"\n  ],\n  \"shortReason\": \"Meets most requirements with relevant experience in Node.js and REST API design, but lacks key skills in Python, message queues, and database design.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.21571358,
+    "prompt_tokens": 344,
+    "prompt_time": 0.03320446,
+    "completion_tokens": 140,
+    "completion_time": 0.156502434,
+    "total_tokens": 484,
+    "total_time": 0.189706894
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_020e283281",
+  "x_groq": {
+    "id": "req_01kpwfjd7vfc5bs4c7bt2hwzjs",
+    "seed": 1354437440
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:13:52.885Z] [INFO] [stage1:candidate:1/10] Groq EXTRACTED TEXT (549 chars)
+{
+  "text": "{\n  \"candidateId\": \"69e9b89fc2bbbcc45ba7ce81\",\n  \"matchScore\": 75,\n  \"strengths\": [\n    \"4+ years experience with Node.js\",\n    \"Strong understanding of REST API design\",\n    \"Experience with microservices architecture\"\n  ],\n  \"gaps\": [\n    \"No experience with Python\",\n    \"No knowledge of message queues (RabbitMQ/Kafka)\",\n    \"No database design and optimization skills\"\n  ],\n  \"shortReason\": \"Meets most requirements with relevant experience in Node.js and REST API design, but lacks key skills i"
+}
+[2026-04-23T06:13:52.887Z] [INFO] [stage1:candidate:1/10] Groq PARSED JSON successfully
+{
+  "candidateId": "69e9b89fc2bbbcc45ba7ce81",
+  "matchScore": 75,
+  "strengths": [
+    "4+ years experience with Node.js",
+    "Strong understanding of REST API design",
+    "Experience with microservices architecture"
+  ],
+  "gaps": [
+    "No experience with Python",
+    "No knowledge of message queues (RabbitMQ/Kafka)",
+    "No database design and optimization skills"
+  ],
+  "shortReason": "Meets most requirements with relevant experience in Node.js and REST API design, but lacks key skills in Python, message queues, and database design."
+}
+[2026-04-23T06:13:52.888Z] [INFO] [stage1:candidate:7/10] Groq REQUEST: model=llama-3.1-8b-instant maxTokens=256 promptPreview="Evaluate this candidate for the job.  JOB: Title: Backend API Developer Key Requirements: - 4+ years experience with Node.js or Python - Strong understanding of REST API design - Experience with micro..."
+[2026-04-23T06:13:52.920Z] [INFO] [stage1:candidate:2/10] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-2a7e10e3-8f20-4f5d-9833-3b9d1f66d98b",
+  "object": "chat.completion",
+  "created": 1776924833,
+  "model": "llama-3.1-8b-instant",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"candidateId\": \"69e9b89fc2bbbcc45ba7ce8d\",\n  \"matchScore\": 60,\n  \"strengths\": [\n    \"Experience with Python and Node.js\",\n    \"Knowledge of Docker\"\n  ],\n  \"gaps\": [\n    \"Lack of experience with microservices architecture\",\n    \"No experience with RabbitMQ/Kafka\",\n    \"No experience with REST API design\",\n    \"No experience with database design and optimization\"\n  ],\n  \"shortReason\": \"Grace has some relevant experience, but lacks key skills for the Backend API Developer role.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.015647809,
+    "prompt_tokens": 352,
+    "prompt_time": 0.263913521,
+    "completion_tokens": 127,
+    "completion_time": 0.167626648,
+    "total_tokens": 479,
+    "total_time": 0.431540169
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_4387d3edbb",
+  "x_groq": {
+    "id": "req_01kpwfjd7efc582qh4a0etqxvh",
+    "seed": 174459946
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:13:52.922Z] [INFO] [stage1:candidate:2/10] Groq EXTRACTED TEXT (486 chars)
+{
+  "text": "{\n  \"candidateId\": \"69e9b89fc2bbbcc45ba7ce8d\",\n  \"matchScore\": 60,\n  \"strengths\": [\n    \"Experience with Python and Node.js\",\n    \"Knowledge of Docker\"\n  ],\n  \"gaps\": [\n    \"Lack of experience with microservices architecture\",\n    \"No experience with RabbitMQ/Kafka\",\n    \"No experience with REST API design\",\n    \"No experience with database design and optimization\"\n  ],\n  \"shortReason\": \"Grace has some relevant experience, but lacks key skills for the Backend API Developer role.\"\n}"
+}
+[2026-04-23T06:13:52.923Z] [INFO] [stage1:candidate:2/10] Groq PARSED JSON successfully
+{
+  "candidateId": "69e9b89fc2bbbcc45ba7ce8d",
+  "matchScore": 60,
+  "strengths": [
+    "Experience with Python and Node.js",
+    "Knowledge of Docker"
+  ],
+  "gaps": [
+    "Lack of experience with microservices architecture",
+    "No experience with RabbitMQ/Kafka",
+    "No experience with REST API design",
+    "No experience with database design and optimization"
+  ],
+  "shortReason": "Grace has some relevant experience, but lacks key skills for the Backend API Developer role."
+}
+[2026-04-23T06:13:52.926Z] [INFO] [stage1:candidate:8/10] Groq REQUEST: model=llama-3.1-8b-instant maxTokens=256 promptPreview="Evaluate this candidate for the job.  JOB: Title: Backend API Developer Key Requirements: - 4+ years experience with Node.js or Python - Strong understanding of REST API design - Experience with micro..."
+[2026-04-23T06:13:52.936Z] [INFO] [stage1:candidate:5/10] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-855938a3-8a86-407e-bc4d-c729a183251c",
+  "object": "chat.completion",
+  "created": 1776924833,
+  "model": "llama-3.1-8b-instant",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"candidateId\": \"69e9b89fc2bbbcc45ba7cefc\",\n  \"matchScore\": 60,\n  \"strengths\": [\n    \"Experience with Node.js\",\n    \"Knowledge of PostgreSQL\",\n    \"Familiarity with Docker\"\n  ],\n  \"gaps\": [\n    \"Lack of experience with Python\",\n    \"No experience with microservices architecture\",\n    \"No experience with message queues (RabbitMQ/Kafka)\",\n    \"No experience with database design and optimization\"\n  ],\n  \"shortReason\": \"Candidate has some relevant experience, but lacks key skills and experience in critical areas.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.214248957,
+    "prompt_tokens": 353,
+    "prompt_time": 0.034197421,
+    "completion_tokens": 133,
+    "completion_time": 0.188089603,
+    "total_tokens": 486,
+    "total_time": 0.222287024
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_020e283281",
+  "x_groq": {
+    "id": "req_01kpwfjd7vfc5vssgz46zdhsp4",
+    "seed": 37815741
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:13:52.939Z] [INFO] [stage1:candidate:5/10] Groq EXTRACTED TEXT (520 chars)
+{
+  "text": "{\n  \"candidateId\": \"69e9b89fc2bbbcc45ba7cefc\",\n  \"matchScore\": 60,\n  \"strengths\": [\n    \"Experience with Node.js\",\n    \"Knowledge of PostgreSQL\",\n    \"Familiarity with Docker\"\n  ],\n  \"gaps\": [\n    \"Lack of experience with Python\",\n    \"No experience with microservices architecture\",\n    \"No experience with message queues (RabbitMQ/Kafka)\",\n    \"No experience with database design and optimization\"\n  ],\n  \"shortReason\": \"Candidate has some relevant experience, but lacks key skills and experience i"
+}
+[2026-04-23T06:13:52.940Z] [INFO] [stage1:candidate:5/10] Groq PARSED JSON successfully
+{
+  "candidateId": "69e9b89fc2bbbcc45ba7cefc",
+  "matchScore": 60,
+  "strengths": [
+    "Experience with Node.js",
+    "Knowledge of PostgreSQL",
+    "Familiarity with Docker"
+  ],
+  "gaps": [
+    "Lack of experience with Python",
+    "No experience with microservices architecture",
+    "No experience with message queues (RabbitMQ/Kafka)",
+    "No experience with database design and optimization"
+  ],
+  "shortReason": "Candidate has some relevant experience, but lacks key skills and experience in critical areas."
+}
+[2026-04-23T06:13:52.943Z] [INFO] [stage1:candidate:9/10] Groq REQUEST: model=llama-3.1-8b-instant maxTokens=256 promptPreview="Evaluate this candidate for the job.  JOB: Title: Backend API Developer Key Requirements: - 4+ years experience with Node.js or Python - Strong understanding of REST API design - Experience with micro..."
+[2026-04-23T06:13:52.954Z] [INFO] [stage1:candidate:3/10] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-46a3908c-13e2-43d6-9974-247725b46df2",
+  "object": "chat.completion",
+  "created": 1776924833,
+  "model": "llama-3.1-8b-instant",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"candidateId\": \"69e9b89fc2bbbcc45ba7ce9c\",\n  \"matchScore\": 55,\n  \"strengths\": [\n    \"Experience with Python\",\n    \"Knowledge of PostgreSQL\"\n  ],\n  \"gaps\": [\n    \"Lack of experience with Node.js\",\n    \"No experience with RabbitMQ/Kafka\",\n    \"No experience with microservices architecture\",\n    \"No experience with REST API design\"\n  ],\n  \"shortReason\": \"The candidate has some relevant experience, but lacks key skills and experience for the Backend API Developer role.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.018324707,
+    "prompt_tokens": 353,
+    "prompt_time": 0.285207427,
+    "completion_tokens": 125,
+    "completion_time": 0.16656567,
+    "total_tokens": 478,
+    "total_time": 0.451773097
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_4387d3edbb",
+  "x_groq": {
+    "id": "req_01kpwfjd7cevns29ce7b3z4x2c",
+    "seed": 483661452
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:13:52.956Z] [INFO] [stage1:candidate:3/10] Groq EXTRACTED TEXT (476 chars)
+{
+  "text": "{\n  \"candidateId\": \"69e9b89fc2bbbcc45ba7ce9c\",\n  \"matchScore\": 55,\n  \"strengths\": [\n    \"Experience with Python\",\n    \"Knowledge of PostgreSQL\"\n  ],\n  \"gaps\": [\n    \"Lack of experience with Node.js\",\n    \"No experience with RabbitMQ/Kafka\",\n    \"No experience with microservices architecture\",\n    \"No experience with REST API design\"\n  ],\n  \"shortReason\": \"The candidate has some relevant experience, but lacks key skills and experience for the Backend API Developer role.\"\n}"
+}
+[2026-04-23T06:13:52.959Z] [INFO] [stage1:candidate:3/10] Groq PARSED JSON successfully
+{
+  "candidateId": "69e9b89fc2bbbcc45ba7ce9c",
+  "matchScore": 55,
+  "strengths": [
+    "Experience with Python",
+    "Knowledge of PostgreSQL"
+  ],
+  "gaps": [
+    "Lack of experience with Node.js",
+    "No experience with RabbitMQ/Kafka",
+    "No experience with microservices architecture",
+    "No experience with REST API design"
+  ],
+  "shortReason": "The candidate has some relevant experience, but lacks key skills and experience for the Backend API Developer role."
+}
+[2026-04-23T06:13:52.963Z] [INFO] [stage1:candidate:10/10] Groq REQUEST: model=llama-3.1-8b-instant maxTokens=256 promptPreview="Evaluate this candidate for the job.  JOB: Title: Backend API Developer Key Requirements: - 4+ years experience with Node.js or Python - Strong understanding of REST API design - Experience with micro..."
+[2026-04-23T06:13:52.985Z] [INFO] [stage1:candidate:6/10] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-dd7d6899-a0a1-4eab-afc8-41e1ddd21348",
+  "object": "chat.completion",
+  "created": 1776924833,
+  "model": "llama-3.1-8b-instant",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"candidateId\": \"69e9b89fc2bbbcc45ba7cf0d\",\n  \"matchScore\": 75,\n  \"strengths\": [\n    \"4+ years experience with Node.js\",\n    \"Strong understanding of REST API design\",\n    \"Experience with microservices architecture\",\n    \"Knowledge of message queues (RabbitMQ)\"\n  ],\n  \"gaps\": [\n    \"No experience with Python\",\n    \"No experience with Kafka\",\n    \"No experience with database design and optimization\"\n  ],\n  \"shortReason\": \"Meets most requirements with relevant experience, but lacks key skills in Python, Kafka, and database design.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.018022922,
+    "prompt_tokens": 357,
+    "prompt_time": 0.022474628,
+    "completion_tokens": 138,
+    "completion_time": 0.129394321,
+    "total_tokens": 495,
+    "total_time": 0.151868949
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_03e8423237",
+  "x_groq": {
+    "id": "req_01kpwfjdhgehrbyxf21qt1gx74",
+    "seed": 16410481
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:13:52.988Z] [INFO] [stage1:candidate:6/10] Groq EXTRACTED TEXT (541 chars)
+{
+  "text": "{\n  \"candidateId\": \"69e9b89fc2bbbcc45ba7cf0d\",\n  \"matchScore\": 75,\n  \"strengths\": [\n    \"4+ years experience with Node.js\",\n    \"Strong understanding of REST API design\",\n    \"Experience with microservices architecture\",\n    \"Knowledge of message queues (RabbitMQ)\"\n  ],\n  \"gaps\": [\n    \"No experience with Python\",\n    \"No experience with Kafka\",\n    \"No experience with database design and optimization\"\n  ],\n  \"shortReason\": \"Meets most requirements with relevant experience, but lacks key skills "
+}
+[2026-04-23T06:13:52.989Z] [INFO] [stage1:candidate:6/10] Groq PARSED JSON successfully
+{
+  "candidateId": "69e9b89fc2bbbcc45ba7cf0d",
+  "matchScore": 75,
+  "strengths": [
+    "4+ years experience with Node.js",
+    "Strong understanding of REST API design",
+    "Experience with microservices architecture",
+    "Knowledge of message queues (RabbitMQ)"
+  ],
+  "gaps": [
+    "No experience with Python",
+    "No experience with Kafka",
+    "No experience with database design and optimization"
+  ],
+  "shortReason": "Meets most requirements with relevant experience, but lacks key skills in Python, Kafka, and database design."
+}
+[2026-04-23T06:13:53.354Z] [INFO] [stage1:candidate:7/10] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-766b19e6-f614-449e-aa57-03ebe3eec86f",
+  "object": "chat.completion",
+  "created": 1776924833,
+  "model": "llama-3.1-8b-instant",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"candidateId\": \"69e9a741f83c32b90d090f7d\",\n  \"matchScore\": 60,\n  \"strengths\": [\n    \"Experience with Python\",\n    \"Knowledge of Kubernetes\",\n    \"Experience with AWS\"\n  ],\n  \"gaps\": [\n    \"Lack of experience with Node.js\",\n    \"No experience with RabbitMQ/Kafka\",\n    \"No experience with microservices architecture\",\n    \"No experience with database design and optimization\"\n  ],\n  \"shortReason\": \"Brian has some relevant experience, but lacks key skills for the Backend API Developer role.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.006090093,
+    "prompt_tokens": 355,
+    "prompt_time": 0.043667903,
+    "completion_tokens": 130,
+    "completion_time": 0.209617524,
+    "total_tokens": 485,
+    "total_time": 0.253285427
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_4387d3edbb",
+  "x_groq": {
+    "id": "req_01kpwfjdv8fc5vzy3mqzycrxqz",
+    "seed": 1573445664
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:13:53.356Z] [INFO] [stage1:candidate:7/10] Groq EXTRACTED TEXT (497 chars)
+{
+  "text": "{\n  \"candidateId\": \"69e9a741f83c32b90d090f7d\",\n  \"matchScore\": 60,\n  \"strengths\": [\n    \"Experience with Python\",\n    \"Knowledge of Kubernetes\",\n    \"Experience with AWS\"\n  ],\n  \"gaps\": [\n    \"Lack of experience with Node.js\",\n    \"No experience with RabbitMQ/Kafka\",\n    \"No experience with microservices architecture\",\n    \"No experience with database design and optimization\"\n  ],\n  \"shortReason\": \"Brian has some relevant experience, but lacks key skills for the Backend API Developer role.\"\n}"
+}
+[2026-04-23T06:13:53.357Z] [INFO] [stage1:candidate:7/10] Groq PARSED JSON successfully
+{
+  "candidateId": "69e9a741f83c32b90d090f7d",
+  "matchScore": 60,
+  "strengths": [
+    "Experience with Python",
+    "Knowledge of Kubernetes",
+    "Experience with AWS"
+  ],
+  "gaps": [
+    "Lack of experience with Node.js",
+    "No experience with RabbitMQ/Kafka",
+    "No experience with microservices architecture",
+    "No experience with database design and optimization"
+  ],
+  "shortReason": "Brian has some relevant experience, but lacks key skills for the Backend API Developer role."
+}
+[2026-04-23T06:13:53.375Z] [INFO] [stage1:candidate:8/10] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-433b2f56-ed12-4d87-8b7a-742165f726f8",
+  "object": "chat.completion",
+  "created": 1776924833,
+  "model": "llama-3.1-8b-instant",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"candidateId\": \"69e9b89fc2bbbcc45ba7d034\",\n  \"matchScore\": 85,\n  \"strengths\": [\n    \"4+ years experience with Node.js\",\n    \"Strong understanding of REST API design\",\n    \"Experience with microservices architecture\",\n    \"Knowledge of message queues (RabbitMQ)\"\n  ],\n  \"gaps\": [\n    \"No experience with Kafka\",\n    \"No experience with database design and optimization skills\"\n  ],\n  \"shortReason\": \"Joshua has strong experience in Node.js and REST API design, but lacks experience with Kafka and database design.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.00544399,
+    "prompt_tokens": 350,
+    "prompt_time": 0.023107591,
+    "completion_tokens": 132,
+    "completion_time": 0.20057489,
+    "total_tokens": 482,
+    "total_time": 0.223682481
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_4387d3edbb",
+  "x_groq": {
+    "id": "req_01kpwfjdwvevs8fhbpsk1etwz8",
+    "seed": 1705567283
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:13:53.377Z] [INFO] [stage1:candidate:8/10] Groq EXTRACTED TEXT (519 chars)
+{
+  "text": "{\n  \"candidateId\": \"69e9b89fc2bbbcc45ba7d034\",\n  \"matchScore\": 85,\n  \"strengths\": [\n    \"4+ years experience with Node.js\",\n    \"Strong understanding of REST API design\",\n    \"Experience with microservices architecture\",\n    \"Knowledge of message queues (RabbitMQ)\"\n  ],\n  \"gaps\": [\n    \"No experience with Kafka\",\n    \"No experience with database design and optimization skills\"\n  ],\n  \"shortReason\": \"Joshua has strong experience in Node.js and REST API design, but lacks experience with Kafka and "
+}
+[2026-04-23T06:13:53.379Z] [INFO] [stage1:candidate:8/10] Groq PARSED JSON successfully
+{
+  "candidateId": "69e9b89fc2bbbcc45ba7d034",
+  "matchScore": 85,
+  "strengths": [
+    "4+ years experience with Node.js",
+    "Strong understanding of REST API design",
+    "Experience with microservices architecture",
+    "Knowledge of message queues (RabbitMQ)"
+  ],
+  "gaps": [
+    "No experience with Kafka",
+    "No experience with database design and optimization skills"
+  ],
+  "shortReason": "Joshua has strong experience in Node.js and REST API design, but lacks experience with Kafka and database design."
+}
+[2026-04-23T06:13:58.606Z] [ERROR] [stage1:candidate:10/10] Groq API ERROR: 429 {"error":{"message":"Rate limit reached for model `llama-3.1-8b-instant` in organization `org_01kntyfqw1erf8j8dkhxakm42k` service tier `on_demand` on tokens per minute (TPM): Limit 6000, Used 5918, Requested 608. Please try again in 5.26s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing","type":"tokens","code":"rate_limit_exceeded"}}
+[2026-04-23T06:13:58.764Z] [INFO] [stage1:candidate:9/10] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-d80798d7-87cd-4df0-a96d-df9346b6868b",
+  "object": "chat.completion",
+  "created": 1776924839,
+  "model": "llama-3.1-8b-instant",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"candidateId\": \"69e9ad8dbe9bfa5c39cc4a34\",\n  \"matchScore\": 60,\n  \"strengths\": [\n    \"Experience with Node.js\",\n    \"Knowledge of Docker\"\n  ],\n  \"gaps\": [\n    \"Lack of experience with Python\",\n    \"No experience with microservices architecture\",\n    \"No experience with message queues (RabbitMQ/Kafka)\",\n    \"No experience with database design and optimization\"\n  ],\n  \"shortReason\": \"Candidate has some relevant experience, but lacks key skills for the Backend API Developer role.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.018441358,
+    "prompt_tokens": 352,
+    "prompt_time": 0.019549655,
+    "completion_tokens": 128,
+    "completion_time": 0.154908219,
+    "total_tokens": 480,
+    "total_time": 0.174457874
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_03e8423237",
+  "x_groq": {
+    "id": "req_01kpwfjk5cf4m8p5yzx10dtkcq",
+    "seed": 1959177518
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:13:58.766Z] [INFO] [stage1:candidate:9/10] Groq EXTRACTED TEXT (487 chars)
+{
+  "text": "{\n  \"candidateId\": \"69e9ad8dbe9bfa5c39cc4a34\",\n  \"matchScore\": 60,\n  \"strengths\": [\n    \"Experience with Node.js\",\n    \"Knowledge of Docker\"\n  ],\n  \"gaps\": [\n    \"Lack of experience with Python\",\n    \"No experience with microservices architecture\",\n    \"No experience with message queues (RabbitMQ/Kafka)\",\n    \"No experience with database design and optimization\"\n  ],\n  \"shortReason\": \"Candidate has some relevant experience, but lacks key skills for the Backend API Developer role.\"\n}"
+}
+[2026-04-23T06:13:58.767Z] [INFO] [stage1:candidate:9/10] Groq PARSED JSON successfully
+{
+  "candidateId": "69e9ad8dbe9bfa5c39cc4a34",
+  "matchScore": 60,
+  "strengths": [
+    "Experience with Node.js",
+    "Knowledge of Docker"
+  ],
+  "gaps": [
+    "Lack of experience with Python",
+    "No experience with microservices architecture",
+    "No experience with message queues (RabbitMQ/Kafka)",
+    "No experience with database design and optimization"
+  ],
+  "shortReason": "Candidate has some relevant experience, but lacks key skills for the Backend API Developer role."
+}
+[2026-04-23T06:13:58.769Z] [INFO] [stage2:ranking] Groq REQUEST: model=llama-3.1-8b-instant maxTokens=4096 promptPreview="Rank these candidates based on matchScore and strengths.  Input: [{"candidateId":"69e9b89fc2bbbcc45ba7ce81","matchScore":75,"strengths":["4+ years experience with Node.js","Strong understanding of RES..."
+[2026-04-23T06:14:07.928Z] [INFO] [stage2:ranking] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-ca48484b-a8b1-46e8-9ebb-9558864a7cc3",
+  "object": "chat.completion",
+  "created": 1776924848,
+  "model": "llama-3.1-8b-instant",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"ranked\": [\n    {\n      \"candidateId\": \"69e9d034fc2bbbcc45ba7d034\",\n      \"rank\": 1,\n      \"finalRecommendation\": \"Strong hire\"\n    },\n    {\n      \"candidateId\": \"69e9b89fc2bbbcc45ba7ce9c\",\n      \"rank\": 2,\n      \"finalRecommendation\": \"Strong hire\"\n    },\n    {\n      \"candidateId\": \"69e9b89fc2bbbcc45ba7cf0d\",\n      \"rank\": 3,\n      \"finalRecommendation\": \"Strong hire\"\n    },\n    {\n      \"candidateId\": \"69e9b89fc2bbbcc45ba7ce81\",\n      \"rank\": 4,\n      \"finalRecommendation\": \"Strong hire\"\n    },\n    {\n      \"candidateId\": \"69e9ae7a628a5f64e24cff65\",\n      \"rank\": 5,\n      \"finalRecommendation\": \"Strong hire\"\n    },\n    {\n      \"candidateId\": \"69e9b89fc2bbbcc45ba7ce8d\",\n      \"rank\": 6,\n      \"finalRecommendation\": \"Strong hire\"\n    },\n    {\n      \"candidateId\": \"69e9b89fc2bbbcc45ba7d034\",\n      \"rank\": 7,\n      \"finalRecommendation\": \"Strong hire\"\n    },\n    {\n      \"candidateId\": \"69e9b89fc2bbbcc45ba7cefc\",\n      \"rank\": 8,\n      \"finalRecommendation\": \"Strong hire\"\n    },\n    {\n      \"candidateId\": \"69e9b89fc2bbbcc45ba7d034\",\n      \"rank\": 9,\n      \"finalRecommendation\": \"Strong hire\"\n    },\n    {\n      \"candidateId\": \"69e9ad8dbe9bfa5c39cc4a34\",\n      \"rank\": 10,\n      \"finalRecommendation\": \"Strong hire\"\n    },\n    {\n      \"candidateId\": \"69e9a741f83c32b90d090f7d\",\n      \"rank\": 11,\n      \"finalRecommendation\": \"Strong hire\"\n    },\n    {\n      \"candidateId\": \"69e9b198d727717a2340807d\",\n      \"rank\": 12,\n      \"finalRecommendation\": \"Not recommended\"\n    }\n  ],\n  \"comparisonSummary\": \"Top candidates have 4+ years experience with Node.js and strong understanding of REST API design.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.079955176,
+    "prompt_tokens": 575,
+    "prompt_time": 0.089142101,
+    "completion_tokens": 547,
+    "completion_time": 1.434937351,
+    "total_tokens": 1122,
+    "total_time": 1.524079452
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_4387d3edbb",
+  "x_groq": {
+    "id": "req_01kpwfjtrvfc7tcjm1a0fhpqrr",
+    "seed": 1847988445
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:14:07.930Z] [INFO] [stage2:ranking] Groq EXTRACTED TEXT (1616 chars)
+{
+  "text": "{\n  \"ranked\": [\n    {\n      \"candidateId\": \"69e9d034fc2bbbcc45ba7d034\",\n      \"rank\": 1,\n      \"finalRecommendation\": \"Strong hire\"\n    },\n    {\n      \"candidateId\": \"69e9b89fc2bbbcc45ba7ce9c\",\n      \"rank\": 2,\n      \"finalRecommendation\": \"Strong hire\"\n    },\n    {\n      \"candidateId\": \"69e9b89fc2bbbcc45ba7cf0d\",\n      \"rank\": 3,\n      \"finalRecommendation\": \"Strong hire\"\n    },\n    {\n      \"candidateId\": \"69e9b89fc2bbbcc45ba7ce81\",\n      \"rank\": 4,\n      \"finalRecommendation\": \"Strong hire\"\n  "
+}
+[2026-04-23T06:14:07.931Z] [INFO] [stage2:ranking] Groq PARSED JSON successfully
+{
+  "ranked": [
+    {
+      "candidateId": "69e9d034fc2bbbcc45ba7d034",
+      "rank": 1,
+      "finalRecommendation": "Strong hire"
+    },
+    {
+      "candidateId": "69e9b89fc2bbbcc45ba7ce9c",
+      "rank": 2,
+      "finalRecommendation": "Strong hire"
+    },
+    {
+      "candidateId": "69e9b89fc2bbbcc45ba7cf0d",
+      "rank": 3,
+      "finalRecommendation": "Strong hire"
+    },
+    {
+      "candidateId": "69e9b89fc2bbbcc45ba7ce81",
+      "rank": 4,
+      "finalRecommendation": "Strong hire"
+    },
+    {
+      "candidateId": "69e9ae7a628a5f64e24cff65",
+      "rank": 5,
+      "finalRecommendation": "Strong hire"
+    },
+    {
+      "candidateId": "69e9b89fc2bbbcc45ba7ce8d",
+      "rank": 6,
+      "finalRecommendation": "Strong hire"
+    },
+    {
+      "candidateId": "69e9b89fc2bbbcc45ba7d034",
+      "rank": 7,
+      "finalRecommendation": "Strong hire"
+    },
+    {
+      "candidateId": "69e9b89fc2bbbcc45ba7cefc",
+      "rank": 8,
+      "finalRecommendation": "Strong hire"
+    },
+    {
+      "candidateId": "69e9b89fc2bbbcc45ba7d034",
+      "rank": 9,
+      "finalRecommendation": "Strong hire"
+    },
+    {
+      "candidateId": "69e9ad8dbe9bfa5c39cc4a34",
+      "rank": 10,
+      "finalRecommendation": "Strong hire"
+    },
+    {
+      "candidateId": "69e9a741f83c32b90d090f7d",
+      "rank": 11,
+      "finalRecommendation": "Strong hire"
+    },
+    {
+      "candidateId": "69e9b198d727717a2340807d",
+      "rank": 12,
+      "finalRecommendation": "Not recommended"
+    }
+  ],
+  "comparisonSummary": "Top candidates have 4+ years experience with Node.js and strong understanding of REST API design."
+}
+[2026-04-23T06:21:11.839Z] [INFO] [stage1:candidate:1/10] Groq REQUEST: model=llama-3.3-70b-versatile maxTokens=256 promptPreview="Evaluate this candidate for the job.  JOB: Title: Backend API Developer Key Requirements: - 4+ years experience with Node.js or Python - Strong understanding of REST API design - Experience with micro..."
+[2026-04-23T06:21:11.842Z] [INFO] [stage1:candidate:2/10] Groq REQUEST: model=llama-3.3-70b-versatile maxTokens=256 promptPreview="Evaluate this candidate for the job.  JOB: Title: Backend API Developer Key Requirements: - 4+ years experience with Node.js or Python - Strong understanding of REST API design - Experience with micro..."
+[2026-04-23T06:21:11.844Z] [INFO] [stage1:candidate:3/10] Groq REQUEST: model=llama-3.3-70b-versatile maxTokens=256 promptPreview="Evaluate this candidate for the job.  JOB: Title: Backend API Developer Key Requirements: - 4+ years experience with Node.js or Python - Strong understanding of REST API design - Experience with micro..."
+[2026-04-23T06:21:11.846Z] [INFO] [stage1:candidate:4/10] Groq REQUEST: model=llama-3.3-70b-versatile maxTokens=256 promptPreview="Evaluate this candidate for the job.  JOB: Title: Backend API Developer Key Requirements: - 4+ years experience with Node.js or Python - Strong understanding of REST API design - Experience with micro..."
+[2026-04-23T06:21:11.848Z] [INFO] [stage1:candidate:5/10] Groq REQUEST: model=llama-3.3-70b-versatile maxTokens=256 promptPreview="Evaluate this candidate for the job.  JOB: Title: Backend API Developer Key Requirements: - 4+ years experience with Node.js or Python - Strong understanding of REST API design - Experience with micro..."
+[2026-04-23T06:21:12.849Z] [INFO] [stage1:candidate:3/10] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-5dde9dca-dcfe-4b82-b1bf-4b20c465bc04",
+  "object": "chat.completion",
+  "created": 1776925273,
+  "model": "llama-3.3-70b-versatile",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"candidateId\": \"69e9ba57f2fcdaee2bfeaaa0\",\n  \"matchScore\": 30,\n  \"strengths\": [\n    \"Python skill\",\n    \"Node.js skill\"\n  ],\n  \"gaps\": [\n    \"Lack of REST API design experience\",\n    \"No microservices architecture experience\",\n    \"No message queues experience\",\n    \"No database design and optimization experience\",\n    \"Insufficient relevant work experience\"\n  ],\n  \"shortReason\": \"The candidate lacks key requirements and relevant work experience, resulting in a weak match for the Backend API Developer role.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.092382273,
+    "prompt_tokens": 351,
+    "prompt_time": 0.111282735,
+    "completion_tokens": 130,
+    "completion_time": 0.312489691,
+    "total_tokens": 481,
+    "total_time": 0.423772426
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_dae98b5ecb",
+  "x_groq": {
+    "id": "req_01kpwfztqse38bptghc0cp0jty",
+    "seed": 2055888809
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:21:12.851Z] [INFO] [stage1:candidate:3/10] Groq EXTRACTED TEXT (519 chars)
+{
+  "text": "{\n  \"candidateId\": \"69e9ba57f2fcdaee2bfeaaa0\",\n  \"matchScore\": 30,\n  \"strengths\": [\n    \"Python skill\",\n    \"Node.js skill\"\n  ],\n  \"gaps\": [\n    \"Lack of REST API design experience\",\n    \"No microservices architecture experience\",\n    \"No message queues experience\",\n    \"No database design and optimization experience\",\n    \"Insufficient relevant work experience\"\n  ],\n  \"shortReason\": \"The candidate lacks key requirements and relevant work experience, resulting in a weak match for the Backend API"
+}
+[2026-04-23T06:21:12.852Z] [INFO] [stage1:candidate:3/10] Groq PARSED JSON successfully
+{
+  "candidateId": "69e9ba57f2fcdaee2bfeaaa0",
+  "matchScore": 30,
+  "strengths": [
+    "Python skill",
+    "Node.js skill"
+  ],
+  "gaps": [
+    "Lack of REST API design experience",
+    "No microservices architecture experience",
+    "No message queues experience",
+    "No database design and optimization experience",
+    "Insufficient relevant work experience"
+  ],
+  "shortReason": "The candidate lacks key requirements and relevant work experience, resulting in a weak match for the Backend API Developer role."
+}
+[2026-04-23T06:21:12.854Z] [INFO] [stage1:candidate:6/10] Groq REQUEST: model=llama-3.3-70b-versatile maxTokens=256 promptPreview="Evaluate this candidate for the job.  JOB: Title: Backend API Developer Key Requirements: - 4+ years experience with Node.js or Python - Strong understanding of REST API design - Experience with micro..."
+[2026-04-23T06:21:12.866Z] [INFO] [stage1:candidate:5/10] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-671419c3-30f6-473a-9bcb-4fcdf1b10a93",
+  "object": "chat.completion",
+  "created": 1776925273,
+  "model": "llama-3.3-70b-versatile",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"candidateId\": \"69e9a699f83c32b90d0909ff\",\n  \"matchScore\": 60,\n  \"strengths\": [\n    \"Node.js experience\",\n    \"PostgreSQL database skills\"\n  ],\n  \"gaps\": [\n    \"No explicit experience with microservices architecture\",\n    \"No mention of message queues like RabbitMQ/Kafka\"\n  ],\n  \"shortReason\": \"The candidate has some relevant experience, but lacks explicit experience in key areas like microservices architecture and message queues.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.224494078,
+    "prompt_tokens": 351,
+    "prompt_time": 0.018731758,
+    "completion_tokens": 113,
+    "completion_time": 0.252292734,
+    "total_tokens": 464,
+    "total_time": 0.271024492
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_d42c28f9ce",
+  "x_groq": {
+    "id": "req_01kpwfzttpewptjzfdswc9r42j",
+    "seed": 509742996
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:21:12.869Z] [INFO] [stage1:candidate:5/10] Groq EXTRACTED TEXT (441 chars)
+{
+  "text": "{\n  \"candidateId\": \"69e9a699f83c32b90d0909ff\",\n  \"matchScore\": 60,\n  \"strengths\": [\n    \"Node.js experience\",\n    \"PostgreSQL database skills\"\n  ],\n  \"gaps\": [\n    \"No explicit experience with microservices architecture\",\n    \"No mention of message queues like RabbitMQ/Kafka\"\n  ],\n  \"shortReason\": \"The candidate has some relevant experience, but lacks explicit experience in key areas like microservices architecture and message queues.\"\n}"
+}
+[2026-04-23T06:21:12.870Z] [INFO] [stage1:candidate:5/10] Groq PARSED JSON successfully
+{
+  "candidateId": "69e9a699f83c32b90d0909ff",
+  "matchScore": 60,
+  "strengths": [
+    "Node.js experience",
+    "PostgreSQL database skills"
+  ],
+  "gaps": [
+    "No explicit experience with microservices architecture",
+    "No mention of message queues like RabbitMQ/Kafka"
+  ],
+  "shortReason": "The candidate has some relevant experience, but lacks explicit experience in key areas like microservices architecture and message queues."
+}
+[2026-04-23T06:21:12.873Z] [INFO] [stage1:candidate:7/10] Groq REQUEST: model=llama-3.3-70b-versatile maxTokens=256 promptPreview="Evaluate this candidate for the job.  JOB: Title: Backend API Developer Key Requirements: - 4+ years experience with Node.js or Python - Strong understanding of REST API design - Experience with micro..."
+[2026-04-23T06:21:12.957Z] [INFO] [stage1:candidate:4/10] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-403cdf6f-3872-41d0-9292-3c90eaf74a12",
+  "object": "chat.completion",
+  "created": 1776925273,
+  "model": "llama-3.3-70b-versatile",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"candidateId\": \"69e9b89fc2bbbcc45ba7ceea\",\n  \"matchScore\": 60,\n  \"strengths\": [\n    \"Node.js experience\",\n    \"Software Engineer role\"\n  ],\n  \"gaps\": [\n    \"Lack of Python experience\",\n    \"No explicit microservices experience\",\n    \"No message queues experience\"\n  ],\n  \"shortReason\": \"The candidate has some relevant experience with Node.js, but lacks experience in key areas such as microservices and message queues.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.251906127,
+    "prompt_tokens": 351,
+    "prompt_time": 0.06364384,
+    "completion_tokens": 113,
+    "completion_time": 0.302673933,
+    "total_tokens": 464,
+    "total_time": 0.366317773
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_d42c28f9ce",
+  "x_groq": {
+    "id": "req_01kpwfztswf0car2y123g0mxas",
+    "seed": 1789001094
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:21:12.958Z] [INFO] [stage1:candidate:4/10] Groq EXTRACTED TEXT (426 chars)
+{
+  "text": "{\n  \"candidateId\": \"69e9b89fc2bbbcc45ba7ceea\",\n  \"matchScore\": 60,\n  \"strengths\": [\n    \"Node.js experience\",\n    \"Software Engineer role\"\n  ],\n  \"gaps\": [\n    \"Lack of Python experience\",\n    \"No explicit microservices experience\",\n    \"No message queues experience\"\n  ],\n  \"shortReason\": \"The candidate has some relevant experience with Node.js, but lacks experience in key areas such as microservices and message queues.\"\n}"
+}
+[2026-04-23T06:21:12.960Z] [INFO] [stage1:candidate:4/10] Groq PARSED JSON successfully
+{
+  "candidateId": "69e9b89fc2bbbcc45ba7ceea",
+  "matchScore": 60,
+  "strengths": [
+    "Node.js experience",
+    "Software Engineer role"
+  ],
+  "gaps": [
+    "Lack of Python experience",
+    "No explicit microservices experience",
+    "No message queues experience"
+  ],
+  "shortReason": "The candidate has some relevant experience with Node.js, but lacks experience in key areas such as microservices and message queues."
+}
+[2026-04-23T06:21:12.961Z] [INFO] [stage1:candidate:8/10] Groq REQUEST: model=llama-3.3-70b-versatile maxTokens=256 promptPreview="Evaluate this candidate for the job.  JOB: Title: Backend API Developer Key Requirements: - 4+ years experience with Node.js or Python - Strong understanding of REST API design - Experience with micro..."
+[2026-04-23T06:21:12.971Z] [INFO] [stage1:candidate:2/10] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-4ef3be56-f8a5-401a-a3c8-409e8afb49d9",
+  "object": "chat.completion",
+  "created": 1776925273,
+  "model": "llama-3.3-70b-versatile",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"candidateId\": \"69e9ba57f2fcdaee2bfeaa81\",\n  \"matchScore\": 50,\n  \"strengths\": [\n    \"Python experience\",\n    \"Senior Engineer role\"\n  ],\n  \"gaps\": [\n    \"No Node.js experience\",\n    \"No message queues experience\",\n    \"Limited database design skills\"\n  ],\n  \"shortReason\": \"The candidate has some relevant experience, but lacks key requirements such as Node.js and message queues experience.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.240270338,
+    "prompt_tokens": 347,
+    "prompt_time": 0.09900676,
+    "completion_tokens": 107,
+    "completion_time": 0.273983641,
+    "total_tokens": 454,
+    "total_time": 0.372990401
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_d42c28f9ce",
+  "x_groq": {
+    "id": "req_01kpwfztt2fg2t63w8xs2k7nsw",
+    "seed": 491548290
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:21:12.973Z] [INFO] [stage1:candidate:2/10] Groq EXTRACTED TEXT (398 chars)
+{
+  "text": "{\n  \"candidateId\": \"69e9ba57f2fcdaee2bfeaa81\",\n  \"matchScore\": 50,\n  \"strengths\": [\n    \"Python experience\",\n    \"Senior Engineer role\"\n  ],\n  \"gaps\": [\n    \"No Node.js experience\",\n    \"No message queues experience\",\n    \"Limited database design skills\"\n  ],\n  \"shortReason\": \"The candidate has some relevant experience, but lacks key requirements such as Node.js and message queues experience.\"\n}"
+}
+[2026-04-23T06:21:12.974Z] [INFO] [stage1:candidate:2/10] Groq PARSED JSON successfully
+{
+  "candidateId": "69e9ba57f2fcdaee2bfeaa81",
+  "matchScore": 50,
+  "strengths": [
+    "Python experience",
+    "Senior Engineer role"
+  ],
+  "gaps": [
+    "No Node.js experience",
+    "No message queues experience",
+    "Limited database design skills"
+  ],
+  "shortReason": "The candidate has some relevant experience, but lacks key requirements such as Node.js and message queues experience."
+}
+[2026-04-23T06:21:12.976Z] [INFO] [stage1:candidate:9/10] Groq REQUEST: model=llama-3.3-70b-versatile maxTokens=256 promptPreview="Evaluate this candidate for the job.  JOB: Title: Backend API Developer Key Requirements: - 4+ years experience with Node.js or Python - Strong understanding of REST API design - Experience with micro..."
+[2026-04-23T06:21:13.057Z] [INFO] [stage1:candidate:1/10] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-28a2fa6c-dd3a-42ca-8364-904236dd7135",
+  "object": "chat.completion",
+  "created": 1776925273,
+  "model": "llama-3.3-70b-versatile",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"candidateId\": \"69e9ba57f2fcdaee2bfeaa5b\",\n  \"matchScore\": 75,\n  \"strengths\": [\n    \"Experience with Node.js and Python\",\n    \"Knowledge of database design with PostgreSQL and MongoDB\"\n  ],\n  \"gaps\": [\n    \"Limited information on REST API design experience\",\n    \"No explicit experience with microservices architecture or message queues\"\n  ],\n  \"shortReason\": \"The candidate has a strong technical background, but lacks explicit experience in some key areas, resulting in a moderate to strong match score.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.251365667,
+    "prompt_tokens": 356,
+    "prompt_time": 0.103104732,
+    "completion_tokens": 125,
+    "completion_time": 0.363813604,
+    "total_tokens": 481,
+    "total_time": 0.466918336
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_d42c28f9ce",
+  "x_groq": {
+    "id": "req_01kpwfztsqfg2ve1s6z0j49k2g",
+    "seed": 1017523930
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:21:13.059Z] [INFO] [stage1:candidate:1/10] Groq EXTRACTED TEXT (512 chars)
+{
+  "text": "{\n  \"candidateId\": \"69e9ba57f2fcdaee2bfeaa5b\",\n  \"matchScore\": 75,\n  \"strengths\": [\n    \"Experience with Node.js and Python\",\n    \"Knowledge of database design with PostgreSQL and MongoDB\"\n  ],\n  \"gaps\": [\n    \"Limited information on REST API design experience\",\n    \"No explicit experience with microservices architecture or message queues\"\n  ],\n  \"shortReason\": \"The candidate has a strong technical background, but lacks explicit experience in some key areas, resulting in a moderate to strong mat"
+}
+[2026-04-23T06:21:13.060Z] [INFO] [stage1:candidate:1/10] Groq PARSED JSON successfully
+{
+  "candidateId": "69e9ba57f2fcdaee2bfeaa5b",
+  "matchScore": 75,
+  "strengths": [
+    "Experience with Node.js and Python",
+    "Knowledge of database design with PostgreSQL and MongoDB"
+  ],
+  "gaps": [
+    "Limited information on REST API design experience",
+    "No explicit experience with microservices architecture or message queues"
+  ],
+  "shortReason": "The candidate has a strong technical background, but lacks explicit experience in some key areas, resulting in a moderate to strong match score."
+}
+[2026-04-23T06:21:13.064Z] [INFO] [stage1:candidate:10/10] Groq REQUEST: model=llama-3.3-70b-versatile maxTokens=256 promptPreview="Evaluate this candidate for the job.  JOB: Title: Backend API Developer Key Requirements: - 4+ years experience with Node.js or Python - Strong understanding of REST API design - Experience with micro..."
+[2026-04-23T06:21:13.468Z] [INFO] [stage1:candidate:6/10] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-2ae7a0ea-d0fd-43af-bfee-114cf3a630fc",
+  "object": "chat.completion",
+  "created": 1776925273,
+  "model": "llama-3.3-70b-versatile",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"candidateId\": \"69e9ba57f2fcdaee2bfeab2e\",\n  \"matchScore\": 60,\n  \"strengths\": [\n    \"Node.js experience\",\n    \"Database skills (PostgreSQL, MongoDB)\"\n  ],\n  \"gaps\": [\n    \"Limited REST API design experience\",\n    \"No message queues experience\",\n    \"No microservices architecture experience\"\n  ],\n  \"shortReason\": \"The candidate has some relevant experience, but lacks key requirements in REST API design, message queues, and microservices architecture.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.091649501,
+    "prompt_tokens": 356,
+    "prompt_time": 0.054998177,
+    "completion_tokens": 119,
+    "completion_time": 0.269123648,
+    "total_tokens": 475,
+    "total_time": 0.324121825
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_dae98b5ecb",
+  "x_groq": {
+    "id": "req_01kpwfzvf0fc3tatv3eb6z7r4g",
+    "seed": 1433901870
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:21:13.470Z] [INFO] [stage1:candidate:6/10] Groq EXTRACTED TEXT (460 chars)
+{
+  "text": "{\n  \"candidateId\": \"69e9ba57f2fcdaee2bfeab2e\",\n  \"matchScore\": 60,\n  \"strengths\": [\n    \"Node.js experience\",\n    \"Database skills (PostgreSQL, MongoDB)\"\n  ],\n  \"gaps\": [\n    \"Limited REST API design experience\",\n    \"No message queues experience\",\n    \"No microservices architecture experience\"\n  ],\n  \"shortReason\": \"The candidate has some relevant experience, but lacks key requirements in REST API design, message queues, and microservices architecture.\"\n}"
+}
+[2026-04-23T06:21:13.471Z] [INFO] [stage1:candidate:6/10] Groq PARSED JSON successfully
+{
+  "candidateId": "69e9ba57f2fcdaee2bfeab2e",
+  "matchScore": 60,
+  "strengths": [
+    "Node.js experience",
+    "Database skills (PostgreSQL, MongoDB)"
+  ],
+  "gaps": [
+    "Limited REST API design experience",
+    "No message queues experience",
+    "No microservices architecture experience"
+  ],
+  "shortReason": "The candidate has some relevant experience, but lacks key requirements in REST API design, message queues, and microservices architecture."
+}
+[2026-04-23T06:21:13.739Z] [INFO] [stage1:candidate:7/10] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-55e26b26-0058-46e3-a3b2-c91e06323db8",
+  "object": "chat.completion",
+  "created": 1776925274,
+  "model": "llama-3.3-70b-versatile",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"candidateId\": \"69e9ba57f2fcdaee2bfeab40\",\n  \"matchScore\": 40,\n  \"strengths\": [\n    \"Node.js experience\",\n    \"Database skills with MongoDB\"\n  ],\n  \"gaps\": [\n    \"Lack of REST API design experience\",\n    \"No experience with message queues\",\n    \"No microservices architecture experience\",\n    \"Limited relevant work experience\"\n  ],\n  \"shortReason\": \"The candidate has some relevant technical skills, but lacks key experience in REST API design, microservices architecture, and message queues.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.194371508,
+    "prompt_tokens": 353,
+    "prompt_time": 0.085058142,
+    "completion_tokens": 126,
+    "completion_time": 0.359683563,
+    "total_tokens": 479,
+    "total_time": 0.444741705
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_d42c28f9ce",
+  "x_groq": {
+    "id": "req_01kpwfzvhnf0caxhwddxdkm2nj",
+    "seed": 132822437
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:21:13.741Z] [INFO] [stage1:candidate:7/10] Groq EXTRACTED TEXT (500 chars)
+{
+  "text": "{\n  \"candidateId\": \"69e9ba57f2fcdaee2bfeab40\",\n  \"matchScore\": 40,\n  \"strengths\": [\n    \"Node.js experience\",\n    \"Database skills with MongoDB\"\n  ],\n  \"gaps\": [\n    \"Lack of REST API design experience\",\n    \"No experience with message queues\",\n    \"No microservices architecture experience\",\n    \"Limited relevant work experience\"\n  ],\n  \"shortReason\": \"The candidate has some relevant technical skills, but lacks key experience in REST API design, microservices architecture, and message queues.\"\n}"
+}
+[2026-04-23T06:21:13.742Z] [INFO] [stage1:candidate:7/10] Groq PARSED JSON successfully
+{
+  "candidateId": "69e9ba57f2fcdaee2bfeab40",
+  "matchScore": 40,
+  "strengths": [
+    "Node.js experience",
+    "Database skills with MongoDB"
+  ],
+  "gaps": [
+    "Lack of REST API design experience",
+    "No experience with message queues",
+    "No microservices architecture experience",
+    "Limited relevant work experience"
+  ],
+  "shortReason": "The candidate has some relevant technical skills, but lacks key experience in REST API design, microservices architecture, and message queues."
+}
+[2026-04-23T06:21:13.746Z] [INFO] [stage1:candidate:9/10] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-fc92729f-c15c-40ef-a624-4d5a611f3921",
+  "object": "chat.completion",
+  "created": 1776925274,
+  "model": "llama-3.3-70b-versatile",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"candidateId\": \"69e9ba57f2fcdaee2bfeac01\",\n  \"matchScore\": 75,\n  \"strengths\": [\n    \"Experience with Node.js\",\n    \"Knowledge of PostgreSQL\",\n    \"Experience with Python\"\n  ],\n  \"gaps\": [\n    \"Limited experience with message queues\",\n    \"No direct experience with microservices architecture mentioned\"\n  ],\n  \"shortReason\": \"The candidate has relevant experience with Node.js and Python, but lacks direct experience with microservices architecture and message queues.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.253119174,
+    "prompt_tokens": 355,
+    "prompt_time": 0.021673695,
+    "completion_tokens": 116,
+    "completion_time": 0.279208872,
+    "total_tokens": 471,
+    "total_time": 0.300882567
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_0761e44d7b",
+  "x_groq": {
+    "id": "req_01kpwfzvmdfg88f5yhvbppdjca",
+    "seed": 949112783
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:21:13.748Z] [INFO] [stage1:candidate:9/10] Groq EXTRACTED TEXT (475 chars)
+{
+  "text": "{\n  \"candidateId\": \"69e9ba57f2fcdaee2bfeac01\",\n  \"matchScore\": 75,\n  \"strengths\": [\n    \"Experience with Node.js\",\n    \"Knowledge of PostgreSQL\",\n    \"Experience with Python\"\n  ],\n  \"gaps\": [\n    \"Limited experience with message queues\",\n    \"No direct experience with microservices architecture mentioned\"\n  ],\n  \"shortReason\": \"The candidate has relevant experience with Node.js and Python, but lacks direct experience with microservices architecture and message queues.\"\n}"
+}
+[2026-04-23T06:21:13.749Z] [INFO] [stage1:candidate:9/10] Groq PARSED JSON successfully
+{
+  "candidateId": "69e9ba57f2fcdaee2bfeac01",
+  "matchScore": 75,
+  "strengths": [
+    "Experience with Node.js",
+    "Knowledge of PostgreSQL",
+    "Experience with Python"
+  ],
+  "gaps": [
+    "Limited experience with message queues",
+    "No direct experience with microservices architecture mentioned"
+  ],
+  "shortReason": "The candidate has relevant experience with Node.js and Python, but lacks direct experience with microservices architecture and message queues."
+}
+[2026-04-23T06:21:13.791Z] [INFO] [stage1:candidate:8/10] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-f235ee1a-c1eb-46de-8410-031b3824122a",
+  "object": "chat.completion",
+  "created": 1776925274,
+  "model": "llama-3.3-70b-versatile",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"candidateId\": \"69e9ba57f2fcdaee2bfeab4e\",\n  \"matchScore\": 60,\n  \"strengths\": [\n    \"Experience with Node.js\",\n    \"Database skills with PostgreSQL and MongoDB\"\n  ],\n  \"gaps\": [\n    \"Lack of experience with message queues\",\n    \"No explicit experience with microservices architecture\",\n    \"Unclear experience with REST API design\"\n  ],\n  \"shortReason\": \"The candidate has some relevant experience, but lacks key requirements such as experience with message queues and microservices architecture.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.253995026,
+    "prompt_tokens": 353,
+    "prompt_time": 0.033773532,
+    "completion_tokens": 124,
+    "completion_time": 0.310518636,
+    "total_tokens": 477,
+    "total_time": 0.344292168
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_0761e44d7b",
+  "x_groq": {
+    "id": "req_01kpwfzvmafg8b48zzc1bvymfz",
+    "seed": 54544598
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:21:13.792Z] [INFO] [stage1:candidate:8/10] Groq EXTRACTED TEXT (503 chars)
+{
+  "text": "{\n  \"candidateId\": \"69e9ba57f2fcdaee2bfeab4e\",\n  \"matchScore\": 60,\n  \"strengths\": [\n    \"Experience with Node.js\",\n    \"Database skills with PostgreSQL and MongoDB\"\n  ],\n  \"gaps\": [\n    \"Lack of experience with message queues\",\n    \"No explicit experience with microservices architecture\",\n    \"Unclear experience with REST API design\"\n  ],\n  \"shortReason\": \"The candidate has some relevant experience, but lacks key requirements such as experience with message queues and microservices architecture."
+}
+[2026-04-23T06:21:13.793Z] [INFO] [stage1:candidate:8/10] Groq PARSED JSON successfully
+{
+  "candidateId": "69e9ba57f2fcdaee2bfeab4e",
+  "matchScore": 60,
+  "strengths": [
+    "Experience with Node.js",
+    "Database skills with PostgreSQL and MongoDB"
+  ],
+  "gaps": [
+    "Lack of experience with message queues",
+    "No explicit experience with microservices architecture",
+    "Unclear experience with REST API design"
+  ],
+  "shortReason": "The candidate has some relevant experience, but lacks key requirements such as experience with message queues and microservices architecture."
+}
+[2026-04-23T06:21:13.905Z] [INFO] [stage1:candidate:10/10] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-d2689b5b-3fb2-4c26-acc4-27d9a8a4b5a4",
+  "object": "chat.completion",
+  "created": 1776925274,
+  "model": "llama-3.3-70b-versatile",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"candidateId\": \"69e9ba57f2fcdaee2bfeac1d\",\n  \"matchScore\": 60,\n  \"strengths\": [\n    \"Experience with Python\",\n    \"Knowledge of Node.js\",\n    \"Database experience with MongoDB\"\n  ],\n  \"gaps\": [\n    \"Limited experience with REST API design\",\n    \"No direct experience with microservices architecture\",\n    \"No experience with message queues like RabbitMQ/Kafka\"\n  ],\n  \"shortReason\": \"The candidate has some relevant experience, but lacks key requirements in REST API design, microservices architecture, and message queues.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.253364079,
+    "prompt_tokens": 356,
+    "prompt_time": 0.019322307,
+    "completion_tokens": 132,
+    "completion_time": 0.333039964,
+    "total_tokens": 488,
+    "total_time": 0.352362271
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_0761e44d7b",
+  "x_groq": {
+    "id": "req_01kpwfzvqwf0c8qbygnb206h61",
+    "seed": 1105764417
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:21:13.906Z] [INFO] [stage1:candidate:10/10] Groq EXTRACTED TEXT (529 chars)
+{
+  "text": "{\n  \"candidateId\": \"69e9ba57f2fcdaee2bfeac1d\",\n  \"matchScore\": 60,\n  \"strengths\": [\n    \"Experience with Python\",\n    \"Knowledge of Node.js\",\n    \"Database experience with MongoDB\"\n  ],\n  \"gaps\": [\n    \"Limited experience with REST API design\",\n    \"No direct experience with microservices architecture\",\n    \"No experience with message queues like RabbitMQ/Kafka\"\n  ],\n  \"shortReason\": \"The candidate has some relevant experience, but lacks key requirements in REST API design, microservices archite"
+}
+[2026-04-23T06:21:13.907Z] [INFO] [stage1:candidate:10/10] Groq PARSED JSON successfully
+{
+  "candidateId": "69e9ba57f2fcdaee2bfeac1d",
+  "matchScore": 60,
+  "strengths": [
+    "Experience with Python",
+    "Knowledge of Node.js",
+    "Database experience with MongoDB"
+  ],
+  "gaps": [
+    "Limited experience with REST API design",
+    "No direct experience with microservices architecture",
+    "No experience with message queues like RabbitMQ/Kafka"
+  ],
+  "shortReason": "The candidate has some relevant experience, but lacks key requirements in REST API design, microservices architecture, and message queues."
+}
+[2026-04-23T06:21:13.909Z] [INFO] [stage2:ranking] Groq REQUEST: model=llama-3.3-70b-versatile maxTokens=4096 promptPreview="Rank these candidates in DESCENDING order by matchScore (highest first). Candidate with highest matchScore gets rank 1.  Input (already sorted by matchScore descending): [{"candidateId":"69e9ba57f2fcd..."
+[2026-04-23T06:21:14.929Z] [INFO] [stage2:ranking] Groq RAW RESPONSE
+{
+  "id": "chatcmpl-fa6505ab-1cff-4642-99ae-928a20368c24",
+  "object": "chat.completion",
+  "created": 1776925275,
+  "model": "llama-3.3-70b-versatile",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"ranked\": [\n    {\n      \"candidateId\": \"69e9ba57f2fcdaee2bfeaa5b\",\n      \"rank\": 1,\n      \"finalRecommendation\": \"Strong hire\"\n    },\n    {\n      \"candidateId\": \"69e9ba57f2fcdaee2bfeac01\",\n      \"rank\": 2,\n      \"finalRecommendation\": \"Strong hire\"\n    },\n    {\n      \"candidateId\": \"69e9ba57f2fcdaee2bfeab4e\",\n      \"rank\": 3,\n      \"finalRecommendation\": \"Consider\"\n    },\n    {\n      \"candidateId\": \"69e9ba57f2fcdaee2bfeab2e\",\n      \"rank\": 4,\n      \"finalRecommendation\": \"Consider\"\n    },\n    {\n      \"candidateId\": \"69e9ba57f2fcdaee2bfeac1d\",\n      \"rank\": 5,\n      \"finalRecommendation\": \"Consider\"\n    },\n    {\n      \"candidateId\": \"69e9a699f83c32b90d0909ff\",\n      \"rank\": 6,\n      \"finalRecommendation\": \"Consider\"\n    },\n    {\n      \"candidateId\": \"69e9b89fc2bbbcc45ba7ceea\",\n      \"rank\": 7,\n      \"finalRecommendation\": \"Consider\"\n    },\n    {\n      \"candidateId\": \"69e9ba57f2fcdaee2bfeaa81\",\n      \"rank\": 8,\n      \"finalRecommendation\": \"Weak fit\"\n    },\n    {\n      \"candidateId\": \"69e9ba57f2fcdaee2bfeab40\",\n      \"rank\": 9,\n      \"finalRecommendation\": \"Weak fit\"\n    },\n    {\n      \"candidateId\": \"69e9ba57f2fcdaee2bfeaaa0\",\n      \"rank\": 10,\n      \"finalRecommendation\": \"Weak fit\"\n    }\n  ],\n  \"comparisonSummary\": \"Top candidates ranked highest due to high match scores and relevant strengths such as experience with Node.js, Python, and database design with PostgreSQL and MongoDB.\"\n}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "queue_time": 0.008625671,
+    "prompt_tokens": 647,
+    "prompt_time": 0.045810794,
+    "completion_tokens": 474,
+    "completion_time": 0.761122483,
+    "total_tokens": 1121,
+    "total_time": 0.806933277
+  },
+  "usage_breakdown": null,
+  "system_fingerprint": "fp_dae98b5ecb",
+  "x_groq": {
+    "id": "req_01kpwfzwhafg8b3b3cg38jjxje",
+    "seed": 1380354894
+  },
+  "service_tier": "on_demand"
+}
+[2026-04-23T06:21:14.931Z] [INFO] [stage2:ranking] Groq EXTRACTED TEXT (1411 chars)
+{
+  "text": "{\n  \"ranked\": [\n    {\n      \"candidateId\": \"69e9ba57f2fcdaee2bfeaa5b\",\n      \"rank\": 1,\n      \"finalRecommendation\": \"Strong hire\"\n    },\n    {\n      \"candidateId\": \"69e9ba57f2fcdaee2bfeac01\",\n      \"rank\": 2,\n      \"finalRecommendation\": \"Strong hire\"\n    },\n    {\n      \"candidateId\": \"69e9ba57f2fcdaee2bfeab4e\",\n      \"rank\": 3,\n      \"finalRecommendation\": \"Consider\"\n    },\n    {\n      \"candidateId\": \"69e9ba57f2fcdaee2bfeab2e\",\n      \"rank\": 4,\n      \"finalRecommendation\": \"Consider\"\n    },\n  "
+}
+[2026-04-23T06:21:14.932Z] [INFO] [stage2:ranking] Groq PARSED JSON successfully
+{
+  "ranked": [
+    {
+      "candidateId": "69e9ba57f2fcdaee2bfeaa5b",
+      "rank": 1,
+      "finalRecommendation": "Strong hire"
+    },
+    {
+      "candidateId": "69e9ba57f2fcdaee2bfeac01",
+      "rank": 2,
+      "finalRecommendation": "Strong hire"
+    },
+    {
+      "candidateId": "69e9ba57f2fcdaee2bfeab4e",
+      "rank": 3,
+      "finalRecommendation": "Consider"
+    },
+    {
+      "candidateId": "69e9ba57f2fcdaee2bfeab2e",
+      "rank": 4,
+      "finalRecommendation": "Consider"
+    },
+    {
+      "candidateId": "69e9ba57f2fcdaee2bfeac1d",
+      "rank": 5,
+      "finalRecommendation": "Consider"
+    },
+    {
+      "candidateId": "69e9a699f83c32b90d0909ff",
+      "rank": 6,
+      "finalRecommendation": "Consider"
+    },
+    {
+      "candidateId": "69e9b89fc2bbbcc45ba7ceea",
+      "rank": 7,
+      "finalRecommendation": "Consider"
+    },
+    {
+      "candidateId": "69e9ba57f2fcdaee2bfeaa81",
+      "rank": 8,
+      "finalRecommendation": "Weak fit"
+    },
+    {
+      "candidateId": "69e9ba57f2fcdaee2bfeab40",
+      "rank": 9,
+      "finalRecommendation": "Weak fit"
+    },
+    {
+      "candidateId": "69e9ba57f2fcdaee2bfeaaa0",
+      "rank": 10,
+      "finalRecommendation": "Weak fit"
+    }
+  ],
+  "comparisonSummary": "Top candidates ranked highest due to high match scores and relevant strengths such as experience with Node.js, Python, and database design with PostgreSQL and MongoDB."
+}

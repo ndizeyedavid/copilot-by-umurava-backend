@@ -1,10 +1,33 @@
 import { GoogleGenAI } from "@google/genai";
+import axios from "axios";
 import dotenv from "dotenv";
+import { Groq } from "groq-sdk";
+import fs from "fs";
+import path from "path";
 import ENV from "../config/env";
 
 dotenv.config();
 
 const genAI = new GoogleGenAI({ apiKey: ENV.gemini_api_key });
+const groqClient = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+// Logger to file for debugging Groq issues
+const LOG_FILE = path.join(process.cwd(), "logs", "groq-screening.log");
+function logToFile(level: string, message: string, data?: any) {
+  const timestamp = new Date().toISOString();
+  const logEntry = `[${timestamp}] [${level}] ${message}${data ? "\n" + JSON.stringify(data, null, 2) : ""}\n`;
+  try {
+    const logDir = path.dirname(LOG_FILE);
+    if (!fs.existsSync(logDir)) {
+      fs.mkdirSync(logDir, { recursive: true });
+    }
+    fs.appendFileSync(LOG_FILE, logEntry);
+  } catch (e) {
+    console.error("Failed to write to log file:", e);
+  }
+  // Also output to console
+  console.log(logEntry.trim());
+}
 
 export interface JobData {
   title: string;
@@ -66,6 +89,198 @@ export interface CandidateScore {
 export interface ScreeningResult {
   candidates: CandidateScore[];
   comparisonSummary: string;
+}
+
+export async function evaluateCandidatesGroqOnly(
+  job: JobData,
+  candidates: CandidateData[],
+): Promise<ScreeningResult> {
+  const startedAt = Date.now();
+  const topRequirements = (
+    Array.isArray(job.requirements) ? job.requirements : []
+  )
+    .filter(Boolean)
+    .map((r) => String(r).trim())
+    .filter(Boolean)
+    .slice(0, 5);
+
+  const concurrency = Number(process.env.SCREENING_AI_CONCURRENCY ?? 10);
+
+  const topK = (() => {
+    const raw = Number(process.env.SCREENING_AI_TOP_K ?? 0);
+    if (!Number.isFinite(raw)) return 0;
+    return Math.max(0, Math.floor(raw));
+  })();
+
+  const stage0 = candidates.map((c) => ({
+    candidate: c,
+    heuristicScore: computeHeuristicScore(topRequirements, c),
+  }));
+
+  const selectedIds = new Set<string>(
+    (topK > 0 && topK < candidates.length
+      ? stage0
+          .slice()
+          .sort((a, b) => b.heuristicScore - a.heuristicScore)
+          .slice(0, topK)
+      : stage0
+    ).map((x) => x.candidate.id),
+  );
+
+  const stage1Inputs = stage0
+    .filter((x) => selectedIds.has(x.candidate.id))
+    .map((x) => x.candidate);
+
+  const stage1Ai = await mapWithConcurrency(
+    stage1Inputs,
+    Number.isFinite(concurrency) && concurrency > 0 ? concurrency : 10,
+    async (candidate, index) => {
+      const prompt = buildCandidateScoringPrompt(
+        job,
+        topRequirements,
+        candidate,
+      );
+      try {
+        const result = await generateJsonGroqOnly<Stage1CandidateScore>(
+          prompt,
+          {
+            label: `stage1:candidate:${index + 1}/${stage1Inputs.length}`,
+            maxOutputTokens: 256,
+          },
+        );
+        return {
+          candidateId: candidate.id,
+          matchScore: clampInt(Number(result?.matchScore ?? 0), 0, 100),
+          strengths: toStringArray(result?.strengths).slice(0, 5),
+          gaps: toStringArray(result?.gaps).slice(0, 5),
+          shortReason: String(result?.shortReason ?? "")
+            .trim()
+            .slice(0, 200),
+        };
+      } catch (error) {
+        console.log(
+          `Groq stage1 failed (candidateId=${candidate.id}) - continuing with fallback`,
+        );
+        return {
+          candidateId: candidate.id,
+          matchScore: 0,
+          strengths: [],
+          gaps: ["AI evaluation failed"],
+          shortReason: "AI evaluation failed",
+        };
+      }
+    },
+  );
+
+  const aiById = new Map(stage1Ai.map((x) => [x.candidateId, x] as const));
+
+  const stage1: Stage1CandidateScore[] = stage0.map((x) => {
+    const ai = aiById.get(x.candidate.id);
+    if (ai) return ai;
+
+    const score = clampInt(x.heuristicScore, 0, 100);
+    return {
+      candidateId: x.candidate.id,
+      matchScore: score,
+      strengths: score > 0 ? ["Basic requirement match"] : [],
+      gaps: score > 0 ? [] : ["Low requirement match"],
+      shortReason: "AI skipped because of incomplete talent's details",
+    };
+  });
+
+  // Only rank the candidates that were actually evaluated by AI (not skipped ones)
+  const stage2Prompt = buildRankingPrompt(stage1Ai);
+  const stage2 = await (async () => {
+    try {
+      return await generateJsonGroqOnly<Stage2RankingResult>(stage2Prompt, {
+        label: "stage2:ranking",
+        maxOutputTokens: 4096,
+      });
+    } catch (error) {
+      console.log("Groq stage2 ranking failed - using fallback ranking");
+      const fallbackRanked = stage1Ai
+        .slice()
+        .sort((a, b) => b.matchScore - a.matchScore)
+        .map((c, idx) => ({
+          candidateId: c.candidateId,
+          rank: idx + 1,
+          finalRecommendation: mapRecommendationFromScore(c.matchScore) as any,
+        }));
+      return { ranked: fallbackRanked, summary: "" } as Stage2RankingResult;
+    }
+  })();
+
+  const ranked = Array.isArray(stage2?.ranked)
+    ? (stage2.ranked as Stage2RankingResult["ranked"])
+    : ([] as Stage2RankingResult["ranked"]);
+  const rankById = new Map(
+    ranked
+      .filter((r: Stage2RankingResult["ranked"][number]) => r && r.candidateId)
+      .map((r: Stage2RankingResult["ranked"][number]) => [
+        String(r.candidateId),
+        {
+          rank: clampInt(Number(r.rank ?? 0), 1, 9999),
+          finalRecommendation: String(r.finalRecommendation ?? "").trim(),
+        },
+      ]),
+  );
+
+  // Only output the candidates that were AI-evaluated and ranked
+  const candidatesOut: CandidateScore[] = stage1Ai
+    .map((s) => {
+      const rankMeta = rankById.get(s.candidateId);
+      return {
+        candidateId: s.candidateId,
+        rank: rankMeta?.rank ?? 9999,
+        matchScore: s.matchScore,
+        confidence: deriveConfidence(s.matchScore),
+        strengths: s.strengths,
+        gaps: s.gaps,
+        reasoning: s.shortReason,
+        finalRecommendation:
+          rankMeta?.finalRecommendation ||
+          mapRecommendationFromScore(s.matchScore),
+      };
+    })
+    .sort((a, b) => a.rank - b.rank)
+    .map((c, idx) => ({ ...c, rank: idx + 1 }));
+
+  console.log(
+    `AI screening pipeline (groq-only) complete: candidates=${candidates.length} aiEvaluated=${stage1Inputs.length} ranked=${candidatesOut.length} concurrency=${
+      Number.isFinite(concurrency) ? concurrency : "default"
+    } totalMs=${Date.now() - startedAt}`,
+  );
+
+  return {
+    candidates: candidatesOut,
+    comparisonSummary: String(
+      (stage2 as any)?.comparisonSummary ?? (stage2 as any)?.summary ?? "",
+    ).trim(),
+  };
+}
+
+async function generateJsonGroqOnly<T>(
+  prompt: string,
+  opts?: { label?: string; maxOutputTokens?: number },
+): Promise<T> {
+  const label = opts?.label ? ` (${opts.label})` : "";
+  const approxChars = prompt.length;
+  const maxOutputTokens =
+    Number.isFinite(opts?.maxOutputTokens) &&
+    (opts?.maxOutputTokens as number) > 0
+      ? (opts?.maxOutputTokens as number)
+      : undefined;
+
+  const startedAt = Date.now();
+  console.log(
+    `Groq request${label}: model=${getGroqModel()} promptChars=${approxChars} maxOutputTokens=${maxOutputTokens ?? "default"}`,
+  );
+  const parsed = await generateJsonWithGroq<T>(prompt, {
+    maxOutputTokens,
+    label: opts?.label,
+  });
+  console.log(`Groq response${label}: ok in ${Date.now() - startedAt}ms`);
+  return parsed;
 }
 
 export async function evaluateCandidates(
@@ -162,16 +377,17 @@ export async function evaluateCandidates(
     };
   });
 
-  const stage2Prompt = buildRankingPrompt(stage1);
+  // Only rank the candidates that were actually evaluated by AI (not skipped ones)
+  const stage2Prompt = buildRankingPrompt(stage1Ai);
   const stage2 = await (async () => {
     try {
       return await generateJson<Stage2RankingResult>(stage2Prompt, {
         label: "stage2:ranking",
-        maxOutputTokens: 512,
+        maxOutputTokens: 4096,
       });
     } catch (error) {
       console.log("Gemini stage2 ranking failed - using fallback ranking");
-      const fallbackRanked = stage1
+      const fallbackRanked = stage1Ai
         .slice()
         .sort((a, b) => b.matchScore - a.matchScore)
         .map((c, idx) => ({
@@ -196,7 +412,8 @@ export async function evaluateCandidates(
       ]),
   );
 
-  const candidatesOut: CandidateScore[] = stage1
+  // Only output the candidates that were AI-evaluated and ranked
+  const candidatesOut: CandidateScore[] = stage1Ai
     .map((s) => {
       const rankMeta = rankById.get(s.candidateId);
       return {
@@ -216,14 +433,16 @@ export async function evaluateCandidates(
     .map((c, idx) => ({ ...c, rank: idx + 1 }));
 
   console.log(
-    `AI screening pipeline complete: candidates=${candidates.length} aiEvaluated=${stage1Inputs.length} concurrency=${
+    `AI screening pipeline (gemini) complete: candidates=${candidates.length} aiEvaluated=${stage1Inputs.length} ranked=${candidatesOut.length} concurrency=${
       Number.isFinite(concurrency) ? concurrency : "default"
     } totalMs=${Date.now() - startedAt}`,
   );
 
   return {
     candidates: candidatesOut,
-    comparisonSummary: String(stage2?.summary ?? "").trim(),
+    comparisonSummary: String(
+      (stage2 as any)?.comparisonSummary ?? (stage2 as any)?.summary ?? "",
+    ).trim(),
   };
 }
 
@@ -241,7 +460,8 @@ type Stage2RankingResult = {
     rank: number;
     finalRecommendation: "Strong hire" | "Consider" | "Weak fit" | "Reject";
   }>;
-  summary: string;
+  summary?: string;
+  comparisonSummary?: string;
 };
 
 function buildCandidateScoringPrompt(
@@ -277,20 +497,27 @@ Experience (roles): ${roles.join(", ") || "None"}
 Education (degrees): ${degrees.join(", ") || "None"}
 
 TASK:
+Evaluate how well the candidate matches the job requirements. Calculate matchScore based on:
+- 90-100: Perfect match, exceeds all key requirements
+- 70-89: Strong match, meets most requirements with relevant experience
+- 50-69: Moderate match, meets some requirements
+- 30-49: Weak match, limited relevant experience
+- 0-29: Poor match, lacks key requirements
+
 Return STRICT JSON:
 
 {
   "candidateId": "string",
-  "matchScore": 0,
+  "matchScore": 75,
   "strengths": ["short bullet"],
   "gaps": ["short bullet"],
   "shortReason": "1 sentence"
 }
 
 Rules:
-- matchScore: integer 0-100
+- matchScore: integer 0-100 based on criteria above
 - Keep strengths/gaps short (max 5 each)
-- shortReason: 1 sentence`;
+- shortReason: 1 sentence explaining the score`;
 }
 
 function buildRankingPrompt(stage1: Stage1CandidateScore[]): string {
@@ -300,10 +527,17 @@ function buildRankingPrompt(stage1: Stage1CandidateScore[]): string {
     strengths: c.strengths,
   }));
 
-  return `Rank these candidates based on matchScore and strengths.
+  return `Rank these candidates in DESCENDING order by matchScore (highest first). Candidate with highest matchScore gets rank 1.
 
-Input:
+Input (already sorted by matchScore descending):
 ${JSON.stringify(input)}
+
+CRITICAL RULES:
+1. Rank 1 = HIGHEST matchScore (strongest candidate)
+2. Sort ALL candidates by matchScore descending
+3. If scores equal, use strengths to break ties
+4. Assign ranks 1, 2, 3... N sequentially
+5. Do NOT skip ranks or reorder arbitrarily
 
 Return JSON:
 {
@@ -314,13 +548,15 @@ Return JSON:
       "finalRecommendation": "Strong hire"
     }
   ],
-  "comparisonSummary": "Short explanation of top candidates"
+  "comparisonSummary": "Why top candidates ranked highest"
 }
 
-Rules:
-- Do not re-analyze resumes
-- Keep comparisonSummary short
-- Ranked list must include all candidates`;
+Recommendations based on matchScore:
+- 80-100: "Strong hire"
+- 60-79: "Consider"
+- 40-59: "Weak fit"
+- 0-39: "Reject"
+`;
 }
 
 async function generateJson<T>(
@@ -386,7 +622,117 @@ async function generateJson<T>(
     }
   }
 
+  if (shouldFallbackToGroq(lastError)) {
+    const startedAt = Date.now();
+    try {
+      console.log(
+        `Groq fallback${label}: model=${getGroqModel()} promptChars=${approxChars} maxOutputTokens=${maxOutputTokens ?? "default"}`,
+      );
+      const parsed = await generateJsonWithGroq<T>(prompt, {
+        maxOutputTokens,
+        label: opts?.label,
+      });
+      console.log(`Groq response${label}: ok in ${Date.now() - startedAt}ms`);
+      return parsed;
+    } catch (error) {
+      console.log(
+        `Groq fallback${label}: failed in ${Date.now() - startedAt}ms`,
+      );
+      lastError = error;
+    }
+  }
+
   throw lastError instanceof Error ? lastError : new Error(String(lastError));
+}
+
+function getGroqModel() {
+  return (
+    String(process.env.GROQ_MODEL ?? "llama-4-scout").trim() || "llama-4-scout"
+  );
+}
+
+function shouldFallbackToGroq(error: unknown) {
+  const key = String(process.env.GROQ_API_KEY ?? "").trim();
+  if (!key) return false;
+  return isTransientGeminiError(error);
+}
+
+async function generateJsonWithGroq<T>(
+  prompt: string,
+  opts?: { maxOutputTokens?: number; label?: string },
+): Promise<T> {
+  const apiKey = String(process.env.GROQ_API_KEY ?? "").trim();
+  if (!apiKey) throw new Error("Missing GROQ_API_KEY");
+
+  const maxTokens =
+    Number.isFinite(opts?.maxOutputTokens) &&
+    (opts?.maxOutputTokens as number) > 0
+      ? (opts?.maxOutputTokens as number)
+      : 8192;
+
+  const model = getGroqModel();
+  const label = opts?.label ?? "groq-request";
+  const promptPreview = prompt.slice(0, 200).replace(/\n/g, " ");
+
+  // logToFile(
+  //   "INFO",
+  //   `[${label}] Groq REQUEST: model=${model} maxTokens=${maxTokens} promptPreview="${promptPreview}..."`,
+  // );
+
+  let chatCompletion;
+  try {
+    chatCompletion = await groqClient.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a strict JSON generator. Output ONLY valid JSON. No markdown, no commentary.",
+        },
+        { role: "user", content: prompt },
+      ],
+      model: model,
+      temperature: 0,
+      max_completion_tokens: maxTokens,
+      top_p: 1,
+      stream: false,
+      stop: null,
+    });
+  } catch (err: any) {
+    // logToFile(
+    //   "ERROR",
+    //   `[${label}] Groq API ERROR: ${err?.message}`,
+    //   err?.response?.data,
+    // );
+    throw err;
+  }
+
+  // logToFile("INFO", `[${label}] Groq RAW RESPONSE`, chatCompletion);
+
+  const text = String(
+    chatCompletion.choices?.[0]?.message?.content ?? "",
+  ).trim();
+
+  // logToFile("INFO", `[${label}] Groq EXTRACTED TEXT (${text.length} chars)`, {
+  //   text: text.slice(0, 500),
+  // });
+
+  if (!text) {
+    // logToFile(
+    //   "ERROR",
+    //   `[${label}] Groq EMPTY RESPONSE - choices:`,
+    //   chatCompletion.choices,
+    // );
+    throw new Error("Empty response from Groq API");
+  }
+
+  try {
+    const parsed = JSON.parse(text) as T;
+    // logToFile("INFO", `[${label}] Groq PARSED JSON successfully`, parsed);
+    return parsed;
+  } catch (error) {
+    // logToFile("ERROR", `[${label}] Groq JSON PARSE FAILED. Raw text: ${text}`);
+    throw new Error(`Failed to parse Groq response: ${error}`);
+  }
 }
 
 function sleep(ms: number) {

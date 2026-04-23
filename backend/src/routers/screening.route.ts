@@ -7,9 +7,14 @@ screeningRouter.get("/", screeningController.getAll);
 screeningRouter.get("/job/:jobId", screeningController.getByJobId);
 screeningRouter.get("/:screeningId", screeningController.getOne);
 screeningRouter.post("/ai/:jobId", screeningController.runAiScreening);
+screeningRouter.post("/ai-groq/:jobId", screeningController.runAiScreeningGroq);
 screeningRouter.post(
   "/import/umurava",
   screeningController.runAiScreeningFromUmurava,
+);
+screeningRouter.post(
+  "/import/umurava-groq",
+  screeningController.runAiScreeningFromUmuravaGroq,
 );
 screeningRouter.put("/:screeningId", screeningController.updateScreening);
 screeningRouter.delete("/:screeningId", screeningController.deleteScreening);
